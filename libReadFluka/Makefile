@@ -1,7 +1,17 @@
 include ../Makefile.inc
 
-all:	ray rdbin
+all:	ray rdbin libReadFluka.so
 
+
+######################## libReadFluka ############
+libReadFluka.so: obj/ReadFluka.o
+	@echo "Compiling $@"
+	@$(GCC) $(SOFLAGS) $^ -o $@
+
+
+obj/ReadFluka.o: src/ReadFluka.cxx src/ReadFluka.h
+	@echo "Compiling $@"
+	@$(GCC) -c $(CXXFLAGS) $< -o $@
 
 ########################## rdbin #################
 obj/rdbin.o:	src/rdbin.f
@@ -25,4 +35,4 @@ ray: obj/ray.o
 ##################################################
 
 clean:
-	@rm -fv *~ obj/* *.map ray rdbin
+	@rm -fv *~ obj/* *.map ray rdbin *.so
