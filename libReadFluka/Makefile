@@ -4,12 +4,16 @@ all:	ray rdbin libReadFluka.so
 
 
 ######################## libReadFluka ############
-libReadFluka.so: obj/ReadFluka.o
+libReadFluka.so: obj/UsrBin.o obj/Reader.o
 	@echo "Compiling $@"
 	@$(GCC) $(SOFLAGS) $^ -o $@
 
 
-obj/ReadFluka.o: src/ReadFluka.cxx src/ReadFluka.h
+obj/Reader.o: src/Reader.cxx src/Reader.h
+	@echo "Compiling $@"
+	@$(GCC) -c $(CXXFLAGS) $< -o $@
+
+obj/UsrBin.o: src/UsrBin.cxx src/UsrBin.h
 	@echo "Compiling $@"
 	@$(GCC) -c $(CXXFLAGS) $< -o $@
 
@@ -35,4 +39,4 @@ ray: obj/ray.o
 ##################################################
 
 clean:
-	@rm -fv *~ obj/* *.map ray rdbin *.so
+	@rm -fv *~ */*~ obj/* *.map ray rdbin *.so

@@ -1,4 +1,4 @@
-#include "ReadFluka.h"
+#include "Reader.h"
 #include <iostream>
 
 #define READ_ERROR 1
@@ -7,7 +7,7 @@
 
 using namespace ReadFluka;
 
-unsigned int gVerbose = kPRINT_NOTHING;
+unsigned int Reader::gVerbose = kPRINT_NOTHING;
 
 Reader::Reader(const char *fname)
 {
