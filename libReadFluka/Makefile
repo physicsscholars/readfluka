@@ -38,5 +38,9 @@ ray: obj/ray.o
 	$(FLUTIL)/lfluka -o ray obj/ray.o
 ##################################################
 
+install: libReadFluka.so
+	@echo "Installing $< to $(MYLIBS)"
+	@ln -sf `pwd`/$< $(MYLIBS)
+
 clean:
 	@rm -fv *~ */*~ obj/* *.map ray rdbin *.so
