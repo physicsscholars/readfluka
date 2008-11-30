@@ -5,24 +5,24 @@
 #define CANT_OPEN_FILE 2
 #define FILENAME_EMPTY 3
 
-using namespace std;
+using namespace ReadFluka;
 
-unsigned int ReadFluka::gVerbose = kPRINT_NOTHING;
+unsigned int gVerbose = kPRINT_NOTHING;
 
-ReadFluka::ReadFluka(const char *fname)
+Reader::Reader(const char *fname)
 {
 	/*
 		Constructor
 	 */
 
   if (fname == 0) {
-    cerr << "ReadFluka::ReadFluka: input file name is not specified" << endl;
+    std::cerr << "Reader::Reader: input file name is not specified" << std::endl;
     exit(FILENAME_EMPTY);
   }
 
-  fin = new ifstream(fname);
+  fin = new std::ifstream(fname);
   if (!fin->is_open()) {
-    cerr << "ReadFluka::ReadFluka: can't open input file " << fname << endl;
+    std::cerr << "Reader::Reader: can't open input file " << fname << std::endl;
     exit(CANT_OPEN_FILE);
   }
   fchar     = new char[81];
@@ -30,7 +30,7 @@ ReadFluka::ReadFluka(const char *fname)
   fRunTime  = new char[32];
 }
 
-ReadFluka::~ReadFluka()
+Reader::~Reader()
 {
 	/*
 		Destructor
@@ -46,7 +46,7 @@ ReadFluka::~ReadFluka()
   }
 }
 
-int ReadFluka::ReadInt(unsigned int n/* =1 */) const
+int Reader::ReadInt(unsigned int n/* =1 */) const
 {
   /*
 		Read n integers
@@ -55,13 +55,13 @@ int ReadFluka::ReadInt(unsigned int n/* =1 */) const
   int data[n];
   fin->read((char *)data, sizeof(int)*n);
   if (fin->fail()) {
-    if (gVerbose>=kPRINT_HEADER) cerr << "read error in ReadFluka::ReadInt()" << endl;
+    if (gVerbose>=kPRINT_HEADER) std::cerr << "read error in Reader::ReadInt()" << std::endl;
   };
 
   return data[0];
 }
  
-float ReadFluka::ReadFloat(unsigned int n/* =1 */) const
+float Reader::ReadFloat(unsigned int n/* =1 */) const
 {
   /*
 		Read n doubles
@@ -70,13 +70,13 @@ float ReadFluka::ReadFloat(unsigned int n/* =1 */) const
   float data[n];
   fin->read((char *)data, sizeof(float)*n);
   if (fin->fail()) {
-    if (gVerbose>=kPRINT_HEADER) cerr << "read error in ReadFluka::ReadFloat()" << endl;
+    if (gVerbose>=kPRINT_HEADER) std::cerr << "read error in Reader::ReadFloat()" << std::endl;
   };
 
   return data[0];
 }
 
-bool ReadFluka::ReadBool(unsigned int n/* =1 */) const
+bool Reader::ReadBool(unsigned int n/* =1 */) const
 {
   /* 
 		 Read n bools
@@ -87,32 +87,32 @@ bool ReadFluka::ReadBool(unsigned int n/* =1 */) const
   return (bool)ReadInt(n);
 }
 
-void ReadFluka::ReadRunTitle()
+void Reader::ReadRunTitle()
 {
 	ReadInt();
   fin->read(fchar, 80);
   if (!fin->good()) {
-    if (gVerbose>=kPRINT_TITLE) cerr << "read error in ReadFluka::ReadRunTitle()" << endl;
+    if (gVerbose>=kPRINT_TITLE) std::cerr << "read error in Reader::ReadRunTitle()" << std::endl;
   };
   fchar[80] = '\0';
 
-  strcpy(fRunTitle, Trimmed(string(fchar)).c_str());
-  if (gVerbose>=kPRINT_TITLE) cout << "title:\t" << fRunTitle << endl;
+  strcpy(fRunTitle, Trimmed(std::string(fchar)).c_str());
+  if (gVerbose>=kPRINT_TITLE) std::cout << "title:\t" << fRunTitle << std::endl;
 }
 
-void ReadFluka::ReadRunTime()
+void Reader::ReadRunTime()
 {
   fin->read(fchar, 32);
   if (!fin->good()) {
-    if (gVerbose>=kPRINT_TITLE) cerr << "read error in ReadFluka::ReadRunTime()" << endl;
+    if (gVerbose>=kPRINT_TITLE) std::cerr << "read error in Reader::ReadRunTime()" << std::endl;
   };
   fchar[32] = '\0';
 
-  strcpy(fRunTime, Trimmed(string(fchar)).c_str());
-  if (gVerbose>=kPRINT_TITLE) cout << "time:\t" << fRunTime << endl;
+  strcpy(fRunTime, Trimmed(std::string(fchar)).c_str());
+  if (gVerbose>=kPRINT_TITLE) std::cout << "time:\t" << fRunTime << std::endl;
 }
 
-int ReadFluka::Nint(float x) const
+int Reader::Nint(float x) const
 {
 	/* 
 		 Round to nearest integer. Rounds half integers to the nearest even integer.
@@ -131,13 +131,13 @@ int ReadFluka::Nint(float x) const
    return i;
 }
 
-string ReadFluka::Trimmed(std::string const& str, char const* sepSet)
+std::string Reader::Trimmed(std::string const& str, char const* sepSet)
 {
-  // Returns a string with leading/trailing characters of a set stripped
+  /* Return a string with leading/trailing characters of a set stripped
+		 str - the original string
+		 sepSet - C string with characters to be dropped
+	*/
 
-  // str - the original string
-  // sepSet - C string with characters to be dropped
-
-  string::size_type const first = str.find_first_not_of(sepSet);
-  return ( first==string::npos )  ? string() : str.substr(first, str.find_last_not_of(sepSet)-first+1);
+	std::string::size_type const first = str.find_first_not_of(sepSet);
+  return ( first==std::string::npos )  ? std::string() : str.substr(first, str.find_last_not_of(sepSet)-first+1);
 }
