@@ -32,14 +32,14 @@ OPEN          +201.0                                                  NEW
 usrbin.txt
 * Energy deposition density
 USRBIN        -10.0     ENERGY   -101.0       50.0      50.0     50.0 Ed
-USRBIN        -50.0      -50.0      0.0       20.0      20.0      2.0 &
+USRBIN        -50.0      -50.0      0.0       4.0        3.0      2.0 &
 USRBIN        -10.0     ENERGY   +201.0       50.0      50.0     50.0 Ed
-USRBIN        -50.0      -50.0      0.0       20.0      20.0      2.0 &
+USRBIN        -50.0      -50.0      0.0       4.0        3.0      2.0 &
 * Electron track-length density
 USRBIN        -10.0   ELECTRON   -101.0       50.0      50.0     50.0 verythin
-USRBIN        -50.0      -50.0      0.0       20.0      20.0      2.0 &
+USRBIN        -50.0      -50.0      0.0       4.0        3.0      2.0 &
 USRBIN        -10.0   ELECTRON   +201.0       50.0      50.0     50.0 verythin
-USRBIN        -50.0      -50.0      0.0       20.0      20.0      2.0 &
+USRBIN        -50.0      -50.0      0.0       4.0        3.0      2.0 &
 *
 START          10.0
 STOP
