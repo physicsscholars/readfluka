@@ -11,8 +11,6 @@ OPT         = -g
 MEMCHECK = $(shell $(ROOTCONFIG) --new --libs)
 #MEMCHECK = ""
 
-
-DllSuf			= so
 CXXFLAGS		=	$(OPT) -Wall -fPIC
 LDFLAGS			=	$(OPT)
 SOFLAGS			=	-shared
