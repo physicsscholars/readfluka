@@ -1,15 +1,15 @@
 include ../Makefile.inc
 
-all:	ray rdbin libReadFluka.so
+all:	libReadFluka.so
 
 
 ######################## libReadFluka ############
-libReadFluka.so: obj/UsrBin.o obj/Reader.o
+libReadFluka.so: obj/UsrBin.o obj/Base.o
 	@echo "Compiling $@"
 	@$(GCC) $(SOFLAGS) $^ -o $@
 
 
-obj/Reader.o: src/Reader.cxx src/Reader.h
+obj/Base.o: src/Base.cxx src/Base.h
 	@echo "Compiling $@"
 	@$(GCC) -c $(CXXFLAGS) $< -o $@
 

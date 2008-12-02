@@ -1,4 +1,4 @@
-#include "Reader.h"
+#include "Base.h"
 #include <iostream>
 
 #define READ_ERROR 1
@@ -7,22 +7,22 @@
 
 using namespace ReadFluka;
 
-unsigned int Reader::gVerbose = kPRINT_NOTHING;
+int Base::gVerbose = kPRINT_TITLE;
 
-Reader::Reader(const char *fname)
+Base::Base(const char *fname)
 {
 	/*
 		Constructor
 	 */
 
   if (fname == 0) {
-    std::cerr << "Reader::Reader: input file name is not specified" << std::endl;
+    std::cerr << "Base::Base: input file name is not specified" << std::endl;
     exit(FILENAME_EMPTY);
   }
 
   fin = new std::ifstream(fname);
   if (!fin->is_open()) {
-    std::cerr << "Reader::Reader: can't open input file " << fname << std::endl;
+    std::cerr << "Base::Base: can't open input file " << fname << std::endl;
     exit(CANT_OPEN_FILE);
   }
   fchar     = new char[81];
@@ -30,7 +30,7 @@ Reader::Reader(const char *fname)
   fRunTime  = new char[32];
 }
 
-Reader::~Reader()
+Base::~Base()
 {
 	/*
 		Destructor
@@ -46,7 +46,7 @@ Reader::~Reader()
   }
 }
 
-int Reader::ReadInt(unsigned int n/* =1 */) const
+int Base::ReadInt(unsigned int n/* =1 */) const
 {
   /*
 		Read n integers
@@ -55,13 +55,13 @@ int Reader::ReadInt(unsigned int n/* =1 */) const
   int data[n];
   fin->read((char *)data, sizeof(int)*n);
   if (fin->fail()) {
-    if (gVerbose>=kPRINT_HEADER) std::cerr << "read error in Reader::ReadInt()" << std::endl;
+    if (gVerbose>=kPRINT_HEADER) std::cerr << "read error in Base::ReadInt()" << std::endl;
   };
 
   return data[0];
 }
  
-float Reader::ReadFloat(unsigned int n/* =1 */) const
+float Base::ReadFloat(unsigned int n/* =1 */) const
 {
   /*
 		Read n doubles
@@ -70,13 +70,13 @@ float Reader::ReadFloat(unsigned int n/* =1 */) const
   float data[n];
   fin->read((char *)data, sizeof(float)*n);
   if (fin->fail()) {
-    if (gVerbose>=kPRINT_HEADER) std::cerr << "read error in Reader::ReadFloat()" << std::endl;
+    if (gVerbose>=kPRINT_HEADER) std::cerr << "read error in Base::ReadFloat()" << std::endl;
   };
 
   return data[0];
 }
 
-bool Reader::ReadBool(unsigned int n/* =1 */) const
+bool Base::ReadBool(unsigned int n/* =1 */) const
 {
   /* 
 		 Read n bools
@@ -87,32 +87,34 @@ bool Reader::ReadBool(unsigned int n/* =1 */) const
   return (bool)ReadInt(n);
 }
 
-void Reader::ReadRunTitle()
+void Base::ReadRunTitle()
 {
 	ReadInt();
   fin->read(fchar, 80);
   if (!fin->good()) {
-    if (gVerbose>=kPRINT_TITLE) std::cerr << "read error in Reader::ReadRunTitle()" << std::endl;
+    if (gVerbose>=kPRINT_TITLE) std::cerr << "read error in Base::ReadRunTitle()" << std::endl;
   };
   fchar[80] = '\0';
 
   strcpy(fRunTitle, Trimmed(std::string(fchar)).c_str());
-  if (gVerbose>=kPRINT_TITLE) std::cout << "title:\t" << fRunTitle << std::endl;
+  if (gVerbose==kPRINT_FLUKA) std::cout << " *****  " << fRunTitle << " *****" << std::endl;
+	else if (gVerbose>kPRINT_TITLE) std::cout << "Title:\t" << fRunTitle << std::endl;
 }
 
-void Reader::ReadRunTime()
+void Base::ReadRunTime()
 {
   fin->read(fchar, 32);
   if (!fin->good()) {
-    if (gVerbose>=kPRINT_TITLE) std::cerr << "read error in Reader::ReadRunTime()" << std::endl;
+    if (gVerbose>=kPRINT_TITLE) std::cerr << "read error in Base::ReadRunTime()" << std::endl;
   };
   fchar[32] = '\0';
 
   strcpy(fRunTime, Trimmed(std::string(fchar)).c_str());
-  if (gVerbose>=kPRINT_TITLE) std::cout << "time:\t" << fRunTime << std::endl;
+  if (gVerbose==kPRINT_FLUKA) std::cout << "\t" << fRunTime << std::endl;
+	else if (gVerbose>=kPRINT_TITLE) std::cout << "Time:\t" << fRunTime << std::endl;
 }
 
-int Reader::Nint(float x) const
+int Base::Nint(float x) const
 {
 	/* 
 		 Round to nearest integer. Rounds half integers to the nearest even integer.
@@ -131,7 +133,7 @@ int Reader::Nint(float x) const
    return i;
 }
 
-std::string Reader::Trimmed(std::string const& str, char const* sepSet)
+std::string Base::Trimmed(std::string const& str, char const* sepSet)
 {
   /* Return a string with leading/trailing characters of a set stripped
 		 str - the original string

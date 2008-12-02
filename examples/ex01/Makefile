@@ -1,7 +1,5 @@
 include ../../Makefile.inc
 
-READFLUKASYS=../../libReadFluka
-
 all: reader
 
 run: ex01_.inp
@@ -15,4 +13,6 @@ clean:
 	@echo "Cleaning..."
 	@find . -name "*~" -delete
 	@rm -fvr obj/* *.so reader_root reader
+
+cleandata:
 	@rm -fvr *~ fort.* *.{log,out,err,bin,txt} {ranex01,fluka_}* *{_geolog,eventdat}
