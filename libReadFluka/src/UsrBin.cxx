@@ -65,7 +65,8 @@ bool UsrBin::Read()
 
 	if (fFirstRead == true) {
 		//		ReadInt(2); // these 2 ints were introduced in FLUKA2008 => understand what are they and use them
-		std::cerr << "fluka2008: " << ReadInt() << " " << ReadInt() << std::endl;
+		if (gVerbose==kPRINT_FLUKA) ReadInt(2);
+		else std::cerr << "fluka2008: " << ReadInt() << " " << ReadInt() << std::endl;
 		fFirstRead = false;
 	}
 
@@ -76,6 +77,7 @@ bool UsrBin::Read()
 	sprintf(fTITUSB, "%s", Base::Trimmed(std::string(fTITUSB)).c_str());
 
   fITUSBN = ReadInt();
+	if ((fITUSBN<0) || (fITUSBN>17)) std::cerr << "error in UsrBin::Read():\tfITUSBN=" << fITUSBN << " - unknown type of binning" << std::endl;
 
   fIDUSBN = ReadInt();
   fXLOW   = ReadFloat();
@@ -131,19 +133,20 @@ bool UsrBin::Read()
 bool UsrBin::fReadCartesian()
 {
 	if (gVerbose==kPRINT_FLUKA) {
-		std::cout << "Cartesian binning n. " << fMB;
+		std::cout << 1 << std::endl << "   Cartesian binning n. ";
+		if (fMB == 128) std::cout << 2;		else std::cout << fMB+1; // is it correct? why it's like that?
 		std::cout << " \""  << fTITUSB << "\" , ";
-		if (fIDUSBN>200) std::cout << "generalized particle n. " << fIDUSBN << std::endl;
+		std::cout << "generalized particle n. " << fIDUSBN << std::endl;
 
-		std::cout<<"\tX coordinate from "<<fXLOW<<" to "<<fXHIGH<<" cm, "<<fNXBIN<<" bins ("<<fDXUSBN<<" cm wide)"<<std::endl;
-		std::cout<<"\tY coordinate from "<<fYLOW<<" to "<<fYHIGH<<" cm, "<<fNYBIN<<" bins ("<<fDYUSBN<<" cm wide)"<<std::endl;
-		std::cout<<"\tZ coordinate from "<<fZLOW<<" to "<<fZHIGH<<" cm, "<<fNZBIN<<" bins ("<<fDZUSBN<<" cm wide)"<<std::endl;
+		std::cout<<"\tX coordinate: from "<<fXLOW<<" to "<<fXHIGH<<" cm, "<<fNXBIN<<" bins ("<<fDXUSBN<<" cm wide)"<<std::endl;
+		std::cout<<"\tY coordinate: from "<<fYLOW<<" to "<<fYHIGH<<" cm, "<<fNYBIN<<" bins ("<<fDYUSBN<<" cm wide)"<<std::endl;
+		std::cout<<"\tZ coordinate: from "<<fZLOW<<" to "<<fZHIGH<<" cm, "<<fNZBIN<<" bins ("<<fDZUSBN<<" cm wide)"<<std::endl;
 
 		std::cout<<"\tData follow in a matrix A(ix,iy,iz), format (1(5x,1p,10(1x,e11.4)))" << std::endl << std::endl;
-		std::cout << fITUSBN << std::endl;
-		if (fITUSBN<0) std::cout<<"\taccurate deposition along the tracks requested" << std::endl;
+		if (fITUSBN>=10) std::cout<<"\taccurate deposition along the tracks requested" << std::endl;
+		if (fIDUSBN<200) std::cout<<"\tthis is a track-length binning" << std::endl; // is it correct?
 	}
-	else if (gVerbose>kPRINT_TITLE) std::clog << "read cartesian binning" << std::endl;
+	else if (gVerbose>kPRINT_TITLE) std::clog << std::endl << "read cartesian binning" << std::endl;
 
   if (fScored) delete fScored;
   fScored = new float[GetNbins()];
@@ -160,7 +163,7 @@ bool UsrBin::fReadCartesian()
 		}
     if (gVerbose>=kPRINT_SCORED)	std::cout << fScored[i] << ' ';
   }
-	if (gVerbose==kPRINT_FLUKA) std::cout << std::endl;
+	//	if (gVerbose==kPRINT_FLUKA) std::cout << std::endl;
   if (gVerbose>=kPRINT_TITLE) std::cout << std::endl;
 
   return true;
