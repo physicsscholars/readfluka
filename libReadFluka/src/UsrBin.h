@@ -63,7 +63,9 @@ namespace ReadFluka {
 	public:
 		UsrBin(const char *fname);
 		virtual ~UsrBin();
-		
+
+		const int   GetBinNumber() const {return fMB;}
+		const float GetWeight() const {return fWEIPRI;}
 		const float GetXmin() const {return fXLOW;}
 		const float GetXmin(int i, int j=1, int k=1) const;
 		

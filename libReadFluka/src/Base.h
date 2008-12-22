@@ -12,7 +12,7 @@
 #include <fstream>
 
 namespace ReadFluka {
-	enum EVerboseLevel {kPRINT_NOTHING, kPRINT_FLUKA, kPRINT_TITLE, kPRINT_HEADER, kPRINT_MISC, kPRINT_SCORED};
+	enum EVerboseLevel {kPRINT_NOTHING, kPRINT_TITLE, kPRINT_HEADER, kPRINT_MISC, kPRINT_SCORED};
 
 	class Base {
 	private:

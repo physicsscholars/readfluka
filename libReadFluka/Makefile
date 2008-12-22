@@ -4,7 +4,7 @@ all:	libReadFluka.so
 
 
 ######################## libReadFluka ############
-libReadFluka.so: obj/UsrBin.o obj/Base.o
+libReadFluka.so: obj/UsrBin.o obj/UsrYield.o obj/Base.o
 	@echo "Compiling $@"
 	@$(GCC) $(SOFLAGS) $^ -o $@
 
@@ -14,6 +14,10 @@ obj/Base.o: src/Base.cxx src/Base.h
 	@$(GCC) -c $(CXXFLAGS) $< -o $@
 
 obj/UsrBin.o: src/UsrBin.cxx src/UsrBin.h
+	@echo "Compiling $@"
+	@$(GCC) -c $(CXXFLAGS) $< -o $@
+
+obj/UsrYield.o: src/UsrYield.cxx src/UsrBin.h
 	@echo "Compiling $@"
 	@$(GCC) -c $(CXXFLAGS) $< -o $@
 

@@ -97,8 +97,7 @@ void Base::ReadRunTitle()
   fchar[80] = '\0';
 
   strcpy(fRunTitle, Trimmed(std::string(fchar)).c_str());
-  if (gVerbose==kPRINT_FLUKA) std::cout << " *****  " << fRunTitle << " *****" << std::endl;
-	else if (gVerbose>kPRINT_TITLE) std::cout << "Title:\t" << fRunTitle << std::endl;
+	if (gVerbose>kPRINT_TITLE) std::cout << "Title:\t" << fRunTitle << std::endl;
 }
 
 void Base::ReadRunTime()
@@ -110,8 +109,7 @@ void Base::ReadRunTime()
   fchar[32] = '\0';
 
   strcpy(fRunTime, Trimmed(std::string(fchar)).c_str());
-  if (gVerbose==kPRINT_FLUKA) std::cout << "\t" << fRunTime << std::endl;
-	else if (gVerbose>=kPRINT_TITLE) std::cout << "Time:\t" << fRunTime << std::endl;
+	if (gVerbose>=kPRINT_TITLE) std::cout << "Time:\t" << fRunTime << std::endl;
 }
 
 int Base::Nint(float x) const

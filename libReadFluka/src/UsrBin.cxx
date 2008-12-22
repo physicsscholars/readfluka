@@ -44,7 +44,7 @@ void UsrBin::fReadHeader()
 
     fWEIPRI = ReadFloat();
     fNCASE  = ReadInt();
-		if ((gVerbose==kPRINT_FLUKA) || (gVerbose>=kPRINT_MISC)) {
+		if (gVerbose>=kPRINT_MISC) {
 			std::cout << "\tTotal number of particles followed\t" << fNCASE;
 			std::cout << ", for a total weight of  ";
 			std::cout.setf(std::ios::scientific);
@@ -65,7 +65,7 @@ bool UsrBin::Read()
 
 	if (fFirstRead == true) {
 		//		ReadInt(2); // these 2 ints were introduced in FLUKA2008 => understand what are they and use them
-		if (gVerbose==kPRINT_FLUKA) ReadInt(2);
+		if (gVerbose==kPRINT_NOTHING) ReadInt(2);
 		else std::cerr << "fluka2008: " << ReadInt() << " " << ReadInt() << std::endl;
 		fFirstRead = false;
 	}
@@ -132,7 +132,7 @@ bool UsrBin::Read()
 
 bool UsrBin::fReadCartesian()
 {
-	if (gVerbose==kPRINT_FLUKA) {
+	if (gVerbose>=kPRINT_MISC) {
 		std::cout << 1 << std::endl << "   Cartesian binning n. ";
 		if (fMB == 128) std::cout << 2;		else std::cout << fMB+1; // is it correct? why it's like that?
 		std::cout << " \""  << fTITUSB << "\" , ";
@@ -156,14 +156,8 @@ bool UsrBin::fReadCartesian()
   if (gVerbose>=kPRINT_TITLE) std::cout << "fScored:\t";
   for (int i=0; i<GetNbins(); i++) {
     fScored[i]  = ReadFloat();
-		if (gVerbose==kPRINT_FLUKA) {
-			if (i==0) std::cout << '\t';
-			std::cout << fScored[i] << " ";
-			if ((i+1)%10 == 0) std::cout  << std::endl << '\t';
-		}
     if (gVerbose>=kPRINT_SCORED)	std::cout << fScored[i] << ' ';
   }
-	//	if (gVerbose==kPRINT_FLUKA) std::cout << std::endl;
   if (gVerbose>=kPRINT_TITLE) std::cout << std::endl;
 
   return true;
