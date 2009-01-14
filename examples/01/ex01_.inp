@@ -1,0 +1,37 @@
+TITLE
+Example 01
+BEAM         10.E+00                                                  PROTON
+BEAMPOS          0.0       0.0     -50.0
+GEOBEGIN                                                              COMBNAME
+  0 0                       A simple Be target inside vacuum
+RPP body1 -5000000.0 +5000000.0 -5000000.0 +5000000.0 -5000000.0 +5000000.0
+RPP body2 -1000000.0 +1000000.0 -1000000.0 +1000000.0    -100.0  +1000000.0
+RPP body3     -10.0      +10.0      -10.0      +10.0        0.0       +5.0
+XYP body4       2.5
+END
+* black hole
+regBH1    5     +body1 -body2
+* vacuum around
+regVA2    5     +body2 -body3
+* Be target 1st half
+regBE3    5     +body3 +body4  
+* Be target 2nd half
+regBE4    5     +body3 -body4  
+END
+GEOEND
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+MATERIAL         4.0    9.0122     1.848       5.0                    BERYLLIU
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+*  Be target, 1st and 2nd half
+ASSIGNMAT  BERYLLIU   regBE3    regBE4
+*  External Black Hole
+ASSIGNMAT  BLCKHOLE   regBH1
+*  Vacuum
+ASSIGNMAT   VACUUM    regVA2
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+RANDOMIZE        1.0
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+USRICALL
+START           10.0
+USROCALL
+STOP
