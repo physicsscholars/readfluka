@@ -4,7 +4,7 @@ all:	libReadFluka.so
 
 
 ######################## libReadFluka ############
-libReadFluka.so: obj/UsrBin.o obj/UsrYield.o obj/Base.o
+libReadFluka.so: obj/UsrBin.o obj/UsrYield.o obj/Mgdraw.o obj/Base.o
 	@echo "Compiling $@"
 	@$(GCC) $(SOFLAGS) $^ -o $@
 
@@ -17,7 +17,11 @@ obj/UsrBin.o: src/UsrBin.cxx src/UsrBin.h
 	@echo "Compiling $@"
 	@$(GCC) -c $(CXXFLAGS) $< -o $@
 
-obj/UsrYield.o: src/UsrYield.cxx src/UsrBin.h
+obj/UsrYield.o: src/UsrYield.cxx src/UsrYield.h
+	@echo "Compiling $@"
+	@$(GCC) -c $(CXXFLAGS) $< -o $@
+
+obj/Mgdraw.o: src/Mgdraw.cxx src/Mgdraw.h
 	@echo "Compiling $@"
 	@$(GCC) -c $(CXXFLAGS) $< -o $@
 
@@ -47,4 +51,4 @@ ray: obj/ray.o
 #	@ln -sf `pwd`/$< $(MYLIBS)
 
 clean:
-	@rm -fv *~ */*~ obj/* *.map ray rdbin *.so
+	@rm -fv *~ obj/* */*~  *.map ray rdbin *.so

@@ -30,9 +30,8 @@ namespace ReadFluka {
 	private:
 		char       *fTITUSB;         // title of scored distribution
 		int         fITUSBN;         // type of binning (must be decoded if > 10)
-		int         fMB;             // number of binning
 		
-		float       fWEIPRI;         // weight of primary particle
+		//		float       fWEIPRI;         // weight of primary particle
 		int         fIDUSBN;         // distribution to be scored
 		
 		float       fXLOW;           // minimum value of x
@@ -64,8 +63,6 @@ namespace ReadFluka {
 		UsrBin(const char *fname);
 		virtual ~UsrBin();
 
-		const int   GetBinNumber() const {return fMB;}
-		const float GetWeight() const {return fWEIPRI;}
 		const float GetXmin() const {return fXLOW;}
 		const float GetXmin(int i, int j=1, int k=1) const;
 		

@@ -112,6 +112,30 @@ void Base::ReadRunTime()
 	if (gVerbose>=kPRINT_TITLE) std::cout << "Time:\t" << fRunTime << std::endl;
 }
 
+float *Base::Read(int size) const
+{
+  float *data = new float(size);
+  fin->read((char *)data, sizeof(float)*size);
+  if (fin->fail()) {
+    std::cerr << "read error in Base::Read()" << std::endl;
+  };
+	
+  return data; // must be deleted
+}
+
+float *Base::ReadFortran()
+{
+	int size = ReadInt();
+	float *data = Read(size-3);
+	int size2 = ReadInt();
+	if (size != size2) {
+		std::cerr << "Base::ReadFortran(): read error: " << size << " != " << size2 << std::endl;
+		//	delete [] data;
+		return 0;
+	}
+	return data;
+}
+
 int Base::Nint(float x) const
 {
 	/* 
@@ -129,6 +153,16 @@ int Base::Nint(float x) const
    }
 
    return i;
+}
+
+bool Base::CheckSize() const
+{
+	if (fSize_start != fSize_end) {
+		std::cerr << "Base::CheckSize() warning:\t" << fSize_start << " " << fSize_end << std::endl;
+		return false;
+	}
+
+	return true;
 }
 
 std::string Base::Trimmed(std::string const& str, char const* sepSet)

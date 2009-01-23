@@ -1,6 +1,7 @@
+#include "UsrYield.h"
+
 #include <iostream>
 #include <iomanip>
-#include "UsrYield.h"
 #include <cmath>
 using namespace ReadFluka;
 
@@ -55,20 +56,23 @@ void UsrYield::ReadHeader()
     ReadRunTitle();
     ReadRunTime();
     
-    fWEIPRI = ReadFloat();      
-    fNCASE  = ReadInt(3);      
-    fIJUSYL = ReadInt();       
+		fWEIPRI = ReadFloat();  // 0x74    
+    fNCASE  = ReadInt();  //0x78
+
+		ReadInt(2);
+
+		/*    fIJUSYL = ReadInt(); // 0x80
     fJTUSYL = ReadInt();       
     fPUSRYL = ReadFloat();    
     fSQSUYL = ReadFloat();     
     fUUSRYL = ReadFloat();     
     fVUSRYL = ReadFloat();    
-    fWUSRYL = ReadFloat();   
+    fWUSRYL = ReadFloat();   */
     
-    if (gVerbose) {
+    if (1) {
       std::cout << "WEIPRI:\t" << fWEIPRI << std::endl;
       std::cout << "NCASE:\t" << fNCASE << std::endl;
-      std::cout << "IJYSUL:\t" << fIJUSYL << std::endl;
+      std::cout << "IJUSYL:\t" << fIJUSYL << std::endl;
       std::cout << "JTUSYL:\t" << fJTUSYL << std::endl;
       std::cout << "PUSRYL:\t" << fPUSRYL << std::endl;
       std::cout << "SQSUYLL:\t" << fSQSUYL << std::endl;
@@ -83,8 +87,14 @@ bool UsrYield::Read()
 {
   Reset();
 	std::string str;
-  ReadFloat(2);
-  if (!fin->good()) return false;
+	if (1) {
+		std::cout << "float: " << ReadFloat() << " " << ReadFloat() << std::endl;
+	} else ReadFloat(2);
+
+  if (!fin->good()) {
+		std::cerr << "UsrYield::Read:\t read error" << std::endl;
+		return false;
+	}
   for (int i=0; i<1; i++) {
     fMY = ReadInt();
     fin->read(fTITUYL, 10);
@@ -115,7 +125,7 @@ bool UsrYield::Read()
     
     ReadInt();
     
-    if (gVerbose) {
+    if (1) {
       std::cout << "MY:\t" << fMY << std::endl;
       std::cout << "TITUYL:\t" << fTITUYL << std::endl;
       std::cout << "ITUSYL:\t" << fITUSYL << std::endl;
@@ -182,15 +192,13 @@ bool UsrYield::Read()
     }
     
     fINTERV = fNEYLBN + fIGMUYL;
-    std::cout << "number of scored values: " << fNEYLBN << std::endl;
+		//    std::cout << "number of scored values: " << fNEYLBN << std::endl;
     fSCORED = new float[fNEYLBN];
     
-    std::cout << "scored[" << fNEYLBN << "]:\t";
+		//    std::cout << "scored[" << fNEYLBN << "]:\t";
     ReadFloat();
     for (int i=0; i<fNEYLBN; i++) {
       fSCORED[i] = ReadFloat();
-      std::cout.setf(std::ios::scientific);
-      std::cout << fSCORED[i] << ' ';
     }
     ReadFloat(fIGMUYL); // read these zeros
     std::cout << std::endl;
@@ -199,7 +207,7 @@ bool UsrYield::Read()
 
   }
   
-  MakeHist();
+	//  MakeHist();
   
   return true;
 }

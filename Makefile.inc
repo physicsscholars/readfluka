@@ -18,5 +18,5 @@ SOFLAGS			=	-shared
 GCC = g++
 
 
-clean:
-	@rm -fv *~ *.o
+#clean_common:
+#	@rm -fv *~ *.o obj/* */*~

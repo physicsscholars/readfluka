@@ -20,10 +20,16 @@ namespace ReadFluka {
 		char                 *fRunTitle;        // run title
 		char                 *fRunTime;         // run time
 		
+	
 	protected:
 		std::ifstream             *fin;              //! file descriptor
 		int                   fNCASE;           // number of primaries handled so far (current one included)
-		
+		float       fWEIPRI;         // weight of primary particle
+		int         fMB;             // number of binning
+
+		int                   fSize_start;
+		int                   fSize_end;
+
 	public:
 		static int gVerbose;
 		Base(const char *fname);
@@ -34,10 +40,17 @@ namespace ReadFluka {
 		bool                   ReadBool(unsigned int   n = 1) const; // read n bools
 		void                   ReadRunTitle();              // read run titie
 		void                   ReadRunTime();               // read run time
+		float                 *Read(int size) const;
+		float                 *ReadFortran(); // Read a fortran structure
 		char                  *GetRunTitle() const {return fRunTitle;}
 		char                  *GetRunTime() const {return fRunTime;}
 		const int              GetEntries() const {return fNCASE;}
+		const float            GetWeight() const {return fWEIPRI;}
+		const int              GetBinNumber() const {return fMB;}
+
 		int                    Nint(float   x) const;
+		bool CheckSize() const;
+
 		
 		std::string                 Trimmed(std::string const& str, char const* sepSet=" ");
 		std::ifstream              *GetFile() const {return fin;}

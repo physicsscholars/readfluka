@@ -1,22 +1,30 @@
 #include "UsrYield.h"
-#include <TFile.h>
-#include <TObjArray.h>
-#include <Riostream.h>
+#include <iostream>
+#include <iomanip>
+
 using namespace std;
  
 int main(int argc, char **argv)
 {
-  UsrYield *data = new UsrYield(argv[1]);
-  data->SetVerboseLevel(1);
+	ReadFluka::Base::gVerbose = ReadFluka::kPRINT_NOTHING;
+	ReadFluka::UsrYield *usryield = new ReadFluka::UsrYield(argv[1]);
 
-  while (data->Read()) {
-    cout << endl;
-  }
+	cout << scientific << setprecision(4);
 
-  TFile f("out.root", "recreate");
-  data->GetHistograms()->Write();
-  f.Close();
- 
-  delete data;
+	cout << " *****  " << usryield->GetRunTitle() << " *****" << endl;
+	cout << '\t' << usryield->GetRunTime() << endl;
+	cout << "\tTotal number of particles followed\t" << usryield->GetEntries();
+	cout << ", for a total weight of  ";
+	cout << usryield->GetWeight() << endl;
+
+	while (usryield->Read()) {
+		cout << "usryield bin number: " << usryield->GetBinNumber()+1 << endl;
+		cout << "title: " << usryield->GetTitle() << endl;
+		cout << "my: " << usryield->GetMY() << endl;
+		//		cout << "generalized particle n. " << usryield->GetDistType() << endl;
+		
+	}
+
+  delete usryield;
   return 0;
 }

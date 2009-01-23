@@ -14,7 +14,6 @@
 namespace ReadFluka {
 	class UsrYield : public Base {
 	private:
-		float                        fWEIPRI;          // weight of primary particle
 		int                          fIJUSYL;          // projectile identity
 		int                          fJTUSYL;          // target identity
 		float                        fPUSRYL;          // momentum of projectile to be used to define (possible) Lorentz transformations, Feynman X etc.
@@ -58,7 +57,7 @@ namespace ReadFluka {
 		void                           ReadHeader();     // read the header
 		void                           Reset();
 		
-		void                           MakeHist();
+		//		void                           MakeHist() {;}
 	public:
 		UsrYield(const char *fname);
 		virtual ~UsrYield();
@@ -82,6 +81,7 @@ namespace ReadFluka {
 		const char                  *GetYTitle() const;
 		int                          GetTypeOfScoredParticles() const {return fIDUSYL;}
 		const char                  *GetNameOfScoredParticles() const;
+		const int GetMY() const {return fMY;}
 	};
 }
 

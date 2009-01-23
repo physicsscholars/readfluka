@@ -69,5 +69,7 @@ USRYIELD       10.0        0.0      1.0 3.14159265       0.0      3.0 &
 USRYIELD     1401.0   ELECTRON   +202.0     VACUUM   LAYER00      1.0 e-
 USRYIELD       10.0        0.0      1.0 3.14159265       0.0      3.0 &
 *
+USERDUMP      100.0                 5.0       -1.0                    dump
+*
 START          10.0
 STOP
