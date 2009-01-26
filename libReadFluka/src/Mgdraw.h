@@ -34,9 +34,9 @@ namespace ReadFluka {
 		virtual ~Mgdraw();
 
 		int ReadEvent(int type=0);
-		int ReadTrack(int ntrack, int mtrack, int jtrack, float etrack, float wtrack);
-		int ReadEnergy(int icode, int jtrack, float etrack, float wtrack);
-		int ReadSource(int ncase, int npflka, int nstmax, float tkesum, float weipri);
+		int ReadTrack();
+		int ReadEnergy();
+		int ReadSource();
 
 		void Print(const char *option="") const;
 	};

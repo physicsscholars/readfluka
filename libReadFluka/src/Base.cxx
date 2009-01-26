@@ -169,7 +169,7 @@ bool Base::SizeEnd()
 	if (fSize_start != fSize_end) {
 		std::cerr << "Base::CheckSize() warning:\t" << fSize_start << " " << fSize_end << std::endl;
 		return false;
-	}
+	} //else std::cerr << "SizeEnd: \t record OK" << std::endl;
 
 	return true;
 }
