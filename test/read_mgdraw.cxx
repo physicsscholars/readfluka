@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 	ReadFluka::Base::gVerbose = ReadFluka::kPRINT_NOTHING;
 	ReadFluka::Mgdraw *mgdraw = new ReadFluka::Mgdraw(argv[1]);
 
-	for (int i=0; i<300; i++) {
+	for (int i=0; i<2; i++) {
 		cout << "*********** event " << i << endl;
 		mgdraw->ReadEvent();
 	}

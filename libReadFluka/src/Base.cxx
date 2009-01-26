@@ -155,8 +155,17 @@ int Base::Nint(float x) const
    return i;
 }
 
-bool Base::CheckSize() const
+int Base::SizeStart()
 {
+	fSize_start = ReadInt();
+	return fSize_start;
+}
+
+bool Base::SizeEnd()
+{
+	// Read size end and compare it with size start
+
+	fSize_end = ReadInt();
 	if (fSize_start != fSize_end) {
 		std::cerr << "Base::CheckSize() warning:\t" << fSize_start << " " << fSize_end << std::endl;
 		return false;

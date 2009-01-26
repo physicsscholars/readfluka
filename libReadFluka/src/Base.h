@@ -49,7 +49,8 @@ namespace ReadFluka {
 		const int              GetBinNumber() const {return fMB;}
 
 		int                    Nint(float   x) const;
-		bool CheckSize() const;
+		int  SizeStart();
+		bool SizeEnd();
 
 		
 		std::string                 Trimmed(std::string const& str, char const* sepSet=" ");
