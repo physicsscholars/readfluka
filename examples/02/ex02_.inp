@@ -1,0 +1,29 @@
+TITLE
+Example 02: Read USERDUMP (mgdraw) output
+GLOBAL        1500.0      -1.0                 1.0
+* GLOBAL(2)<0 is recommended due to the USRBIN card usage
+*........+....1....+....2....+....3....+....4....+....5....+....6....+..SDUM..
+DEFAULTS                                                              CALORIMETRY
+BEAM          -10.0                                                   ELECTRON
+BEAMPOS         0.0       0.0     -10.0
+*
+GEOBEGIN                           25.0      26.0                     COMBNAME
+test.geo
+geolog
+#if DEBUGall
+GEOEND         61.0      61.0      70.0     -61.0     -61.0      -2.0 DEBUG
+GEOEND        500.0     500.0     100.0       0.0       0.0       0.0 &
+STOP
+#endif
+GEOEND
+*
+ASSIGNMAT  BLCKHOLE         BH
+ASSIGNMAT    VACUUM     VACUUM
+ASSIGNMAT    CARBON    LAYER00   LAYER19
+*
+USERDUMP      100.0                 0.0       -1.0                    dump
+*
+RANDOMIZ        1.0
+*
+START           2.0
+STOP
