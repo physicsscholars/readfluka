@@ -1,5 +1,6 @@
 #include "UsrYield.h"
 
+#include <string.h>
 #include <iostream>
 #include <iomanip>
 #include <cmath>
@@ -213,12 +214,12 @@ bool UsrYield::Read()
 }
 
 const char *UsrYield::GetXTitle() const {
-	std::string x1("x");
+  std::string x1("x");
   
   if (fie<0) x1 = "log ";
   else x1 = "";
   
-  switch (abs(fie)) {
+  switch (std::abs(fie)) {
   case (5): x1 += "#eta_{lab}";
     break;
   case (6): x1 += "#eta_{cms}";

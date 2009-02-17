@@ -254,7 +254,7 @@ bool UsrBin::fCheckBounds(int x, int y, int z) const
 void UsrBin::Print() const
 {
 	std::cout << "UsrBin::Print: " << std::flush;
-  if (fScored == 0) exit(0);
+	if (fScored == 0) return;
   
   for (int i=0; i<GetNbins(); i++)
     std::cout << fScored[i] << " ";

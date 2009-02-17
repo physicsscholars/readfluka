@@ -15,7 +15,7 @@ read_mgdraw: read_mgdraw.cxx
 
 clean:
 	@echo "Cleaning..."
-	@find . -name "*~" -delete
+#	@find . -name "*~" -delete
 	@rm -fvr obj/* *.so read_mgdraw flukahp.map
 
 cleandata:

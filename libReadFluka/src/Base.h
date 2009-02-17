@@ -1,6 +1,11 @@
 #ifndef ReadFluka_h
 #define ReadFluka_h
 
+#define READ_ERROR 1
+#define CANT_OPEN_FILE 2
+#define FILENAME_EMPTY 3
+#define WRONG_FORMAT 4
+
 ///////////////////////////////////////////////////////////////
 //
 // ReadFluka

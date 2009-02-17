@@ -1,10 +1,6 @@
 #include "Base.h"
 #include <iostream>
 
-#define READ_ERROR 1
-#define CANT_OPEN_FILE 2
-#define FILENAME_EMPTY 3
-
 using namespace ReadFluka;
 
 int Base::gVerbose = kPRINT_TITLE;
@@ -168,6 +164,7 @@ bool Base::SizeEnd()
 	fSize_end = ReadInt();
 	if (fSize_start != fSize_end) {
 		std::cerr << "Base::CheckSize() warning:\t" << fSize_start << " " << fSize_end << std::endl;
+		exit(-1);
 		return false;
 	} //else std::cerr << "SizeEnd: \t record OK" << std::endl;
 
