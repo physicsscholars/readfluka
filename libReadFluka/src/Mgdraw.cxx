@@ -89,12 +89,21 @@ bool Point::Check() const
   return true;
 }
 
+<<<<<<< .mine
+void Point::Print() const
+{
+  std::cout << "*** point energy deposition" << std::endl;
+  std::cout << "\t icode,jtrack,e,w,gen: "<< GetCode() << "\t" << GetID() << " " << GetE() <<"\t"<< GetW() << " " << GetGen() << std::endl;
+  std::cout << "\t x,y,z,rull: " << GetX() << " " << GetY() << " " << GetZ() << "\t" << GetEd() << std::endl;
+}
+=======
 void Point::Print() const
 {
   std::cout << "*** point energy deposition" << std::endl;
   std::cout << "\t icode,jtrack,e,w,gen: "<< GetCode() << " " << GetID() << " " << GetE() <<" "<< GetW() << " " << GetGen() << std::endl;
   std::cout << "\t x,y,z,rull: " << GetX() << " " << GetY() << " " << GetZ() << " " << GetEd() << std::endl;
 }
+>>>>>>> .r24
 
 Source::Source(int ncase, int npflka, int nstmax, float tkesum, float weipri)
 {
@@ -155,6 +164,143 @@ bool Source::Check() const
   return true;
 }
 
+<<<<<<< .mine
+void Source::Print() const
+{
+  std::cout << "*** source particle" << std::endl;
+  //	std::cout << "icase: " << icase << "\t- type of this record" << std::endl;
+  std::cout << "\tncase: " << GetNcase() << "\t- number of primaries treated so far (including the current one)" << std::endl;
+  std::cout << "\tnpflka: " << GetNpflka() << "\t- number of particles in the stack" << std::endl;
+  std::cout << "\tnstmax: " << GetNstmax() << std::endl;
+  std::cout <<"\ttkesum: " << GetTkesum() << "\t- total kinetic energy of the primaries of a user written SOURCE" << std::endl;
+  std::cout << "\tweipri: " << GetWeipri() << "\t- total weight of the primaries handled so far" << std::endl;
+
+  for (int i=0; i<GetNpflka(); i++) {
+    std::cout << "\thit: " << GetID(i) << " " << GetE(i) << " " << GetW(i) << "\t";
+    std::cout << GetX(i) << " " << GetY(i) << " " << GetZ(i) << "\t\t";
+    std::cout << GetTX(i) << " " << GetTY(i) << " " << GetTZ(i) << std::endl;
+  }
+}
+
+Mgdraw::Mgdraw(const char *fname) : Base(fname)
+{
+  // Constructor
+  
+  //  nevent = ntrack = mtrack = jtrack = icode = 0;
+  //  etrack = wtrack = 0.0f;
+  fType = 0;
+}
+
+Mgdraw::~Mgdraw()
+{
+  // Destructor
+  //  std::cerr << "mgdraw destructor" << std::endl;
+  
+  int n = fTracks.size(); std::cerr << "tracks: " << n << std::endl;
+  for (int i=0; i<n; i++) delete fTracks[i];
+  fTracks.clear();
+
+  n = fPoints.size(); std::cerr << "points: " << n << std::endl;
+  for (int i=0; i<n; i++) delete fPoints[i];
+  fPoints.clear();
+
+  n = fSource.size(); std::cerr << "source: " << n << std::endl;
+  for (int i=0; i<n; i++) delete fSource[i];
+  fSource.clear();  
+}
+
+int Mgdraw::ReadEvent(int type)
+{
+  /*
+    Read a MGDRAW event. The meaning of the argument is the following:
+    type = 0: read the standard MGDRAW output (this is the default value)
+    type = 1: LTRACK added
+   */
+  
+  fType = type;
+  //  std::cout << "ReadEvent" << std::endl;
+  int len = SizeStart();
+  if (len != 20) {
+    std::cerr << "Mgdraw::ReadEvent():\t format error" << std::endl;
+    return WRONG_FORMAT;
+  }
+  
+  //	int icase;
+  fCASE = -1;
+  bool first = true;
+  
+  for(;;) {
+    fCASE = ReadInt(); // ndum
+    
+    if (fCASE<0) {
+      ReadSource();
+    } else if (fCASE == 0) {
+      ReadEnergy();
+      first = false;
+    } else if (fCASE > 0) {
+      ReadTrack(); // 0x4c
+    }
+    //    if ( (fNCASE>1) && (fCASE<0) ) {
+    //      fin->seekg(-4, std::ios::cur);
+    //      std::cerr << "event end" << std::endl;
+    //      break;
+    //    }
+
+    if ((fCASE < 0) && (first == false)) break;
+    first = false;
+  }
+  
+  return fCASE;
+}
+
+int Mgdraw::ReadSource()
+{
+  /*
+    Read SODRAW (SOurce particle DRAWing) entry   < 0
+    WRITE (IODRAW) -NCASE, NPFLKA, NSTMAX, SNGL (TKESUM),
+    &                SNGL (WEIPRI)
+    
+    WRITE (IODRAW) ( IONID,SNGL(TKEFLK(I)+AMNHEA(-IONID)),
+    &                    SNGL (WTFLK(I)), SNGL (XFLK (I)),
+    &                    SNGL (YFLK (I)), SNGL (ZFLK (I)),
+    &                    SNGL (TXFLK(I)), SNGL (TYFLK(I)),
+    &                    SNGL (TZFLK(I)), I = 1, NPFLKA )
+    
+  */
+  
+  fNCASE = -fCASE;       // mdum
+  int fNPFLKA = ReadInt();   // jdum
+  int fNSTMAX = ReadInt();   // maximum number of particles in stack so far
+  float fTKESUM = ReadFloat(); // edum
+  fWEIPRI = ReadFloat(); // wdum
+  Source *s = new Source(-fCASE, fNPFLKA, fNSTMAX, fTKESUM, fWEIPRI);
+  
+ 
+  SizeEnd();	
+  SizeStart();
+  
+  for (int i=0; i<s->GetNpflka(); i++) {
+    s->SetID(i, ReadInt());
+    s->SetE(i, ReadFloat());
+    s->SetW(i, ReadFloat());
+    
+    s->SetX(i, ReadFloat()); s->SetY(i, ReadFloat()); s->SetZ(i,ReadFloat());
+    
+    s->SetTX(i, ReadFloat()); s->SetTY(i, ReadFloat()); s->SetTZ(i, ReadFloat());
+    
+  }
+
+  SizeEnd(); SizeStart();
+
+  s->Check();
+  fSource.push_back(s);
+  
+  //  s->Print();
+
+  return fNCASE;
+}
+
+=======
 void Source::Print() const
 {
   std::cout << "*** source particle" << std::endl;
@@ -286,6 +432,7 @@ int Mgdraw::ReadSource()
   return fNCASE;
 }
 
+>>>>>>> .r24
 int Mgdraw::ReadEnergy()
 {
   /*
@@ -307,10 +454,18 @@ int Mgdraw::ReadEnergy()
 
   SizeEnd(); SizeStart();
 
+<<<<<<< .mine
+  p->Check();
+  fPoints.push_back(p);
+  //  p->Print();
+  
+  return 0;
+=======
   p->Check();
   fPoints.push_back(p);
   
   return 0;
+>>>>>>> .r24
 }
 
 int Mgdraw::ReadTrack()
@@ -340,9 +495,16 @@ int Mgdraw::ReadTrack()
   
   t->Check();
 
+<<<<<<< .mine
+  fTracks.push_back(t);
+  //  t->Print();
+
+  return 0;
+=======
   fTracks.push_back(t);
   
   return 0;
+>>>>>>> .r24
 }
 
 
