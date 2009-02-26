@@ -33,15 +33,16 @@ void print_track(ReadFluka::Mgdraw *m, unsigned int gen_max)
 {
   vector<ReadFluka::Track*> tracks = m->GetTracks();
   for (vector<ReadFluka::Track*>::const_iterator it = tracks.begin(); it != tracks.end(); ++it) {
-    ReadFluka::Track *p = *it;
-    if (p->GetGen() <= gen_max) p->Print();
+    ReadFluka::Track *t = *it;
+    if (t->GetGen() <= gen_max) t->Print();
   }
 }
 
 void draw(ReadFluka::Mgdraw *m, unsigned int gen_max)
 {
   TCanvas *c1 = new TCanvas("c1", "", -1);
-  c1->Range(-10, -10, 10, 25);
+  //  c1->Range(-10, -10, 10, 25);
+  c1->Range(10, -10, 24, 17);
 
   const Int_t colNum=40;
   Int_t my_palette[colNum];
@@ -52,6 +53,7 @@ void draw(ReadFluka::Mgdraw *m, unsigned int gen_max)
   vector<ReadFluka::Track*> tracks = m->GetTracks();
   for (vector<ReadFluka::Track*>::const_iterator it = tracks.begin(); it != tracks.end(); ++it) {
     ReadFluka::Track *t = *it;
+
     TLine *l = new TLine;
     float x1, y1, x2, y2;
 
@@ -84,17 +86,21 @@ void draw(ReadFluka::Mgdraw *m, unsigned int gen_max)
  
 int main(int argc, char **argv)
 {
-  ReadFluka::Base::gVerbose = ReadFluka::kPRINT_NOTHING;
+  ReadFluka::Base::gVerbose = ReadFluka::kPRINT_NOTHING;//kPRINT_SCORED;
   ReadFluka::Mgdraw *mgdraw = new ReadFluka::Mgdraw(argv[1]);
-  
+  mgdraw->SetGenMax(200);
+  mgdraw->SetEmin(5.0);
   mgdraw->ReadEvent(1);
 
   //  print_track(mgdraw, 1);
   
   cerr << "palette: " << gStyle->GetColorPalette(0) << endl;
   
-  draw(mgdraw, 2);
-  print_point(mgdraw, 2);
+  draw(mgdraw, 7);
+  print_src(mgdraw, 20);
+  print_point(mgdraw, 20);
+  print_track(mgdraw, 20);
+  
 
   delete mgdraw;
   return 0;

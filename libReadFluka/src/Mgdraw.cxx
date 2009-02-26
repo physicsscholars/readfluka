@@ -45,18 +45,31 @@ bool Track::Check() const
   return true;
 }
 
-void Track::Print() const 
+void Track::Print(const char *option) const 
 {
+  /*
+    option == "first_last" => print only first and last point of the track
+   */
+
   std::cout << "*** continuous energy deposition (track)" << std::endl;
 
   std::cout<<"\t ntrack,mtrack,jtrack,etrack,wtrack,gen: "<<fn<<" "<<fm << " " <<fj << " " <<fe << " " <<fw << " " << fl << std::endl;
-  for (int i=0; i<fn+1; i++) {
-    std::cout << "\t\t i,x,y,z: " << i << " " << fx[i] << " " << fy[i] << " " << fz[i] << std::endl;
+
+  if (!strcmp(option, "first_last")) {
+    for (int i=0; i<fn+1; i+=fn) {
+      std::cout << "\t\t i,x,y,z: " << i << " " << fx[i] << " " << fy[i] << " " << fz[i] << std::endl;
+    }
+  } else {
+    for (int i=0; i<fn+1; i++) {
+      std::cout << "\t\t i,x,y,z: " << i << " " << fx[i] << " " << fy[i] << " " << fz[i] << std::endl;
+    }
   }
+
   for (int j=0; j<fm; j++) {
     std::cout << "\t\t j,dtrack: " << j << " " << fd[j] << std::endl;
   }
   std::cout << "\t\t path: " << GetPath() << std::endl;
+  
 }
 
 
@@ -74,17 +87,17 @@ bool Point::Check() const
 {
   if (fw<0.0) {
     std::cerr << "Point::Check():\t wrong fw" << std::endl;
-    exit(WRONG_FORMAT);
+    //    exit(WRONG_FORMAT);
   }
 
   if (fe<0.0) {
     std::cerr << "Point::Check():\t wrong fe" << std::endl;
-    exit(WRONG_FORMAT);
+    //    exit(WRONG_FORMAT);
   }
 
   if (frull<0.0) {
-    std::cerr << "Point::Check():\t wrong frull" << std::endl;
-    exit(WRONG_FORMAT);
+    std::cerr << "Point::Check():\t wrong frull: " << frull << std::endl;
+    //    exit(WRONG_FORMAT);
   }  
   return true;
 }
@@ -178,7 +191,11 @@ Mgdraw::Mgdraw(const char *fname) : Base(fname)
   
   //  nevent = ntrack = mtrack = jtrack = icode = 0;
   //  etrack = wtrack = 0.0f;
+  if (gVerbose>=kPRINT_SCORED) std::cerr << "Mgdraw constructor" << std::endl;
   fType = 0;
+  fGenMax = INT_MAX;
+  fGenCur = 0;
+  fEmin = -1.0; // put all energies by default
 }
 
 Mgdraw::~Mgdraw()
@@ -206,9 +223,10 @@ int Mgdraw::ReadEvent(int type)
     type = 0: read the standard MGDRAW output (this is the default value)
     type = 1: LTRACK added
    */
+
+  if (gVerbose>=kPRINT_SCORED) std::cerr << "Mgdraw::ReadEvent(" << type << ")" << std::endl;
   
   fType = type;
-  //  std::cout << "ReadEvent" << std::endl;
   int len = SizeStart();
   if (len != 20) {
     std::cerr << "Mgdraw::ReadEvent():\t format error" << std::endl;
@@ -235,6 +253,11 @@ int Mgdraw::ReadEvent(int type)
     //      std::cerr << "event end" << std::endl;
     //      break;
     //    }
+    
+    /*    if ( (fType == 1) && (GetGenCur() >= GetGenMax()) ) {
+      std::cerr << "max generation => break" << std::endl;
+      break;
+      }*/
 
     if ((fCASE < 0) && (first == false)) break;
     first = false;
@@ -257,6 +280,8 @@ int Mgdraw::ReadSource()
     &                    SNGL (TZFLK(I)), I = 1, NPFLKA )
     
   */
+
+  if (gVerbose>=kPRINT_SCORED) std::cerr << "Mgdraw::ReadSource()" << std::endl;
   
   fNCASE = -fCASE;       // mdum
   int fNPFLKA = ReadInt();   // jdum
@@ -283,6 +308,7 @@ int Mgdraw::ReadSource()
   SizeEnd(); SizeStart();
 
   s->Check();
+
   fSource.push_back(s);
   
   //  s->Print();
@@ -297,7 +323,8 @@ int Mgdraw::ReadEnergy()
     WRITE (IODRAW)  0, ICODE, JTRACK, SNGL (ETRACK), SNGL (WTRACK)
     WRITE (IODRAW)  SNGL (XSCO), SNGL (YSCO), SNGL (ZSCO), SNGL (RULL)
   */
-  
+
+  if (gVerbose>=kPRINT_SCORED) std::cerr << "Mgdraw::ReadEnergy()" << std::endl;
   
   Point *p = new Point(ReadInt(), ReadInt(), ReadFloat(), ReadFloat());
   if (fType == 1) p->SetGen(ReadInt());
@@ -312,7 +339,10 @@ int Mgdraw::ReadEnergy()
   SizeEnd(); SizeStart();
 
   p->Check();
-  fPoints.push_back(p);
+  if (p->GetGen() > GetGenCur()) SetGenCur(p->GetGen());
+  if ( ((fType==0) || ((fType>0) && (p->GetGen() <= GetGenMax())))  && 
+      (p->GetE()>=fEmin)) fPoints.push_back(p);
+  else delete p;
   //  p->Print();
   
   return 0;
@@ -321,6 +351,8 @@ int Mgdraw::ReadEnergy()
 int Mgdraw::ReadTrack()
 {
   // Read track                     > 0
+
+  if (gVerbose>=kPRINT_SCORED) std::cerr << "Mgdraw::ReadTrack()" << std::endl;
   
   Track *t = new Track(fCASE, ReadInt(), ReadInt(), ReadFloat(), ReadFloat());
   if (fType == 1) t->fl = ReadInt();
@@ -344,9 +376,13 @@ int Mgdraw::ReadTrack()
   SizeEnd(); SizeStart();
   
   t->Check();
-
-  fTracks.push_back(t);
-  //  t->Print();
+  
+  if (t->GetGen() > GetGenCur())   SetGenCur(t->GetGen());
+  if ((t->GetGen() <= GetGenMax())  && 
+      (t->GetE()>=fEmin)) {
+    fTracks.push_back(t);
+    std::cerr << t->GetID() << " " << t->GetGen() << " " << t->GetE() << std::endl;
+  } else delete t;
 
   return 0;
 }

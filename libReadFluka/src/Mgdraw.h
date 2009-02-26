@@ -27,6 +27,7 @@ namespace ReadFluka {
     inline int GetN() const { return fn; }
     inline int GetM() const { return fm; }
     inline int GetID() const { return fj; }
+    inline float GetE() const { return fe; }
     
     void SetXYZ(int i, float x, float y, float z) {fx[i] = x; fy[i] = y, fz[i] = z;}
     inline float GetX(int i) const {return fx[i]; }
@@ -41,7 +42,7 @@ namespace ReadFluka {
     inline unsigned int GetGen() const {return fl;}
 
     bool Check() const;
-    void Print() const;
+    void Print(const char *option="") const;
   };
 
   class Point { // point energy deposition
@@ -141,10 +142,21 @@ namespace ReadFluka {
     std::vector<Source*> fSource;
     std::vector<Track*> fTracks;
     std::vector<Point*> fPoints;
-    
+    unsigned int fGenMax; // maximum generation number to put in vectros - helps to save memory @ huge files but can be used for type 2 events only since needs info about generation (LTRACK)
+    unsigned int fGenCur; // current generation number of tracks/points - used to read only several first generations of the collision tape
+    float fEmin; // minimum track energy to put in vectors
+
   public:
     Mgdraw(const char *fname);
     virtual ~Mgdraw();
+    
+    inline void SetGenMax(unsigned int g) { fGenMax = g; }
+    inline unsigned int GetGenMax() { return fGenMax; }
+
+    inline void SetGenCur(unsigned int g) { fGenCur = g; }
+    inline unsigned int GetGenCur() { return fGenCur; }
+
+    inline void SetEmin(float emin) { fEmin = emin; }
     
     int ReadEvent(int type=0);
     int ReadTrack();
