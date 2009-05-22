@@ -1,6 +1,9 @@
 #include "Mgdraw.h"
 #include <iostream>
 #include <iomanip>
+#include <cstdlib>
+#include <limits.h>
+#include <cstring>
 
 using namespace ReadFluka;
 

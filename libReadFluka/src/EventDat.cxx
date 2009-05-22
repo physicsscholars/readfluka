@@ -1,9 +1,11 @@
 #include "EventDat.h"
 
-EventDat::EventDat(const char* fname) : ReadFluka(fname)
+using namespace ReadFluka;
+
+EventDat::EventDat(const char* fname) : Base(fname)
 {
   // constructor. fname is a name of a file with EVENTDAT output
-  fENDIST = new Float_t[NENDIST];
+  fENDIST = new float[NENDIST];
   fNCASE=fNREGS=fNSCO=0;
   fWEIPRU=fENETOT=0.0;
 
@@ -11,9 +13,9 @@ EventDat::EventDat(const char* fname) : ReadFluka(fname)
 
   fIsReadHeader = false; //kFALSE;
   fReadHeader();
-  fREGSCO = new Float_t[fNREGS];
-  for (UInt_t i=0; i<fNREGS; i++) fREGSCO[i] = -1;
-  for (UInt_t i=0; i<4; i++) fSeed[i] = 0;
+  fREGSCO = new float[fNREGS];
+  for (unsigned int i=0; i<fNREGS; i++) fREGSCO[i] = -1;
+  for (unsigned int i=0; i<4; i++) fSeed[i] = 0;
 }
 
 EventDat::~EventDat()
@@ -42,8 +44,8 @@ void EventDat::fReadHeader()
     fNSCO = ReadInt();  // number of scoring distributions
     if (gVerbose) cout << "number of scoring distributions: " << fNSCO << " ->\t";
     
-    fSco = new Int_t[fNSCO];
-    for (UInt_t i=0; i<fNSCO; i++) {
+    fSco = new int[fNSCO];
+    for (unsigned int i=0; i<fNSCO; i++) {
       fSco[i] = ReadInt();
       if (gVerbose) cout << fSco[i] << ' ';
     }
@@ -56,30 +58,30 @@ void EventDat::fReadENDIST()
 {
   // read 12 energy contributions to the total energy balance ( NOT normalized to the weight of primary)
 
-  fin->read((Char_t *)fENDIST, sizeof(Float_t)*NENDIST); // 48=4*12
+  fin->read((char *)fENDIST, sizeof(float)*NENDIST); // 48=4*12
 }
 
 void EventDat::fReadScoredDistributions()
 {
   // read scored distributions
-  Float_t F[4];
-  Int_t iisc;
-  Int_t iscore[fNSCO];
-  for (UInt_t isc=0; isc<fNSCO; isc++) {
-    fin->read((Char_t *)&iisc, 4);
-    fin->read((Char_t *)&iscore[isc], 4);
+  float F[4];
+  int iisc;
+  int iscore[fNSCO];
+  for (unsigned int isc=0; isc<fNSCO; isc++) {
+    fin->read((char *)&iisc, 4);
+    fin->read((char *)&iscore[isc], 4);
     
     if (gVerbose>2) cout << isc+1 << ": " << iisc << " " << iscore[isc] << endl;
-    if (iisc != (Int_t)isc+1) 
+    if (iisc != (int)isc+1) 
       if (gVerbose>2) cerr << "Wrong sequence: " << iisc << " != " << isc+1 << endl;
 
     if (gVerbose>2) cout << "strange numbers: ";
-    for (Int_t i=0; i<4; i++) {
+    for (int i=0; i<4; i++) {
       F[i] = ReadFloat();
       if (gVerbose>2) cout << F[i] << " ";
     }
     
-    for (UInt_t region=0; region<fNREGS; region++) {
+    for (unsigned int region=0; region<fNREGS; region++) {
       fREGSCO[region] = ReadFloat();
     }
     
@@ -88,11 +90,11 @@ void EventDat::fReadScoredDistributions()
     // read 3 dummy records
     ReadInt(3);
     
-    Int_t checker = ReadInt();
+    int checker = ReadInt();
     
     if (checker < 0) {
       //      cout << "float before seeds: ";
-      for (Int_t i=0; i<3; i++) {
+      for (int i=0; i<3; i++) {
 	F[0] = ReadFloat();
 	//	cout << F[0] << " ";
       }
@@ -107,8 +109,8 @@ void EventDat::fReadScoredDistributions()
 void EventDat::fReadSeeds()
 {
   if (gVerbose>=0) cout << endl << "seeds after this event:\t";
-  Int_t iTmp;
-  for (Int_t i=0; i<10; i++)  {
+  int iTmp;
+  for (int i=0; i<10; i++)  {
     iTmp = ReadInt();
     if (i==0) fSeed[0] = iTmp;
     if (i==1) fSeed[1] = iTmp;
@@ -121,10 +123,10 @@ void EventDat::fReadSeeds()
   if (gVerbose>=0) cout << endl;
 }
 
-Bool_t EventDat::ReadEvent()
+bool EventDat::ReadEvent()
 {
     // read 1 event from the data file
-  Int_t tmp = ReadInt();
+  int tmp = ReadInt();
   if (!fin->good()) return false;
   fNCASE = tmp;
   if (gVerbose>1) clog << "reading event #: " << fNCASE << endl;

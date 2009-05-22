@@ -219,7 +219,7 @@ const char *UsrYield::GetXTitle() const {
   if (fie<0) x1 = "log ";
   else x1 = "";
   
-  switch (std::abs(fie)) {
+  switch ((int)std::abs((float)fie)) {
   case (5): x1 += "#eta_{lab}";
     break;
   case (6): x1 += "#eta_{cms}";
@@ -232,10 +232,10 @@ const char *UsrYield::GetXTitle() const {
 }
 
 const char *UsrYield::GetYTitle() const {
-	std::string y("y");
-	std::string x2;
+  std::string y("y");
+  std::string x2;
   
-  switch(abs(fia)) {
+  switch((int)std::abs((float)fia)) {
   case(1):
     x2 = "E_{kin}";
     break;
