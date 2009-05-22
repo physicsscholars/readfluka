@@ -1,0 +1,41 @@
+!#define DEBUG
+TITLE
+Example 03: Energy loss in Silicon
+BEAM         10.E+00                                                  MUON-
+BEAMPOS          0.0       0.0     -50.0
+GEOBEGIN                                                              COMBNAME
+  0 0                       A simple Be target inside vacuum
+RPP body1 -5000000.0 +5000000.0 -5000000.0 +5000000.0 -5000000.0 +5000000.0
+RPP body2 -1000000.0 +1000000.0 -1000000.0 +1000000.0    -100.0  +1000000.0
+RPP body3       -0.5        0.5       -0.5        0.5        0.0      0.05
+END
+* black hole
+regBH1    5     +body1 -body2
+* vacuum around
+regVA2    5     +body2 -body3
+* Target 1st half
+regTar    5     +body3
+END
+#if DEBUG
+GEOEND           0.6       0.6       0.1      -0.6     -0.6      -0.1 DEBUG
+GEOEND         100.0     100.0     500.0       0.0      0.0       0.0 &
+STOP
+#endif
+GEOEND
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+MATERIAL        14.0   28.0855     2.329      14.0                    SILICON
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+*  Be target, 1st and 2nd half
+ASSIGNMAT   SILICON   regTar
+ASSIGNMAT  BLCKHOLE   regBH1
+ASSIGNMAT   VACUUM    regVA2
+*
+SCORE         ENERGY
+EVENTDAT        78.0                                                  eventdat
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+RANDOMIZE        1.0
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+USRICALL
+START           10.0
+USROCALL
+STOP
