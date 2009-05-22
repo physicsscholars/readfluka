@@ -37,8 +37,8 @@ namespace ReadFluka {
     EventDat(const char *fname);
     virtual              ~EventDat();
     bool                ReadEvent(); // read 1 event from the data file
-    const unsigned int          GetNregs() const {return fNREGS;}
-    const unsigned int          GetNsco()  const {return fNSCO;}
+    const unsigned int GetNregs() const {return fNREGS;}
+    const unsigned int GetNsco()  const {return fNSCO;}
     const int           GetSco(unsigned int i) const {return fSco[i];}
     const float         GetENDIST(unsigned int i) const {return (i<NENDIST) ? fENDIST[i] : 0;}
     float              *GetENDIST() const {return fENDIST;}
