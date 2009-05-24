@@ -108,7 +108,7 @@ void EventDat::fReadScoredDistributions()
 
 void EventDat::fReadSeeds()
 {
-  if (gVerbose>=0) cout << endl << "seeds after this event:\t";
+  if (gVerbose>0) cout << endl << gVerbose << " seeds after this event:\t";
   int iTmp;
   for (int i=0; i<10; i++)  {
     iTmp = ReadInt();
@@ -116,11 +116,11 @@ void EventDat::fReadSeeds()
     if (i==1) fSeed[1] = iTmp;
     if (i==6) fSeed[2] = iTmp;
     if (i==7) fSeed[3] = iTmp;
-    if (gVerbose>=0) cout << hex << iTmp << dec << " ";
+    if (gVerbose>0) cout << hex << iTmp << dec << " ";
   }
   cout << '\t';
-  if (true) cout << ReadFloat() << " " << ReadFloat(); else ReadFloat(2);
-  if (gVerbose>=0) cout << endl;
+  if (gVerbose>0) cout << ReadFloat() << " " << ReadFloat(); else ReadFloat(2);
+  if (gVerbose>0) cout << endl;
 }
 
 bool EventDat::ReadEvent()

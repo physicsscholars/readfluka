@@ -12,4 +12,4 @@ ex01: writer.o source.o
 
 
 run:
-	$FLUTIL/rfluka -e $FLUPRO/flukahp -N0 -M1 ex01_
+	$(FLUTIL)/rfluka -e $(FLUTIL)/flukahp -N0 -M1 ex03_
