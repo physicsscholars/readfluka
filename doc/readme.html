@@ -3,70 +3,69 @@
   <head>
     <title>read fluka</title>
   </head>
-
+  
   <body>
     <h1>ReadFLUKA</h1>
-		<h2>Introduction</h2>
-		<p>
-			This aim of this project is to provide a user-friendly C++ interface for <b>reading</b>
-			the  binary output	produced by different <a href="http://www.fluka.org">FLUKA</a>
-			estimators and for <b>drawing</b> the obtained values with such tools as 
-			<a href="http://root.cern.ch">ROOT</a> or Gunplot.
-		</p>
+    <h2>Introduction</h2>
+    <p>
+      This aim of this project is to provide a user-friendly C++ interface for <b>reading</b>
+      the  binary output	produced by different <a href="http://www.fluka.org">FLUKA</a>
+      estimators and for <b>drawing</b> the obtained values with such tools as 
+      <a href="http://root.cern.ch">ROOT</a> or Gunplot.
+    </p>
+    
+    
+    
+    <h2>Installation</h2>
+    <dl>
+      <li>To install ReadFLUKA from source you first have either to get the tar file containing
+	the source or to use the Subversion repository to get the latest verstion.<br />
+	
+	The tar file can be downloaded from here: <a href="">http://code.google.com/p/readfluka</a>.<br />
+	Alternatively, you can checkout the head (development version) of the source:
+	<code>
+	  svn co http://code.google.com/p/readfluka/trunk readfluka
+	</code>
+      </li>
 
-
-
-		<h2>Installation</h2>
-		<dl>
-			<li>To install ReadFLUKA from source you first have either to get the tar file containing
-				the source or to use the Subversion repository to get the latest verstion.
-				
-				The tar file can be downloaded from here: <a href="">http://code.google.com/p/readfluka</a>.
-				Alternatively, you can checkout the head (development version) of the source:
-				<code>
-					svn co http://code.google.com/p/readfluka/trunk readfluka
-				</code>
-			</li>
-				
-			<li>Set the variable <b>READFLUKA_SYS</b> to the ReadFLUKA directory:<br>
-				<code>export READFLUKA_SYS=/path/to/libReadFluka</code>
-			</li>
-			
-			<li>
-				Add <b>READFLUKA_SYS</b> to <b>LD_LIBRARY_PATH</b>:
-				<code>
-					export PATH=$READFLUKA_SYS:$LD_LIBRARY_PATH
-				</code>
-			</li>
-
-			<li>
-				Go to <b>READFLUKA_SYS</b> and type <code>make</code>.
-			</li>
-		</dl>
-
-		<h3>Information on third party software</h3>
-
-		<h4>ROOT</h4>
-		<p> If you are going to use the library with <a href="http://root.cern.ch">ROOT</a>,
-			please be sure that you have the <b>ROOTSYS</b> variable correctly defined before you install ReadFLUKA.
-		</p>
-
-		<h2>List of directories</h2>
-		<table width="50%">
-				<tr>
-					<td>doc</td>
-					<td>Documentation files.</td>
-				</tr>
-				<tr>
-					<td>examples</td>
-					<td>Examples of using the project.</td>
-				</tr>
-				<tr>
-					<td>libReadFluka</td>
-					<td>The source code and the library itself.</td>
-				</tr>		
-		</table>
-
+      <li>Run the file <b>env.sh</b> from the libReadFluka folder. This bash script does nothing but exporting two local variables:<br />
+	<code>export READFLUKA_SYS=/path/to/libReadFluka<br />
+	  export LD_LIBRARY_PATH=$READFLUKA_SYS:$LD_LIBRARY_PATH
+	</code>
+      </li>
+      
+      <li>
+	Go to <b>$READFLUKA_SYS</b> and type <code>make</code>.
+      </li>
+    </dl>
+    
+    <h3>Information on third party software</h3>
+    
+    <h4>ROOT</h4>
+    <p> If you are going to use the library with <a href="http://root.cern.ch">ROOT</a>,
+      please be sure that you have the <b>ROOTSYS</b> variable correctly defined before you install ReadFLUKA.
+    </p>
+    
+    <h2>List of directories</h2>
+    <table width="50%">
+      <tr>
+	<td>doc</td>
+	<td>Documentation files.</td>
+      </tr>
+      <tr>
+	<td>examples</td>
+	<td>Examples of using the project.</td>
+      </tr>
+      <tr>
+	<td>libReadFluka</td>
+	<td>The source code and the library itself.</td>
+      </tr>
+      <tr>
+	<td>tools</td>
+	<td>Tools to read the FLUKA binary output files.</td>
+      </tr>		
+    </table>
+    
     <hr>
     <address><a href="mailto:batkov at_ pi.infn.it">Konstantin Batkov</a></address>
 <!-- Created: Mon Dec  8 16:05:14 CET 2008 -->

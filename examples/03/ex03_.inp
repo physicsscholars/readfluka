@@ -2,7 +2,8 @@
 TITLE
 Example 03: Energy loss in Silicon
 DEFAULTS                                                              PRECISION
-BEAM          5.E+00                                                  MUON-
+BEAM          5.E+00                                                  HEAVYION
+HI-PROPE       26.00       56.                                        IRON
 BEAMPOS          0.0       0.0     -50.0
 GEOBEGIN                                                              COMBNAME
   0 0                       A simple Be target inside vacuum
