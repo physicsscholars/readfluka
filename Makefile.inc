@@ -8,7 +8,7 @@ PLATFORM   :=	$(shell $(ROOTCONFIG) --platform)
 ROOTCFLAGS :=	$(shell $(ROOTCONFIG) --cflags)
 ROOTGLIBS  := $(shell root-config --glibs)
 ROOTLIBS   := $(shell $(ROOTCONFIG) --libs)
-OPT         = -g
+#OPT         = -g
 MEMCHECK = $(shell $(ROOTCONFIG) --new --libs)
 #MEMCHECK = ""
 

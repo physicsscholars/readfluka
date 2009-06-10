@@ -1,9 +1,5 @@
-/*
-  Author: Konstantin Batkov    kbat at mail.ru
-  http://readfluka.googlecode.com
- */
-
 #include "EventDat.h"
+#include "ROOT_UsrBin.h"
 #include <TFile.h>
 #include <TTree.h>
 #include <iostream>
@@ -12,35 +8,28 @@ using namespace std;
 
 int usage()
 {
-  cout << "Usage: eventdat2root /path/to/eventdat_binary_output [out.root]" << endl;
-  cout << "\tArray indices in FLUKA start from ONE (FORTRAN style), but here they start from ZERO (C++ style)." << endl;
-  cout << "\tSo, the region number in the root file produced is fulka region minus ONE." << endl;
-  cout << "\tImplemented for a single scored distribution only." << endl << endl;
+  cerr << "Usage: reader /path/to/eventdat_binary_output /path/to/usrbin_binary_output [out.root]" << endl;
   return 1;
 }
 
 int main(int argc, const char **argv)
 {
-  if (argc < 2) return usage();
+  if (argc<4) return usage();
 
-  TString fname_in(argv[1]);
-  TString fname_out;
-  if (argc == 3) 
-    fname_out = argv[2];
-  else 
-    fname_out = fname_in + ".root";
+  TString fname_eventdat(argv[1]);
+  TString fname_usrbin(argv[2]);
+  TString fname_out(argv[3]);
 
   ReadFluka::Base::gVerbose = ReadFluka::kPRINT_NOTHING;
-  ReadFluka::EventDat *eventdat = new ReadFluka::EventDat(fname_in.Data());
+  ReadFluka::EventDat *eventdat = new ReadFluka::EventDat(fname_eventdat.Data());
+  ReadFluka::ROOT_UsrBin *usrbin = new ReadFluka::ROOT_UsrBin(fname_usrbin.Data());
 
   TString title = Form("%s\t%s", eventdat->GetRunTitle(), eventdat->GetRunTime()); cout << title << endl;
   const UInt_t Nregs = eventdat->GetNregs();
-  cout << "number of regions: " << Nregs << "\t";
-  UInt_t Nsco = eventdat->GetNsco();
-  cout << "number of scored distributions: " << Nsco << endl;
+  //  UInt_t Nsco = eventdat->GetNsco();
 
   TFile *file = new TFile(fname_out.Data(), "recreate", title.Data());
-  file->SetTitle(argv[1]);
+  file->SetTitle(title.Data());
 
   Float_t *Ed = new Float_t[Nregs];  //  memset(Ed, 0, sizeof(Float_t)*Nregs);
   Int_t   *seed = new Int_t[NSEED];
@@ -64,7 +53,14 @@ int main(int argc, const char **argv)
 
     tree->Fill();
   }
-  file->Write();
+
+  // write the histograms:
+  while (usrbin->Read()) {
+    usrbin->Histogram()->Write();
+  }
+
+
+  tree->Write();
   file->Close();
 
   //  cout << "delete tree:" << endl;
@@ -73,6 +69,6 @@ int main(int argc, const char **argv)
   delete [] seed;
   delete [] Ed;
   SafeDelete(file);
-
+  cout << endl;
   return 0;
 }
