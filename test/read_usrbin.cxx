@@ -13,7 +13,7 @@ int main(int argc, const char **argv)
 
 	cout << " *****  " << usrbin->GetRunTitle() << " *****" << endl;
 	cout << '\t' << usrbin->GetRunTime() << endl;
-	cout << "\tTotal number of particles followed\t" << usrbin->GetEntries();
+	cout << "\tTotal number of particles followed\t" << usrbin->GetEntryNumber();
 	cout << ", for a total weight of  ";
 	cout << usrbin->GetWeight() << endl;
 

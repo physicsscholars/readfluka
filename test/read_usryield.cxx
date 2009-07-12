@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 
 	cout << " *****  " << usryield->GetRunTitle() << " *****" << endl;
 	cout << '\t' << usryield->GetRunTime() << endl;
-	cout << "\tTotal number of particles followed\t" << usryield->GetEntries();
+	cout << "\tTotal number of particles followed\t" << usryield->GetEntryNumber();
 	cout << ", for a total weight of  ";
 	cout << usryield->GetWeight() << endl;
 

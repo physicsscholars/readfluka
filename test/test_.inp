@@ -40,6 +40,10 @@ usryield.txt
 * in order to read the binary file with libReadFluka and compare it with the text file
 * by diff (run 'make test')
 *
+SCORE        ENERGY   BEAMPART
+EVENTDAT     -103.0                                                   evdat.bin
+*EVENTDAT     +103.0                                                   evdat.txt
+*
 * Energy deposition density
 USRBIN        -10.0     ENERGY   -101.0       50.0      50.0     50.0 Ed
 USRBIN        -50.0      -50.0      0.0      40.0        3.0      1.0 &
@@ -73,5 +77,5 @@ USERDUMP      100.0                 0.0       -1.0                    dump
 *
 RANDOMIZ        1.0
 *
-START          20.0
+START           1.0
 STOP

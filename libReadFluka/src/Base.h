@@ -49,7 +49,7 @@ namespace ReadFluka {
 		float                 *ReadFortran(); // Read a fortran structure
 		char                  *GetRunTitle() const {return fRunTitle;}
 		char                  *GetRunTime() const {return fRunTime;}
-		const int              GetEntries() const {return fNCASE;}
+		const int              GetEntryNumber() const {return fNCASE;}
 		const float            GetWeight() const {return fWEIPRI;}
 		const int              GetBinNumber() const {return fMB;}
 

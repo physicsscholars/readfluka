@@ -30,7 +30,7 @@ int main(int argc, const char **argv)
   else 
     fname_out = fname_in + ".root";
 
-  ReadFluka::Base::gVerbose = ReadFluka::kPRINT_NOTHING;
+  ReadFluka::Base::gVerbose = ReadFluka::kPRINT_MISC;
   ReadFluka::EventDat *eventdat = new ReadFluka::EventDat(fname_in.Data());
 
   TString title = Form("%s\t%s", eventdat->GetRunTitle(), eventdat->GetRunTime()); cout << title << endl;
