@@ -4,7 +4,7 @@ GLOBAL        1500.0      -1.0                 1.0
 * GLOBAL(2)<0 is recommended due to the USRBIN card usage
 *........+....1....+....2....+....3....+....4....+....5....+....6....+..SDUM..
 DEFAULTS                                                              CALORIMETRY
-BEAM          -10.0                                                   ELECTRON
+BEAM           -1.0                                                   PROTON
 BEAMPOS         0.0       0.0     -10.0
 *
 GEOBEGIN                           25.0      26.0                     COMBNAME
@@ -77,5 +77,5 @@ USERDUMP      100.0                 0.0       -1.0                    dump
 *
 RANDOMIZ        1.0
 *
-START           1.0
+START          20.0
 STOP

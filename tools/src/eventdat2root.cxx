@@ -53,7 +53,8 @@ int main(int argc, const char **argv)
 
   while (eventdat->ReadEvent() == kTRUE) {
     for (unsigned int reg=0; reg<Nregs; reg++) {
-      Ed[reg] = eventdat->GetValue(reg+1);
+      Ed[reg] = eventdat->GetValue(208, reg+1);
+      if (reg == 2) cout << "Ed[2]: " << Ed[reg] << endl;
     }
 
     for (unsigned short iseed=0; iseed<NSEED; iseed++)

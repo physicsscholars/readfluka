@@ -1,5 +1,6 @@
 #include "Base.h"
 #include <iostream>
+#include <iomanip>
 #include <cstdlib>
 #include <cstring>
 
@@ -95,7 +96,7 @@ void Base::ReadRunTitle()
   fchar[80] = '\0';
 
   strcpy(fRunTitle, Trimmed(std::string(fchar)).c_str());
-	if (gVerbose>kPRINT_TITLE) std::cout << "Title:\t" << fRunTitle << std::endl;
+	if (gVerbose>kPRINT_TITLE) std::clog << "Title:\t" << fRunTitle << std::endl;
 }
 
 void Base::ReadRunTime()
@@ -107,7 +108,7 @@ void Base::ReadRunTime()
   fchar[32] = '\0';
 
   strcpy(fRunTime, Trimmed(std::string(fchar)).c_str());
-	if (gVerbose>=kPRINT_TITLE) std::cout << "Time:\t" << fRunTime << std::endl;
+	if (gVerbose>=kPRINT_TITLE) std::clog << "Time:\t" << fRunTime << std::endl;
 }
 
 float *Base::Read(int size) const
@@ -155,22 +156,25 @@ int Base::Nint(float x) const
 
 int Base::SizeStart()
 {
-	fSize_start = ReadInt();
-	return fSize_start;
+  fSize_start = ReadInt();
+  // if (gVerbose>=kPRINT_MISC) std::clog << std::setw(100) << std::right << "*** SizeStart: " << fSize_start << std::endl;
+  return fSize_start;
 }
 
 bool Base::SizeEnd()
 {
-	// Read size end and compare it with size start
+  // Read size end and compare it with size start
 
-	fSize_end = ReadInt();
-	if (fSize_start != fSize_end) {
-		std::cerr << "Base::CheckSize() warning:\t" << fSize_start << " " << fSize_end << std::endl;
-		exit(-1);
-		return false;
-	} //else std::cerr << "SizeEnd: \t record OK" << std::endl;
+  fSize_end = ReadInt();
+  //  if (gVerbose>=kPRINT_MISC) std::clog << std::setw(100) << std::right << "*** SizeEnd: " << fSize_end << std::endl;
 
-	return true;
+  if (fSize_start != fSize_end) {
+    std::cerr << "Base::CheckSize() warning:\t" << fSize_start << " " << fSize_end << std::endl;
+    exit(WRONG_FORMAT);
+    return false;
+  } //else std::cerr << "SizeEnd: \t record OK" << std::endl;
+  
+  return true;
 }
 
 std::string Base::Trimmed(std::string const& str, char const* sepSet)
