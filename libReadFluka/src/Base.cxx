@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <cstdlib>
 #include <cstring>
+#include <sstream>
 
 using namespace ReadFluka;
 
@@ -133,6 +134,39 @@ float *Base::ReadFortran()
 		return 0;
 	}
 	return data;
+}
+
+const char *Base::Code2Name(int code, bool replace) const
+{
+  /*
+    Converts FLUKA particle code to its name.
+    if 'replace' is true then replaces all non-alphanumeric characters
+    (helpfull when using this name for a branch of a tree or as a histogram name). 
+   */
+
+  switch(code) {
+  case 201:
+    return replace ? "ALL_PART" : "ALL-PART";
+  case 202:
+    return replace ? "ALL_CHAR" : "ALL-CHAR";
+  case 203:
+    return replace ? "ALL_NEUT" : "ALL-NEUT";
+  case 204:
+    return replace ? "ALL_NEGA" : "ALL-NEGA";
+  case 205:
+    return replace ? "ALL_POSI" : "ALL-POSI";
+  case 206:
+    return "NUCLEONS";
+  case 208:
+    return "ENERGY";
+  case 210:
+    return "BEAMPART";
+  default:
+    std::ostringstream name;
+    name << "id" << code;
+    return name.str().c_str();
+  }
+
 }
 
 int Base::Nint(float x) const

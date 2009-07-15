@@ -53,6 +53,8 @@ namespace ReadFluka {
 		const float            GetWeight() const {return fWEIPRI;}
 		const int              GetBinNumber() const {return fMB;}
 
+		const char            *Code2Name(int code, bool replace = false) const;
+
 		int                    Nint(float   x) const;
 		int  SizeStart();
 		bool SizeEnd();

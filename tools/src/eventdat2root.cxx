@@ -47,7 +47,7 @@ int main(int argc, const char **argv)
   Float_t *endist = new Float_t[NENDIST];
 
   TTree *tree = new TTree("EVENTDAT", title.Data());
-  tree->Branch("DATA", Ed,  Form("Ed[%d]/F", Nregs));
+  tree->Branch("DATA", Ed,  Form("%s[%d]/F", eventdat->Code2Name(208), Nregs));
   tree->Branch("SEEDS", seed, Form("seed[%d]/I", NSEED));
   tree->Branch("ENDIST", endist, Form("endist[%d]/F", NENDIST));
 
