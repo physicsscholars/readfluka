@@ -24,7 +24,11 @@ int main(int argc, const char **argv)
 
   TString fname_in(argv[1]);
   TString fname_out;
-  if (argc == 3) fname_out = argv[2];  else fname_out = fname_in + ".root";
+  if (argc == 3) fname_out = argv[2];
+  else if (argc == 2) fname_out = fname_in + ".root";
+  else return usage();
+
+  clog << fname_in << "  ->  " << fname_out << ":\t" << flush;
 
   ReadFluka::Base::gVerbose = ReadFluka::kPRINT_NOTHING;
   ReadFluka::ROOT_UsrBin *usrbin = new ReadFluka::ROOT_UsrBin(fname_in.Data());
@@ -33,7 +37,9 @@ int main(int argc, const char **argv)
 
   while (usrbin->Read()) {
     usrbin->Histogram()->Write();
+    clog << usrbin->GetBinName() << "  " << flush;
   }
+  clog << endl;
 
   file->Close();
 

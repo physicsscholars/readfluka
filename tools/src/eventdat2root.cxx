@@ -40,6 +40,10 @@ int main(int argc, const char **argv)
   cout << "number of scored distributions: " << Nsco << endl;
 
   TFile *file = new TFile(fname_out.Data(), "recreate", title.Data());
+  if (file->IsZombie()) {
+    cerr << "Can't create " << fname_out.Data() << endl;
+    return CANT_OPEN_FILE;
+  }
   file->SetTitle(argv[1]);
 
   Float_t *Ed = new Float_t[Nregs];  //  memset(Ed, 0, sizeof(Float_t)*Nregs);

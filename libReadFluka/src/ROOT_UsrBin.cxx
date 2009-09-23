@@ -26,7 +26,7 @@ TH2F *ROOT_UsrBin::Histogram2(unsigned int z) const
 
 TH3F *ROOT_UsrBin::Histogram() const
 {
-  std::cout << "the name: \"" << GetBinName() << "\"" << std::endl;
+  //  std::cout << "\t\"" << GetBinName() << "\"" << std::flush;
   TH3F *h = new TH3F(GetBinName(), Form("%s (%d);x [cm];y [cm];z [cm]", GetBinName(), GetDistType()), GetNbinsX(), GetXmin(), GetXmax(), GetNbinsY(), GetYmin(), GetYmax(), GetNbinsZ(), GetZmin(), GetZmax());
   
   for (int x=1; x<=GetNbinsX(); x++)
