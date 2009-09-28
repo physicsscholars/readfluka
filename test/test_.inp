@@ -35,6 +35,10 @@ OPEN          -102.0                                                  NEW
 usryield.bin
 OPEN          +202.0                                                  NEW
 usryield.txt
+OPEN          -103.0                                                  NEW
+usrbdx.bin
+OPEN          +203.0                                                  NEW
+usrbdx.txt
 *
 * Each estimator is defined once for the binary file and once for the text one
 * in order to read the binary file with libReadFluka and compare it with the text file
@@ -72,6 +76,12 @@ USRYIELD     1401.0   ELECTRON   -102.0     VACUUM   LAYER00      1.0 e-
 USRYIELD       10.0        0.0      1.0 3.14159265       0.0      3.0 &
 USRYIELD     1401.0   ELECTRON   +202.0     VACUUM   LAYER00      1.0 e-
 USRYIELD       10.0        0.0      1.0 3.14159265       0.0      3.0 &
+*
+USRBDX         99.0      201.0   -103.0     VACUUM   LAYER00          fluence
+USRBDX         10.0                 2.0                           1.0 &
+*
+USRBDX         99.0      201.0    203.0     VACUUM   LAYER00          fluence
+USRBDX         10.0                 2.0                           1.0 &
 *
 USERDUMP      100.0                 0.0       -1.0                    dump
 *

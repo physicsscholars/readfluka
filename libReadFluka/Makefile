@@ -4,10 +4,9 @@ all:	libReadFluka.so libReadFlukaROOT.so
 
 
 ######################## libReadFluka ############
-libReadFluka.so: obj/UsrBin.o obj/UsrYield.o obj/EventDat.o obj/Mgdraw.o obj/Base.o
+libReadFluka.so: obj/UsrBin.o obj/UsrYield.o obj/EventDat.o obj/Mgdraw.o obj/Usxsuw.o obj/Base.o
 	@echo "Compiling $@"
 	@$(GCC) $(SOFLAGS) $^ -o $@
-
 
 obj/Base.o: src/Base.cxx src/Base.h
 	@echo "Compiling $@"
@@ -29,6 +28,9 @@ obj/Mgdraw.o: src/Mgdraw.cxx src/Mgdraw.h
 	@echo "Compiling $@"
 	@$(GCC) -c $(CXXFLAGS) $< -o $@
 
+obj/Usxsuw.o: src/Usxsuw.cxx src/Usxsuw.h
+	@echo "Compiling $@"
+	@$(GCC) -c $(CXXFLAGS) $< -o $@
 ########################## libReadFlukaROOT #####
 
 libReadFlukaROOT.so: obj/ROOT_UsrBin.o
