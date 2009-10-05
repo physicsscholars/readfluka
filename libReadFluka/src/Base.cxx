@@ -145,6 +145,8 @@ const char *Base::Code2Name(int code, bool replace) const
    */
 
   switch(code) {
+  case 1:
+    return "PROTON";
   case 201:
     return replace ? "ALL_PART" : "ALL-PART";
   case 202:
@@ -159,6 +161,8 @@ const char *Base::Code2Name(int code, bool replace) const
     return "NUCLEONS";
   case 208:
     return "ENERGY";
+  case 209:
+    return replace ? "PIONSPM" : "PIONS+-";
   case 210:
     return "BEAMPART";
   default:

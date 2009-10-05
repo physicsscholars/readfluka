@@ -1,10 +1,13 @@
 include ../Makefile.inc
 
-all:	libReadFluka.so libReadFlukaROOT.so
+all:	binary root
+
+binary:	libReadFluka.so
+root:	libReadFlukaROOT.so
 
 
 ######################## libReadFluka ############
-libReadFluka.so: obj/UsrBin.o obj/UsrYield.o obj/EventDat.o obj/Mgdraw.o obj/Usxsuw.o obj/Base.o
+libReadFluka.so: obj/UsrBin.o obj/UsrYield.o obj/EventDat.o obj/Mgdraw.o obj/UsrBdx.o obj/Base.o
 	@echo "Compiling $@"
 	@$(GCC) $(SOFLAGS) $^ -o $@
 
@@ -28,39 +31,28 @@ obj/Mgdraw.o: src/Mgdraw.cxx src/Mgdraw.h
 	@echo "Compiling $@"
 	@$(GCC) -c $(CXXFLAGS) $< -o $@
 
-obj/Usxsuw.o: src/Usxsuw.cxx src/Usxsuw.h
+obj/UsrBdx.o: src/UsrBdx.cxx src/UsrBdx.h
 	@echo "Compiling $@"
 	@$(GCC) -c $(CXXFLAGS) $< -o $@
+
+
 ########################## libReadFlukaROOT #####
 
-libReadFlukaROOT.so: obj/ROOT_UsrBin.o
+libReadFlukaROOT.so: obj/ROOT_UsrBin.o obj/ROOT_UsrBdx.o
 	@echo "Compiling $@"
 	@$(GCC) $(SOFLAGS) $^ -o $@
 
-obj/ROOT_UsrBin.o: src/ROOT_UsrBin.cxx src/ROOT_UsrBin.h
+obj/ROOT_%.o: src/ROOT_%.cxx src/ROOT_%.h src/%.cxx src/%.h
 	@echo "Compiling $@"
 	@$(GCC) -c $(CXXFLAGS) $< $(ROOTCFLAGS) -o $@
 
 
-########################## rdbin #################
-obj/rdbin.o:	src/rdbin.f
+
+########################## rdbin and ray #########
+%:	src/%.f
 	@echo "Compiling $@"
-	@$(FLUTIL)/fff $< && mv -f $(?:.f=.o) $@
+	$(FLUTIL)/lfluka -o $@ $<
 
-
-rdbin: obj/rdbin.o
-	@echo "Compiling $@"
-	$(FLUTIL)/lfluka -o rdbin obj/rdbin.o
-
-########################## ray ###################
-obj/ray.o:	src/ray.f
-	@echo "Compiling $@"
-	@$(FLUTIL)/fff $< && mv -f $(?:.f=.o) $@
-
-
-ray: obj/ray.o
-	@echo "Compiling $@"
-	$(FLUTIL)/lfluka -o ray obj/ray.o
 ##################################################
 
 #install: libReadFluka.so

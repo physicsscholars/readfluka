@@ -5,6 +5,7 @@
 #define CANT_OPEN_FILE 2
 #define FILENAME_EMPTY 3
 #define WRONG_FORMAT 4
+#define FATAL_ERROR 5
 
 ///////////////////////////////////////////////////////////////
 //

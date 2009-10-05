@@ -45,8 +45,8 @@ usrbdx.txt
 * by diff (run 'make test')
 *
 SCORE        ENERGY   BEAMPART
-EVENTDAT     -103.0                                                   evdat.bin
-*EVENTDAT     +103.0                                                   evdat.txt
+EVENTDAT     -503.0                                                   evdat.bin
+*EVENTDAT     +503.0                                                   evdat.txt
 *
 * Energy deposition density
 USRBIN        -10.0     ENERGY   -101.0       50.0      50.0     50.0 Ed
@@ -77,11 +77,17 @@ USRYIELD       10.0        0.0      1.0 3.14159265       0.0      3.0 &
 USRYIELD     1401.0   ELECTRON   +202.0     VACUUM   LAYER00      1.0 e-
 USRYIELD       10.0        0.0      1.0 3.14159265       0.0      3.0 &
 *
-USRBDX         99.0      201.0   -103.0     VACUUM   LAYER00          fluence
-USRBDX         10.0                 2.0                           1.0 &
+USRBDX        101.0     PROTON   -103.0     VACUUM   LAYER00    400.0 fluence
+USRBDX          5.0        0.0      5.0                           1.0 &
 *
-USRBDX         99.0      201.0    203.0     VACUUM   LAYER00          fluence
-USRBDX         10.0                 2.0                           1.0 &
+USRBDX        101.0     PROTON   +203.0     VACUUM   LAYER00    400.0 fluence
+USRBDX          5.0        0.0      5.0                           1.0 &
+*
+USRBDX          8.0   ALL-PART   -103.0     VACUUM   LAYER00    400.0 all
+USRBDX          5.0        0.0      5.0                           1.0 &
+*
+USRBDX          8.0   ALL-PART   +203.0     VACUUM   LAYER00    400.0 all
+USRBDX          5.0        0.0      5.0                           1.0 &
 *
 USERDUMP      100.0                 0.0       -1.0                    dump
 *
