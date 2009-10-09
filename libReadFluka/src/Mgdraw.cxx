@@ -294,8 +294,7 @@ int Mgdraw::ReadSource()
   Source *s = new Source(-fCASE, fNPFLKA, fNSTMAX, fTKESUM, fWEIPRI);
   
  
-  SizeEnd();	
-  SizeStart();
+  CheckFormat();
   
   for (int i=0; i<s->GetNpflka(); i++) {
     s->SetID(i, ReadInt());
@@ -308,7 +307,7 @@ int Mgdraw::ReadSource()
     
   }
 
-  SizeEnd(); SizeStart();
+  CheckFormat();
 
   s->Check();
 
@@ -332,14 +331,14 @@ int Mgdraw::ReadEnergy()
   Point *p = new Point(ReadInt(), ReadInt(), ReadFloat(), ReadFloat());
   if (fType == 1) p->SetGen(ReadInt());
 
-  SizeEnd(); SizeStart();
+  CheckFormat();
   
   p->SetX(ReadFloat());
   p->SetY(ReadFloat());
   p->SetZ(ReadFloat());
   p->SetEd(ReadFloat());
 
-  SizeEnd(); SizeStart();
+  CheckFormat();
 
   p->Check();
   if (p->GetGen() > GetGenCur()) SetGenCur(p->GetGen());
@@ -360,7 +359,7 @@ int Mgdraw::ReadTrack()
   Track *t = new Track(fCASE, ReadInt(), ReadInt(), ReadFloat(), ReadFloat());
   if (fType == 1) t->fl = ReadInt();
   
-  SizeEnd(); SizeStart();
+  CheckFormat();
  
   
   for (int i=0; i<t->fn+1; i++) {
@@ -376,7 +375,7 @@ int Mgdraw::ReadTrack()
   
   t->SetPath(ReadFloat());
  
-  SizeEnd(); SizeStart();
+  CheckFormat();
   
   t->Check();
   

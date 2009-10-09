@@ -38,6 +38,10 @@ int main(int argc, const char **argv)
   cout << "number of regions: " << Nregs << "\t";
   UInt_t Nsco = eventdat->GetNsco();
   cout << "number of scored distributions: " << Nsco << endl;
+  if (Nsco!=1) {
+  cerr << "currently only one distribution at a time supported" << endl;
+	return NOT_IMPLEMENTED;
+ }
 
   TFile *file = new TFile(fname_out.Data(), "recreate", title.Data());
   if (file->IsZombie()) {

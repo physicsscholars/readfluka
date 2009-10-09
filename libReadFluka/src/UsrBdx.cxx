@@ -68,8 +68,8 @@ void UsrBdx::ReadHeader()
     std::clog << "NCASE: "  << fNCASE << std::endl;
   }
 
-  ReadInt(3);
-  SizeStart();
+  ReadInt(2); // !!! What is this? !!!
+  CheckFormat();
 }
 
 bool UsrBdx::Read()
@@ -96,14 +96,14 @@ bool UsrBdx::Read()
   fABXLOW = ReadFloat(); fABXHGH = ReadFloat(); fNABXBN = ReadInt(); fDABXBN = ReadFloat();
 
 
-  SizeEnd(); SizeStart();
+  CheckFormat();
 
   if (fLLNUSX) { // read low energy neutrons
     fIGMUSX = ReadInt();
     fENGMAX = new float[fIGMUSX+1];
     for (int i=0; i<fIGMUSX+1; i++) fENGMAX[i] = ReadFloat();
     //    ReadFloat(2); // !!! Why? !!!
-    SizeEnd(); SizeStart();
+    CheckFormat(); 
   } else fIGMUSX = 0;
   // + see page 239 for further reading
 
@@ -116,7 +116,7 @@ bool UsrBdx::Read()
   
   for (int i=0; i<fNScored; i++) fScored[i] = ReadFloat();
 
-  SizeEnd(); SizeStart(); //std::cerr << "+++ OK in the end of UsrBdx::Read +++" << std::endl;
+  CheckFormat(); // std::cerr << "+++ OK in the end of UsrBdx::Read +++" << std::endl;
 
   return true;
 }

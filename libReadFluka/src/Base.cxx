@@ -89,7 +89,8 @@ bool Base::ReadBool(unsigned int n/* =1 */) const
 
 void Base::ReadRunTitle()
 {
-	ReadInt();
+  SizeStart(); //ReadInt();
+	
   fin->read(fchar, 80);
   if (!fin->good()) {
     if (gVerbose>=kPRINT_TITLE) std::cerr << "read error in Base::ReadRunTitle()" << std::endl;
@@ -195,7 +196,7 @@ int Base::Nint(float x) const
 int Base::SizeStart()
 {
   fSize_start = ReadInt();
-  // if (gVerbose>=kPRINT_MISC) std::clog << std::setw(100) << std::right << "*** SizeStart: " << fSize_start << std::endl;
+  //std::clog << std::setw(100) << std::right << "*** SizeStart: " << fSize_start << std::endl;
   return fSize_start;
 }
 
@@ -204,7 +205,7 @@ bool Base::SizeEnd()
   // Read size end and compare it with size start
 
   fSize_end = ReadInt();
-  //  if (gVerbose>=kPRINT_MISC) std::clog << std::setw(100) << std::right << "*** SizeEnd: " << fSize_end << std::endl;
+  //std::clog << std::setw(100) << std::right << "*** SizeEnd: " << fSize_end << std::endl;
 
   if (fSize_start != fSize_end) {
     std::cerr << "Base::CheckSize() warning:\t" << fSize_start << " " << fSize_end << std::endl;
@@ -212,6 +213,12 @@ bool Base::SizeEnd()
     return false;
   } //else std::cerr << "SizeEnd: \t record OK" << std::endl;
   
+  return true;
+}
+
+bool Base::CheckFormat()
+{
+  SizeEnd(); SizeStart();
   return true;
 }
 

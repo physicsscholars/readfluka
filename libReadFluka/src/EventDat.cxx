@@ -59,7 +59,8 @@ void EventDat::fReadHeader()
       if (gVerbose>kPRINT_MISC) clog << fISCORE[i] << ' ';
     }
     if (gVerbose>kPRINT_MISC) clog << endl;
-    ReadInt(); // should be SizeEnd, but for which SizeStart?
+    //    ReadInt(); // should be SizeEnd, but for which SizeStart?
+    SizeEnd();
   }
 }
 
@@ -93,7 +94,7 @@ void EventDat::fReadScoredDistributions()
       exit(WRONG_FORMAT);
     }
 
-    SizeEnd(); SizeStart();
+    CheckFormat(); 
 
     if (gVerbose>kPRINT_MISC) clog << "Reading the data for each " << fNREGS << " regions ..." << flush;
 
@@ -102,7 +103,7 @@ void EventDat::fReadScoredDistributions()
     fREGSCO.push_back(val);
     if (gVerbose>kPRINT_MISC) clog << " done" << endl;
 
-    SizeEnd(); SizeStart();
+    CheckFormat();
     
     // one dummy record (for historical reasons)
     //    ReadInt();
@@ -122,7 +123,7 @@ void EventDat::fReadScoredDistributions()
 
 void EventDat::fReadSeeds()
 {
-  SizeEnd(); SizeStart();
+  CheckFormat(); 
   //  if (gVerbose>kPRINT_MISC) clog << endl << "seeds after this event:\t";
   int iTmp;
   for (int i=0; i<10; i++)  {
@@ -149,13 +150,13 @@ bool EventDat::ReadEvent()
   fWEIPRU = ReadFloat();
   fENETOT = ReadFloat();
   
-  SizeEnd(); SizeStart();
+  CheckFormat();
   fReadENDIST();
 
-  SizeEnd(); SizeStart();
+  CheckFormat();
   fReadScoredDistributions();
   //  ReadInt(4);
-  SizeEnd(); SizeStart();
+  CheckFormat(); 
   
   return true;
 }
