@@ -16,4 +16,4 @@ clean:
 	@rm -fv *~ reader
 
 cleandata:
-	@rm -fv ran* *.{log,out,err,root,11,15,6} *_{usrbin,eventdat}
+	@rm -fv ran* *.{log,out,err,root,11,15,6} *_{usrbin,eventdat,dump}
