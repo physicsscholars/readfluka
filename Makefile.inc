@@ -1,3 +1,7 @@
+# $URL$
+# $Id$
+# $Date$
+
 date=`date +%y%m%d`
 PWD=$(shell pwd)
 
