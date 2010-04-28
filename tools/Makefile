@@ -1,11 +1,14 @@
 include ../Makefile.inc
 
-BINARY := eventdat2txt  usrbin2txt  usrbdx2txt  mgdraw2txt
+#BINARY := eventdat2txt  usrbin2txt  usrbdx2txt  mgdraw2txt
+BINARY := eventdat2txt  usrbin2txt  mgdraw2txt
 ROOT   := eventdat2root usrbin2root usrbdx2root
 
 targets := $(BINARY) $(ROOT)
 
 all:	$(targets)
+binary: $(BINARY)
+root:   $(ROOT)
 
 %2root: src/%2root.cxx
 	@echo "Compiling $@"
