@@ -2,6 +2,8 @@
 # $Id$
 # $Date$
 
+include Makefile.inc
+
 all:
 	make -C libReadFluka
 	make -C tools
@@ -18,3 +20,5 @@ clean:
 	make -C libReadFluka clean
 	make -C tools clean
 
+tar: clean
+	cd .. && tar jcf readfluka.$(date).tar.bz2 readfluka --exclude-tag-all=entries
