@@ -146,6 +146,8 @@ const char *Base::Code2Name(int code, bool replace) const
    */
 
   switch(code) {
+  case -1:
+    return "OPTIPHOT";
   case 1:
     return "PROTON";
   case 201:
