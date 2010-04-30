@@ -5,7 +5,7 @@ def usage():
     print main.__doc__
 
 def notsupported():
-    print("fluka2root:\tFree-format input is not yet supported.\n\t\tYou might consider writing a feature request at http://readfluka.googlecode.com.")
+    printincolor("fluka2root:\tFree-format input is not yet supported.\n\t\tYou might consider writing a feature request at http://readfluka.googlecode.com.")
 
 def str2int(s):
     try:
@@ -56,15 +56,15 @@ usage:\tfluka2root file.inp [N] [M]
 #    print N, M
 
     inp = open(argv[1], "r")
-    print "Input file: %s" % inpname
+#    print "Input file: %s" % inpname
+    isname = False
     for line in inp.readlines():
         if re.search("\AFREE", line):
             notsupported()
             sys.exit(2)
 
-    inp.seek(0)
-    isname = False
-    for line in inp.readlines():
+#    inp.seek(0)
+#    for line in inp.readlines():
         if isname is True:
             name = line[0:10].strip()
             opened[str2int(unit)] = name
@@ -131,7 +131,7 @@ usage:\tfluka2root file.inp [N] [M]
             printincolor(command)
             os.system(command)
 
-        sys.exit(return_value)
+    sys.exit(return_value)
 
 if __name__ == "__main__":
     sys.exit(main())
