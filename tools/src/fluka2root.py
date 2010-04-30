@@ -14,6 +14,13 @@ def str2int(s):
         ret = int(float(s))
     return ret
 
+def printincolor(s,col=37):
+    """
+Print a string with a given color using ANSI/VT100 Terminal Control Escape Sequences
+http://www.termsys.demon.co.uk/vtansi.htm
+    """
+    print "\033[1;%dm%s\033[0m" % (col, s)
+
 def main(argv=None):
     """
 fluka2root - a script to convert the output of all FLUKA estimators (supported by readfluka) to a single ROOT file.
@@ -79,18 +86,21 @@ usage:\tfluka2root file.inp [N] [M]
                 unit = line[30:40].strip()
                 name = line[70:80].strip()
                 print "\t", e, unit, name
-                if not unit in estimators[e]:
-                    estimators[e].append(unit)
+                if str2int(unit)<0: # we are interested in binary files only
+                    if not unit in estimators[e]:
+                        estimators[e].append(unit)
 
     print estimators
+
     if len(opened):
         for e in estimators:
             for i in estimators[e]:
                 i = str2int(i)
-                if i in opened:
-                    estimators[e] = [str("_%s" % opened[i])]
-                else:
-                    estimators[e] = ["_fort.%d" % i]
+                if i<0: # we are interested in binary files only
+                    if i in opened:
+                        estimators[e] = [str("_%s" % opened[i])]
+                    else:
+                        estimators[e] = ["_fort.%d" % i]
         print estimators
 
     inp.close()
@@ -106,15 +116,22 @@ usage:\tfluka2root file.inp [N] [M]
                 binfilename = inpname.replace(".inp", "%.3d%s" % (i, s))
                 rootfilenames.append(binfilename + ".root")
                 command =  "%s2root %s" % (e.lower(), binfilename)
-                print command
+                printincolor(command)
                 return_value = os.system(command)
                 if return_value is not 0:
                     print "warning: " % return_value
+                    sys.exit(return_value)
 # hadd
-        return_value = os.system("hadd %s %s" % (inpname.replace(".inp", "%.3d%s" % (i, ".root")), string.join(rootfilenames)))
+        command = "hadd %s %s" % (inpname.replace(".inp", "%.3d%s" % (i, ".root")), string.join(rootfilenames))
+        printincolor(command)
+        return_value = os.system(command)
 # remove tmp files
         if return_value is 0:
-            os.system("rm -v %s" % string.join(rootfilenames))
+            command = "rm -v %s" % string.join(rootfilenames)
+            printincolor(command)
+            os.system(command)
+
+        sys.exit(return_value)
 
 if __name__ == "__main__":
     sys.exit(main())
