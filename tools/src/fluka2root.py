@@ -92,16 +92,15 @@ usage:\tfluka2root file.inp [N] [M]
 
     print estimators
 
-    if len(opened):
-        for e in estimators:
-            for i in estimators[e]:
-                i = str2int(i)
-                if i<0: # we are interested in binary files only
-                    if i in opened:
-                        estimators[e] = [str("_%s" % opened[i])]
-                    else:
-                        estimators[e] = ["_fort.%d" % i]
-        print estimators
+    for e in estimators:
+        for i in estimators[e]:
+            i = str2int(i)
+            if i<0: # we are interested in binary files only
+                if i in opened:
+                    estimators[e] = [str("_%s" % opened[i])] # !!! what if we have 2 units for the same estimator? !!!
+                else:
+                    estimators[e] = ["_fort.%d" % abs(i)]
+    print estimators
 
     inp.close()
 
