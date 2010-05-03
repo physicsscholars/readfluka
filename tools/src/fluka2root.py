@@ -81,38 +81,50 @@ usage:\tfluka2root file.inp [N] [M]
     print "Supported estimators:"
     for line in inp.readlines():
         for e in estimators:
-            if re.search("\A%s" % e, line) and not re.search("\&", line[70:80]):
-#                print line.strip()
-                unit = line[30:40].strip()
-                name = line[70:80].strip()
-                print "\t", e, unit, name
-                if str2int(unit)<0: # we are interested in binary files only
-                    if not unit in estimators[e]:
-                        estimators[e].append(unit)
+            if e == "EVENTDAT":
+                if re.search("\A%s" % e, line):
+                    unit = line[10:20].strip()
+                    name = line[70:80].strip()
+                    print "\t", e, unit,name
+                    if str2int(unit)<0: # we are interested in binary files only
+                        if not unit in estimators[e]:
+                            estimators[e] = ["_%s" % name]
+            else:
+                if re.search("\A%s" % e, line) and not re.search("\&", line[70:80]):
+                    #                print line.strip()
+                    unit = line[30:40].strip()
+                    name = line[70:80].strip()
+                    print "\t", e, unit, name
+                    if str2int(unit)<0: # we are interested in binary files only
+                        if not unit in estimators[e]:
+                            estimators[e].append(unit)
 
     print estimators
 
-    for e in estimators:
-        for i in estimators[e]:
-            i = str2int(i)
-            if i<0: # we are interested in binary files only
-                if i in opened:
-                    estimators[e] = [str("_%s" % opened[i])] # !!! what if we have 2 units for the same estimator? !!!
+    for e, units in estimators.iteritems():
+        if e == "EVENTDAT":
+            continue
+        for u in units:
+            iu = str2int(u)
+            if iu<0: # we are interested in binary files only
+                if iu in opened:
+                    units[units.index(u)] = str("_%s" % opened[iu])
                 else:
-                    estimators[e] = ["_fort.%d" % abs(i)]
+                    units[units.index(u)] = "_fort.%d" % abs(iu)
+
     print estimators
 
     inp.close()
 
 # run converters
     return_value = 0
-    for i in range(N, M+1):
+    for run in range(N, M+1):
         binfilename = ""
         rootfilenames = []
         command = ""
         for e in estimators:
             for s in estimators[e]:
-                binfilename = inpname.replace(".inp", "%.3d%s" % (i, s))
+                binfilename = inpname.replace(".inp", "%.3d%s" % (run, s))
                 rootfilenames.append(binfilename + ".root")
                 command =  "%s2root %s" % (e.lower(), binfilename)
                 printincolor(command)
@@ -121,7 +133,7 @@ usage:\tfluka2root file.inp [N] [M]
                     print "warning: " % return_value
                     sys.exit(return_value)
 # hadd
-        command = "hadd %s %s" % (inpname.replace(".inp", "%.3d%s" % (i, ".root")), string.join(rootfilenames))
+        command = "hadd %s %s" % (inpname.replace(".inp", "%.3d%s" % (run, ".root")), string.join(rootfilenames))
         printincolor(command)
         return_value = os.system(command)
 # remove tmp files
