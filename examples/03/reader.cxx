@@ -42,7 +42,7 @@ int main(int argc, const char **argv)
 
   while (eventdat->ReadEvent() == kTRUE) {
     for (unsigned int reg=0; reg<Nregs; reg++) {
-      Ed[reg] = eventdat->GetValue(reg+1);
+      Ed[reg] = eventdat->GetValue(0, reg+1);
     }
 
     for (unsigned short iseed=0; iseed<NSEED; iseed++)

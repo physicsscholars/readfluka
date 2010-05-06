@@ -37,6 +37,7 @@ usage:\tfluka2root file.inp [N] [M]
 
     estimators = {"EVENTDAT" : [], "USRBDX" : [], "USRBIN" : []} # dictionary of supported estimators and their file units
     opened = {} # dictionary of the opened units (if any)
+    out_root_files = [] # list of output ROOT files
     
     inpname = argv[1]
     N = 1
@@ -81,7 +82,7 @@ usage:\tfluka2root file.inp [N] [M]
     print "Supported estimators:"
     for line in inp.readlines():
         for e in estimators:
-            if e == "EVENTDAT":
+            if e == "EVENTDAT": # EVENTDAT card has a different format than the other estimators
                 if re.search("\A%s" % e, line):
                     unit = line[10:20].strip()
                     name = line[70:80].strip()
@@ -91,7 +92,6 @@ usage:\tfluka2root file.inp [N] [M]
                             estimators[e] = ["_%s" % name]
             else:
                 if re.search("\A%s" % e, line) and not re.search("\&", line[70:80]):
-                    #                print line.strip()
                     unit = line[30:40].strip()
                     name = line[70:80].strip()
                     print "\t", e, unit, name
@@ -101,6 +101,7 @@ usage:\tfluka2root file.inp [N] [M]
 
     print estimators
 
+# Convert units in the file names:
     for e, units in estimators.iteritems():
         if e == "EVENTDAT":
             continue
@@ -133,14 +134,30 @@ usage:\tfluka2root file.inp [N] [M]
                     print "warning: " % return_value
                     sys.exit(return_value)
 # hadd
-        command = "hadd %s %s" % (inpname.replace(".inp", "%.3d%s" % (run, ".root")), string.join(rootfilenames))
+        out_root_file = inpname.replace(".inp", "%.3d%s" % (run, ".root"))
+        command = "hadd %s %s" % (out_root_file, string.join(rootfilenames))
         printincolor(command)
         return_value = os.system(command)
 # remove tmp files
         if return_value is 0:
             command = "rm -v %s" % string.join(rootfilenames)
             printincolor(command)
-            os.system(command)
+            return_value = os.system(command)
+            if return_value is 0:
+                out_root_files.append(out_root_file)
+            else:
+                sys.exit(return_value)
+
+    print out_root_files
+    if return_value is 0 and len(out_root_files)>1:
+        out_root_file = inpname.replace(".inp", ".root");
+        command = "hadd %s %s" % (out_root_file, string.join(out_root_files))
+        printincolor(command)
+        return_value = os.system(command)
+        if return_value is 0:
+            command = "rm -v %s" % string.join(out_root_files)
+            printincolor(command)
+            return_value = os.system(command)
 
     sys.exit(return_value)
 

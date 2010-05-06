@@ -7,7 +7,7 @@ reader: reader.cxx
 
 
 run:
-	$(FLUTIL)/rfluka -e $(FLUPRO)/flukahp -N0 -M1 ex03_
+	$(FLUTIL)/rfluka -e $(FLUTIL)/flukahp -N0 -M1 ex03_
 
 read:
 	./reader ex03_001_eventdat ex03_001_usrbin ex03.root
