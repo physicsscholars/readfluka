@@ -26,6 +26,7 @@ namespace ReadFluka {
     char                 *fchar;           // temprorary char
     char                 *fRunTitle;       // run title
     char                 *fRunTime;        // run time
+    bool                  bCheckFormat1st; // used by CheckFormat: true if we have not read the check format numbers yet
     
     
   protected:

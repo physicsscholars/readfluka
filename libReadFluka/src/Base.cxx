@@ -11,10 +11,10 @@ int Base::gVerbose = kPRINT_TITLE;
 
 Base::Base(const char *fname)
 {
-	/*
-		Constructor
-	 */
-
+  /*
+    Constructor
+  */
+  
   if (fname == 0) {
     std::cerr << "Base::Base: input file name is not specified" << std::endl;
     exit(FILENAME_EMPTY);
@@ -28,14 +28,16 @@ Base::Base(const char *fname)
   fchar     = new char[81];
   fRunTitle = new char[81];
   fRunTime  = new char[32];
+
+  bCheckFormat1st = true;
 }
 
 Base::~Base()
 {
-	/*
-		Destructor
-	 */
-
+  /*
+    Destructor
+  */
+  
   delete [] fRunTime;  fRunTime = 0;
   delete [] fRunTitle; fRunTitle = 0;
   delete [] fchar;     fchar = 0;
@@ -49,9 +51,9 @@ Base::~Base()
 int Base::ReadInt(unsigned int n/* =1 */) const
 {
   /*
-		Read n integers
-	*/
-
+    Read n integers
+  */
+  
   int data[n];
   fin->read((char *)data, sizeof(int)*n);
   if (fin->fail()) {
@@ -64,9 +66,9 @@ int Base::ReadInt(unsigned int n/* =1 */) const
 float Base::ReadFloat(unsigned int n/* =1 */) const
 {
   /*
-		Read n doubles
-	*/
-
+    Read n doubles
+  */
+  
   float data[n];
   fin->read((char *)data, sizeof(float)*n);
   if (fin->fail()) {
@@ -79,11 +81,11 @@ float Base::ReadFloat(unsigned int n/* =1 */) const
 bool Base::ReadBool(unsigned int n/* =1 */) const
 {
   /* 
-		 Read n bools
-		 since we're reading FORTRAN binary output, sizeof(bool) = sizeof(int)
-		 => read n ints:
-	*/
-
+     Read n bools
+     since we're reading FORTRAN binary output, sizeof(bool) = sizeof(int)
+     => read n ints:
+  */
+  
   return (bool)ReadInt(n);
 }
 
@@ -98,7 +100,7 @@ void Base::ReadRunTitle()
   fchar[80] = '\0';
 
   strcpy(fRunTitle, Trimmed(std::string(fchar)).c_str());
-	if (gVerbose>kPRINT_TITLE) std::clog << "Title:\t" << fRunTitle << std::endl;
+  if (gVerbose>kPRINT_TITLE) std::clog << "Title:\t" << fRunTitle << std::endl;
 }
 
 void Base::ReadRunTime()
@@ -108,9 +110,9 @@ void Base::ReadRunTime()
     if (gVerbose>=kPRINT_TITLE) std::cerr << "read error in Base::ReadRunTime()" << std::endl;
   };
   fchar[32] = '\0';
-
+  
   strcpy(fRunTime, Trimmed(std::string(fchar)).c_str());
-	if (gVerbose>=kPRINT_TITLE) std::clog << "Time:\t" << fRunTime << std::endl;
+  if (gVerbose>=kPRINT_TITLE) std::clog << "Time:\t" << fRunTime << std::endl;
 }
 
 float *Base::Read(int size) const
@@ -120,21 +122,21 @@ float *Base::Read(int size) const
   if (fin->fail()) {
     std::cerr << "read error in Base::Read()" << std::endl;
   };
-	
+  
   return data; // must be deleted
 }
 
 float *Base::ReadFortran()
 {
-	int size = ReadInt();
-	float *data = Read(size-3);
-	int size2 = ReadInt();
-	if (size != size2) {
-		std::cerr << "Base::ReadFortran(): read error: " << size << " != " << size2 << std::endl;
-		//	delete [] data;
-		return 0;
-	}
-	return data;
+  int size = ReadInt();
+  float *data = Read(size-3);
+  int size2 = ReadInt();
+  if (size != size2) {
+    std::cerr << "Base::ReadFortran(): read error: " << size << " != " << size2 << std::endl;
+    //	delete [] data;
+    return 0;
+  }
+  return data;
 }
 
 const char *Base::Code2Name(int code, bool replace) const
@@ -178,26 +180,27 @@ const char *Base::Code2Name(int code, bool replace) const
 
 int Base::Nint(float x) const
 {
-	/* 
-		 Round to nearest integer. Rounds half integers to the nearest even integer.
-	 */
-
-   int i;
-   if (x >= 0) {
-      i = int(x + 0.5);
-      if (x + 0.5 == float(i) && i & 1) i--;
-   } else {
-      i = int(x - 0.5);
-      if (x - 0.5 == float(i) && i & 1) i++;
-
-   }
-
-   return i;
+  /* 
+     Round to nearest integer. Rounds half integers to the nearest even integer.
+  */
+  
+  int i;
+  if (x >= 0) {
+    i = int(x + 0.5);
+    if (x + 0.5 == float(i) && i & 1) i--;
+  } else {
+    i = int(x - 0.5);
+    if (x - 0.5 == float(i) && i & 1) i++;
+    
+  }
+  
+  return i;
 }
 
 int Base::SizeStart()
 {
   fSize_start = ReadInt();
+  bCheckFormat1st = false;
   //std::clog << std::setw(100) << std::right << "*** SizeStart: " << fSize_start << std::endl;
   return fSize_start;
 }
@@ -208,7 +211,7 @@ bool Base::SizeEnd()
 
   fSize_end = ReadInt();
   //std::clog << std::setw(100) << std::right << "*** SizeEnd: " << fSize_end << std::endl;
-
+  
   if (fSize_start != fSize_end) {
     std::cerr << "Base::CheckSize() warning:\t" << fSize_start << " " << fSize_end << std::endl;
     exit(WRONG_FORMAT);
@@ -220,7 +223,11 @@ bool Base::SizeEnd()
 
 bool Base::CheckFormat()
 {
-  SizeEnd(); SizeStart();
+  if (bCheckFormat1st == false) {
+    SizeEnd(); 
+    bCheckFormat1st = true;
+  }
+  SizeStart();
   return true;
 }
 
