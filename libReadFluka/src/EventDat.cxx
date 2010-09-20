@@ -69,7 +69,9 @@ void EventDat::fReadENDIST()
   /*
     Read 12 energy contributions to the total energy balance ( NOT normalized to the weight of primary)
   */
-
+  cerr << " ->fReadENDIST" << endl;
+  CheckFormat();
+  cout << " ->fReadENDIST after check format" << endl;
   fin->read((char *)fENDIST, sizeof(float)*NENDIST); // 48=4*12
 }
 
@@ -78,6 +80,9 @@ void EventDat::fReadScoredDistributions()
   /* 
      read scored distributions
   */
+
+  cerr << "->fReadScoredDistributions" << endl;
+  CheckFormat();
 
   int iisc;
   int iscore[fNSCO];
@@ -99,24 +104,29 @@ void EventDat::fReadScoredDistributions()
     if (gVerbose>kPRINT_MISC) clog << "Reading the data for each " << fNREGS << " regions ..." << flush;
 
     val.clear();
-    for (unsigned int region=0; region<fNREGS; region++) val.push_back(ReadFloat());
+    float tmp;
+    for (unsigned int region=0; region<fNREGS; region++) {
+      tmp = ReadFloat(); cout << tmp << " ";
+      val.push_back(tmp);
+    } cout << endl;
     fREGSCO.push_back(val);
     if (gVerbose>kPRINT_MISC) clog << " done" << endl;
-
     CheckFormat();
-    
-    // one dummy record (for historical reasons)
-    //    ReadInt();
 
-    int ndum = ReadInt();
+    int position = fin->tellg();
+    int   ndum = ReadInt();
     float dum1 = ReadFloat();
     float dum2 = ReadFloat();
     
     if (dum1 < 0) {
+      cerr << "seeds follow" << endl;
       fReadSeeds();
     } else {
+      cerr << "here5" << endl;
       //      clog << "****************** seek" << endl;
-      fin->seekg(-12, ios::cur);
+      //CheckFormat();
+      cerr << "here6" << endl;
+      fin->seekg(position, ios::beg);
     }
   }
 }
@@ -136,12 +146,17 @@ void EventDat::fReadSeeds()
   }
   //  if (gVerbose>kPRINT_MISC) clog << endl;
   //clog << "******** reading seeds done *** " << endl;
+  CheckFormat();
 }
 
 bool EventDat::ReadEvent()
 {
+  cerr << "->ReadEvent" << endl;
     // read 1 event from the data file
-  if (fNCASE==0) SizeStart();
+  if (fNCASE==0) {
+    cerr << "size start" << endl;
+    SizeStart();
+  }
   fREGSCO.clear();
   
   fNCASE = ReadInt();
@@ -149,14 +164,12 @@ bool EventDat::ReadEvent()
   if (gVerbose>kPRINT_MISC) clog << "reading event #: " << fNCASE << endl;
   fWEIPRU = ReadFloat();
   fENETOT = ReadFloat();
-  
-  CheckFormat();
+
   fReadENDIST();
 
-  CheckFormat();
   fReadScoredDistributions();
   //  ReadInt(4);
-  CheckFormat(); 
+  // CheckFormat(); 
   
   return true;
 }
