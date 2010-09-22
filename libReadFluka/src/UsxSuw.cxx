@@ -1,13 +1,15 @@
+//     	       	       	NOT YET	IMLEMENTED - just a copy from UsrBdx!!!
+
 #include <iostream>
 #include <sstream>
 #include <cstring>
 #include <cstdlib> // for exit()
 
-#include "UsrSuw.h"
+#include "UsxSuw.h"
 
 using namespace ReadFluka;
 
-UsrSuw::UsrSuw(const char *fname) : Base(fname)
+UsxSuw::UsxSuw(const char *fname) : Base(fname)
 {
   fIsReadHeader = false;
   fWEIPRI = 0;
@@ -19,12 +21,12 @@ UsrSuw::UsrSuw(const char *fname) : Base(fname)
   ReadHeader();
 }
 
-UsrSuw::~UsrSuw()
+UsxSuw::~UsxSuw()
 {
   Reset();
 }
 
-void UsrSuw::Reset()
+void UsxSuw::Reset()
 {
   fMX = 0;
   fTITUSX = "";
@@ -53,7 +55,7 @@ void UsrSuw::Reset()
   }
 }
 
-void UsrSuw::ReadHeader()
+void UsxSuw::ReadHeader()
 {
   if (fIsReadHeader == true) return;
 
@@ -72,7 +74,7 @@ void UsrSuw::ReadHeader()
   CheckFormat();
 }
 
-bool UsrSuw::Read()
+bool UsxSuw::Read()
 {
   if (fin->eof()) return false; // exit the while-loop if reached the end of the file
   Reset();
@@ -116,12 +118,12 @@ bool UsrSuw::Read()
   
   for (int i=0; i<fNScored; i++) fScored[i] = ReadFloat();
 
-  CheckFormat(); // std::cerr << "+++ OK in the end of UsrSuw::Read +++" << std::endl;
+  CheckFormat(); // std::cerr << "+++ OK in the end of UsxSuw::Read +++" << std::endl;
 
   return true;
 }
 
-float UsrSuw::GetScored(unsigned int ie, unsigned int ia) const
+float UsxSuw::GetScored(unsigned int ie, unsigned int ia) const
 {
   /*
     Return the scored value in the ie-ja-cell.
@@ -146,7 +148,7 @@ float UsrSuw::GetScored(unsigned int ie, unsigned int ia) const
   return fScored[e + a*fNEBXBN];
 }
 
-std::string UsrSuw::GetBinTitle() const
+std::string UsxSuw::GetBinTitle() const
 {
   std::ostringstream tmp;
   if (IsFluence()) tmp << "Fluence of ";
@@ -166,19 +168,19 @@ std::string UsrSuw::GetBinTitle() const
   return tmp.str();
 }
 
-const char* UsrSuw::GetXtitle() const
+const char* UsxSuw::GetXtitle() const
 {
   if (GetType()>0) return "E_{kin} [GeV]";
   else return "lg(E_{kin}/1 GeV)";
 }
 
-const char* UsrSuw::GetYtitle() const
+const char* UsxSuw::GetYtitle() const
 {
   if (abs((float)GetType())<=1) return "#Omega [sr]";
   else return "lg(#Omega/1 sr)";
 }
 
-/*bool UsrSuw::IsLogA() const
+/*bool UsxSuw::IsLogA() const
 {
   int i= int(std::abs(float(GetType())));
   std::cout << "nint: " << i << std::endl;
@@ -187,7 +189,7 @@ const char* UsrSuw::GetYtitle() const
   return (i<=1);
   }*/
 
-void UsrSuw::Print() const
+void UsxSuw::Print() const
 {
   std::cout << "Bdrx n. " << GetCardNumber() << " \"" << GetBinName() << "\"" <<  std::flush;
   std::cout << ", generalized particle n. " << GetID() << std::flush;

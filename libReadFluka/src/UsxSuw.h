@@ -1,9 +1,9 @@
-#ifndef UsrSuw_h
-#define UsrSuw_h
-
+#ifndef UsxSuw_h
+#define UsxSuw_h
+//                      NOT YET IMLEMENTED - just a copy from UsrBdx!!!
 ///////////////////////////////////////////////
 //
-// UsrSuw - a class to read the binary output of usxsuw - the FLUKA tool to analyse and combine the
+// UsxSuw - a class to read the binary output of usxsuw - the FLUKA tool to analyse and combine the
 // USRBDX estimator output.
 //
 ///////////////////////////////////////////////
@@ -15,7 +15,7 @@
 #include <cmath>
 
 namespace ReadFluka {
-  class UsrSuw : public Base {
+  class UsxSuw : public Base {
   private:
     int        fMX;        // USRBDX card number
 
@@ -50,8 +50,8 @@ namespace ReadFluka {
     void       ReadHeader();
     void       Reset();
   public:
-    UsrSuw(const char *fname);
-    virtual ~UsrSuw();
+    UsxSuw(const char *fname);
+    virtual ~UsxSuw();
 
     bool Read();
 
