@@ -45,6 +45,7 @@ namespace ReadFluka {
     inline int            GetK() const {return fK;}
 
     //inline const float *GetRNDATA() const {return fRNDATA;}
+    std::vector< std::vector<float> > GetRNDATA() const {return fRNDATA;}
     
 
     void Print() const;

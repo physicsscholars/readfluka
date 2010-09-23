@@ -51,8 +51,13 @@ int main(int argc, const char **argv)
   cout << "\tZ\tA\tresidual nuclei" << endl;
   cout << "\t\t\tper cm**3 per primary" << endl;
 
-
-
+  /*  float tmp;
+  for (int i=0; i<resnuclei->GetIZRHGH(); i++)
+    for (int j=0; j<resnuclei->GetIMRHGH(); j++) {
+      tmp = resnuclei->GetRNDATA()[i][j];
+      cout << "\t" << i+1 << " " << j+1 << " " << resnuclei->GetK() << endl;
+      cout << "\t" << i+1 << "\t" << j+1+resnuclei->GetK()+2*(i+1) << "\t" << tmp << endl;
+      }*/
   delete resnuclei;
   
   return 0;

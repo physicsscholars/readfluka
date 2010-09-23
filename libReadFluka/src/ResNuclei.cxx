@@ -81,12 +81,11 @@ bool ResNuclei::Read()
     val.clear();
     for (int j=0; j<fIMRHGH; j++) {
       tmp = ReadFloat(); 
-      if (tmp>0) // add +1 since in C++ we count from 0
-	std::cout << i << " " << j << " " << tmp << std::endl;
-      //	std::cout << i+1 << " " << j+fK+2*i+1 << " " << tmp << std::endl;
-      //      val.push_back(tmp);
+      //if (tmp>0) // add +1 since in C++ we count from 0
+      std::cout << i+1 << " " << j+1+fK+2*(i+1) << " " << tmp << std::endl;
+      val.push_back(tmp);
     }
-    //    fRNDATA.push_back(val);
+    fRNDATA.push_back(val);
   }
   CheckFormat();
 
