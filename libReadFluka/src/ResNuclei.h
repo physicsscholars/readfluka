@@ -26,7 +26,7 @@ namespace ReadFluka {
     int fIZRHGH; // maximum Z of the scoring (minimum Z: 1)
     int fK; // what is it? !!!
     std::vector< std::vector<float> > fRNDATA; // residual nuclei data - the scored values
-
+    //float fRNDATA[100][260];
 
     bool ReadHeader();
   public:

@@ -77,16 +77,16 @@ bool ResNuclei::Read()
   std::vector <float> val; // scored values
   float tmp;
   std::cout << "IZRHGH and IMRHGH: " << fIZRHGH << " " << fIMRHGH << std::endl;
-  for (int i=0; i<fIZRHGH; i++) {
+  for (int i=0; i<fIMRHGH; i++) {
     val.clear();
-    for (int j=0; j<fIMRHGH; j++) {
+    for (int j=0; j<fIZRHGH; j++) {
       tmp = ReadFloat(); 
-      //if (tmp>0) // add +1 since in C++ we count from 0
-      std::cout << i+1 << " " << j+1+fK+2*(i+1) << " " << tmp << std::endl;
+      //      std::cout << tmp << "\t\t" << std::flush;
       val.push_back(tmp);
     }
     fRNDATA.push_back(val);
   }
+
   CheckFormat();
 
 
