@@ -10,7 +10,7 @@ int main(int argc, const char **argv)
   
   cout << "***** " << resnuclei->GetRunTitle() << " *****" << endl;
   cout << resnuclei->GetRunTime() << endl;
-  cout << "Total number of particles followed " << resnuclei->GetEntryNumber() << flush;
+  cout << "Total number of particles followed " << resnuclei->GetEntryNumber();
   cout << ", for a total weight of " << resnuclei->GetWeight() << endl;
   
   resnuclei->Read();
@@ -26,7 +26,19 @@ int main(int argc, const char **argv)
 
   if (abs(resnuclei->GetITURSN())<1) { // see page 211
     //    cout << "Res. nucl #" << fNRN << " " << fTIURSN << ", high energy products, region " << fITURSN << fNRURSN << fVURSNC << fIMRHGH + fK << fK+1 << endl;
+    cout << "Res. nuclei n. " << resnuclei->GetNRN() << " \"" << resnuclei->GetTIURSN() 
+	 << "\", 'high' energy products, region n. " << resnuclei->GetNRURSN() << endl;
+    cout << "\tdetector volume: " << resnuclei->GetVURSNC() << " cm**3" << endl;
+    cout << "\tMax. Z: " << resnuclei->GetIZRHGH();
+    cout << ", Max. N-Z: " << resnuclei->GetIMRHGH() + resnuclei->GetK();
+    cout << ", Min. N-Z: " << resnuclei->GetK()+1 << endl;
   } else if (abs(resnuclei->GetITURSN())<2) {
+    cout << "Res. nuclei n. " << resnuclei->GetNRN() << " \"" << resnuclei->GetTIURSN() 
+	 << "\", 'low' energy products, region n. " << resnuclei->GetNRURSN() << endl;
+    cout << "\tdetector volume: " << resnuclei->GetVURSNC() << " cm**3" << endl;
+    cout << "\tMax. Z: " << resnuclei->GetIZRHGH();
+    cout << ", Max. N-Z: " << resnuclei->GetIMRHGH() + resnuclei->GetK();
+    cout << ", Min. N-Z: " << resnuclei->GetK()+1 << endl;
   } else {
     cout << "Res. nuclei n. " << resnuclei->GetNRN() << " \"" << resnuclei->GetTIURSN() 
 	 << "\", all products, region n. " << resnuclei->GetNRURSN() << endl;
@@ -36,6 +48,9 @@ int main(int argc, const char **argv)
     cout << ", Min. N-Z: " << resnuclei->GetK()+1 << endl;
   }  
   
+  cout << "\tZ\tA\tresidual nuclei" << endl;
+  cout << "\t\t\tper cm**3 per primary" << endl;
+
 
 
   delete resnuclei;

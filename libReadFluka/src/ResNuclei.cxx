@@ -37,23 +37,28 @@ void ResNuclei::Reset()
   fVURSNC = 0.0f;
   fIMRHGH = fIZRHGH = 0;
   fK = 0;
+  fRNDATA.clear();
 }
 
-void ResNuclei::ReadHeader()
+bool ResNuclei::ReadHeader()
 {
-  if (fIsReadHeader == true) return;
-
+  if (fIsReadHeader == true) return false;
   fIsReadHeader = true;
-  ReadRunTitle();
+  ReadRunTitle(); // here also SizeStart called 
   ReadRunTime();
+  //ReadInt();
+  //std::cerr << SizeStart() << std::endl;
   fWEIPRI = ReadFloat();
   fNCASE  = ReadInt();
-  //CheckFormat();
+  std::cout << "->strange numbers: " << ReadInt() << " " << ReadInt() << std::endl;
+  CheckFormat();
+
+  return true;
 }
 
 bool ResNuclei::Read()
 {
-  ReadInt(4);
+  //ReadInt(4);
   fNRN = ReadInt();
 
   char *mychar = new char[10];
@@ -67,7 +72,23 @@ bool ResNuclei::Read()
   fIZRHGH = ReadInt();
   fK = ReadInt();
 
- 
+  CheckFormat();
+
+  std::vector <float> val; // scored values
+  float tmp;
+  std::cout << "IZRHGH and IMRHGH: " << fIZRHGH << " " << fIMRHGH << std::endl;
+  for (int i=0; i<fIZRHGH; i++) {
+    val.clear();
+    for (int j=0; j<fIMRHGH; j++) {
+      tmp = ReadFloat(); 
+      if (tmp>0) // add +1 since in C++ we count from 0
+	std::cout << i << " " << j << " " << tmp << std::endl;
+      //	std::cout << i+1 << " " << j+fK+2*i+1 << " " << tmp << std::endl;
+      //      val.push_back(tmp);
+    }
+    //    fRNDATA.push_back(val);
+  }
+  CheckFormat();
 
 
   delete [] mychar; mychar = 0;

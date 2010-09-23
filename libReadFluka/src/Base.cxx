@@ -218,6 +218,7 @@ bool Base::SizeEnd()
     return false;
   } //else std::cerr << "SizeEnd: \t record OK" << std::endl;
   
+  std::cerr << "->check format ok: " << fSize_start << std::endl;
   return true;
 }
 

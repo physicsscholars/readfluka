@@ -25,7 +25,10 @@ namespace ReadFluka {
     int fIMRHGH; // maximum M=N-Z-NMZ_min of the scoring (minimum M: 1). Note: N-Z=M+NMZ_min,N=M+Z+NMZ_min
     int fIZRHGH; // maximum Z of the scoring (minimum Z: 1)
     int fK; // what is it? !!!
-    void ReadHeader();
+    std::vector< std::vector<float> > fRNDATA; // residual nuclei data - the scored values
+
+
+    bool ReadHeader();
   public:
     ResNuclei(const char *fname);
     virtual ~ResNuclei();
@@ -40,6 +43,8 @@ namespace ReadFluka {
     inline int            GetIMRHGH() const {return fIMRHGH;}
     inline int            GetIZRHGH() const {return fIZRHGH;}
     inline int            GetK() const {return fK;}
+
+    //inline const float *GetRNDATA() const {return fRNDATA;}
     
 
     void Print() const;
