@@ -3,7 +3,7 @@
 
 ///////////////////////////////////////////////
 //
-// UsrBdx - a class to read the binary output of usxsuw - the FLUKA tool to analyse and combine the
+// UsrBdx - a class to read the
 // USRBDX estimator output.
 //
 ///////////////////////////////////////////////

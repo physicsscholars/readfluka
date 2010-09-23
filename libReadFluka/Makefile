@@ -40,8 +40,8 @@ obj/UsxSuw.o: src/UsxSuw.cxx src/UsxSuw.h
 	@$(GCC) -c $(CXXFLAGS) $< -o $@
 
 obj/ResNuclei.o: src/ResNuclei.cxx src/ResNuclei.h
-        @echo "Compiling $@"
-        @$(GCC) -c $(CXXFLAGS) $< -o $@
+	@echo "Compiling $@"
+	@$(GCC) -c $(CXXFLAGS) $< -o $@
 
 
 ########################## libReadFlukaROOT #####

@@ -118,6 +118,7 @@ bool UsrBdx::Read()
 
   CheckFormat(); // std::cerr << "+++ OK in the end of UsrBdx::Read +++" << std::endl;
 
+  delete [] mychar; mychar = 0; // is it ok? !!!
   return true;
 }
 
