@@ -15,17 +15,7 @@ int main(int argc, const char **argv)
   
   resnuclei->Read();
 
-  /*cout << "NRN: " << fNRN << endl;
-  cout << "TIURSN: " << fTIURSN << endl;
-  cout << "ITURSN: " << fITURSN << endl;
-  cout << "NRURSN: " << fNRURSN << endl;
-  cout << "VURSNC: " << fVURSNC << " cm3" << endl;
-  cout << "IMRHGH: " << fIMRHGH << endl;
-  cout << "IZRHGH: " << fIZRHGH << endl;
-  cout << "K: " << fK << endl;*/
-
   if (abs(resnuclei->GetITURSN())<1) { // see page 211
-    //    cout << "Res. nucl #" << fNRN << " " << fTIURSN << ", high energy products, region " << fITURSN << fNRURSN << fVURSNC << fIMRHGH + fK << fK+1 << endl;
     cout << "Res. nuclei n. " << resnuclei->GetNRN() << " \"" << resnuclei->GetTIURSN() 
 	 << "\", 'high' energy products, region n. " << resnuclei->GetNRURSN() << endl;
     cout << "\tdetector volume: " << resnuclei->GetVURSNC() << " cm**3" << endl;
@@ -47,22 +37,16 @@ int main(int argc, const char **argv)
     cout << ", Max. N-Z: " << resnuclei->GetIMRHGH() + resnuclei->GetK();
     cout << ", Min. N-Z: " << resnuclei->GetK()+1 << endl;
   }  
-  
-  cout << "\tZ\tA\tresidual nuclei" << endl;
-  cout << "\t\t\tper cm**3 per primary" << endl;
 
-  float tmp;
-  int iCount=0;
-  for (int i=0; i<resnuclei->GetIZRHGH(); i++)
-    for (int j=0; j<resnuclei->GetIMRHGH(); j++) {
-      tmp = resnuclei->GetRNDATA()[j][i];
-      //      cout << "\t" << i+1 << " " << j+1 << " " << resnuclei->GetK() << endl;
-      if (tmp>0)
-	cout << "\t" << i+1 << "\t" << j+1+resnuclei->GetK()+2*(i+1) << "\t" << tmp << endl;
-      iCount++;
-    }
-  cout << "total: " << iCount << endl;
-  
+
+  resnuclei->Print();
+
+  int Z = 12;
+  int A = 22;
+  cout << "Z=" << Z << "\tA=" << A << "\t" << resnuclei->GetRNDATA(Z, A) << endl;
+  cout << "Zmax = " << resnuclei->GetZmax() << endl;
+  cout << "Amax = " << resnuclei->GetAmax() << endl;
+
   delete resnuclei;
  
   return 0;

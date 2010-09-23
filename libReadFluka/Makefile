@@ -46,7 +46,7 @@ obj/ResNuclei.o: src/ResNuclei.cxx src/ResNuclei.h
 
 ########################## libReadFlukaROOT #####
 
-libReadFlukaROOT.so: obj/ROOT_UsrBin.o obj/ROOT_UsrBdx.o
+libReadFlukaROOT.so: obj/ROOT_UsrBin.o obj/ROOT_UsrBdx.o obj/ROOT_ResNuclei.o
 	@echo "Compiling $@"
 	@$(GCC) $(SOFLAGS) $^ -o $@
 
