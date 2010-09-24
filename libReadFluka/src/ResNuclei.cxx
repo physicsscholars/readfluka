@@ -16,6 +16,7 @@ ResNuclei::ResNuclei(const char *fname) : Base(fname)
   //fScored = 0;
   Reset();
 
+  fIsReadHeader = false;
   ReadHeader();
 }
 
@@ -29,7 +30,7 @@ void ResNuclei::Reset()
   /*
     Reset the private members
    */
-  fIsReadHeader = false;
+  //fIsReadHeader = false;
   fNRN = 0;
   fTIURSN = "";
   fITURSN = 0;
@@ -51,7 +52,8 @@ bool ResNuclei::ReadHeader()
   //std::cerr << SizeStart() << std::endl;
   fWEIPRI = ReadFloat();
   fNCASE  = ReadInt();
-  std::cout << "->strange numbers: " << ReadInt() << " " << ReadInt() << std::endl;
+  if (1) ReadInt(2); // strange numbers
+  else  std::cout << "->strange numbers: " << ReadInt() << " " << ReadInt() << std::endl;
   CheckFormat();
 
   return true;
@@ -59,7 +61,9 @@ bool ResNuclei::ReadHeader()
 
 bool ResNuclei::Read()
 {
-  //ReadInt(4);
+  if (fin->eof()) return false;
+  Reset();
+
   fNRN = ReadInt();
 
   char *mychar = new char[10];
@@ -77,7 +81,7 @@ bool ResNuclei::Read()
 
   std::vector <float> val; // scored values
   float tmp;
-  std::cout << "IZRHGH and IMRHGH: " << fIZRHGH << " " << fIMRHGH << std::endl;
+  //std::cout << "IZRHGH and IMRHGH: " << fIZRHGH << " " << fIMRHGH << std::endl;
   for (int i=0; i<fIMRHGH; i++) {
     val.clear();
     for (int j=0; j<fIZRHGH; j++) {
@@ -90,7 +94,6 @@ bool ResNuclei::Read()
   }
 
   CheckFormat();
-
 
   delete [] mychar; mychar = 0;
 
@@ -109,6 +112,7 @@ float ResNuclei::GetRNDATA(unsigned int Z, unsigned int A) const
   }
   if (A>GetAmax()) {
     std::cerr << "WARNING by GetRNDATA: A = " << A << " > Amax" << GetAmax() << std::endl;
+    return 0.0f;
   }
   Z = Z-1;
   A = A-1-fK-2*(Z+1);
@@ -144,23 +148,16 @@ std::string ResNuclei::GetBinTitle() const
   std::ostringstream tmp;
 
   if (abs(GetITURSN())<1) { // see page 211
-    tmp << "Res. nuclei \"" << GetTIURSN() 
-	 << "\", 'high' energy products, region n. " << GetNRURSN() << std::flush;
-    tmp << " detector volume: " << GetVURSNC() << " cm^{3}" << std::flush;
-
+    tmp << "Res. nuclei production rate: 'high' energy products in the region " << GetNRURSN() << std::flush;
   } else if (abs(GetITURSN())<2) {
-    tmp << "Res. nuclei \"" << GetTIURSN() 
-	 << "\", 'low' energy products, region n. " << GetNRURSN() << std::flush;
-    tmp << " detector volume: " << GetVURSNC() << " cm^{3}" << std::flush;
+    tmp << "Res. nuclei production rate: 'low' energy products in the region " << GetNRURSN() << std::flush;
   } else {
-    tmp << "Res. nuclei \"" << GetTIURSN() 
-	 << "\", all products, region n. " << GetNRURSN() << std::flush;
-    tmp << " detector volume: " << GetVURSNC() << " cm^{3}" << std::flush;
+    tmp << "Res. nuclei production rate: all products in the region " << GetNRURSN() << std::flush;
   }  
+  tmp << ", detector volume: " << GetVURSNC() << " cm^{3}" << std::flush;
   tmp << " ( Z_{max} = " << GetIZRHGH();
   tmp << ", (N-Z)_{max} = " << GetIMRHGH() + GetK();
   tmp << ", (N-Z)_{min} = " << GetK()+1 << " )" << std::flush;
-  
 
   return tmp.str();
 }

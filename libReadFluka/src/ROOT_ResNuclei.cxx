@@ -25,11 +25,11 @@ TH2F *ROOT_ResNuclei::Histogram() const
 
 
   TH2F *h = new TH2F(GetBinName().data(), ROOT_ResNuclei::GetBinTitle().Data(), 
-  		     GetNbinsZ(), zmin, zmax,
+  		     GetNbinsZ(),   zmin, zmax,
   		     GetNbinsA()+2, amin, amax+2);
 
-  std::cout << h->GetName() << " " << h->GetNbinsX() << " " << h->GetXaxis()->GetXmin() << " " << h->GetXaxis()->GetXmax() << std::endl;
-  std::cout << h->GetName() << " " << h->GetNbinsY() << " " << h->GetYaxis()->GetXmin() << " " << h->GetYaxis()->GetXmax() << std::endl;
+  //  std::cout << h->GetName() << " " << h->GetNbinsX() << " " << h->GetXaxis()->GetXmin() << " " << h->GetXaxis()->GetXmax() << std::endl;
+  // std::cout << h->GetName() << " " << h->GetNbinsY() << " " << h->GetYaxis()->GetXmin() << " " << h->GetYaxis()->GetXmax() << std::endl;
 
   float tmp;
   for (int i=0; i<GetIZRHGH(); i++)
@@ -41,7 +41,7 @@ TH2F *ROOT_ResNuclei::Histogram() const
     }
  
  
- // h->SetEntries(GetEntryNumber());
+  h->SetEntries(GetEntryNumber());
  
  return h;
 }

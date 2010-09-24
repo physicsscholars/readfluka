@@ -34,11 +34,10 @@ int main(int argc, const char **argv)
 
   TFile *file = TFile::Open(fname_out.Data(), "recreate");
 
-  //while (resnuclei->Read()) {
-    resnuclei->Read();
+  while (resnuclei->Read()) {
     resnuclei->Histogram()->Write();
     clog << resnuclei->GetBinName() << "  " << flush;
-    //}
+  }
   clog << endl;
 
   file->Close();
