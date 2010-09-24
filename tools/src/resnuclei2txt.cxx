@@ -39,7 +39,7 @@ int main(int argc, const char **argv)
       cout << ", Min. N-Z: " << resnuclei->GetK()+1 << endl;
     }  
     
-    //resnuclei->Print();
+    resnuclei->Print();
   }
 
   int Z = 12;
