@@ -144,27 +144,23 @@ std::string ResNuclei::GetBinTitle() const
   std::ostringstream tmp;
 
   if (abs(GetITURSN())<1) { // see page 211
-    tmp << "Res. nuclei n. " << GetNRN() << " \"" << GetTIURSN() 
+    tmp << "Res. nuclei \"" << GetTIURSN() 
 	 << "\", 'high' energy products, region n. " << GetNRURSN() << std::flush;
-    tmp << "\tdetector volume: " << GetVURSNC() << " cm**3" << std::flush;
-    tmp << "\tMax. Z: " << GetIZRHGH();
-    tmp << ", Max. N-Z: " << GetIMRHGH() + GetK();
-    tmp << ", Min. N-Z: " << GetK()+1 << std::flush;
+    tmp << " detector volume: " << GetVURSNC() << " cm^{3}" << std::flush;
+
   } else if (abs(GetITURSN())<2) {
-    tmp << "Res. nuclei n. " << GetNRN() << " \"" << GetTIURSN() 
+    tmp << "Res. nuclei \"" << GetTIURSN() 
 	 << "\", 'low' energy products, region n. " << GetNRURSN() << std::flush;
-    tmp << "\tdetector volume: " << GetVURSNC() << " cm**3" << std::flush;
-    tmp << "\tMax. Z: " << GetIZRHGH();
-    tmp << ", Max. N-Z: " << GetIMRHGH() + GetK();
-    tmp << ", Min. N-Z: " << GetK()+1 << std::flush;
+    tmp << " detector volume: " << GetVURSNC() << " cm^{3}" << std::flush;
   } else {
-    tmp << "Res. nuclei n. " << GetNRN() << " \"" << GetTIURSN() 
+    tmp << "Res. nuclei \"" << GetTIURSN() 
 	 << "\", all products, region n. " << GetNRURSN() << std::flush;
-    tmp << "\tdetector volume: " << GetVURSNC() << " cm**3" << std::flush;
-    tmp << "\tMax. Z: " << GetIZRHGH();
-    tmp << ", Max. N-Z: " << GetIMRHGH() + GetK();
-    tmp << ", Min. N-Z: " << GetK()+1 << std::flush;
+    tmp << " detector volume: " << GetVURSNC() << " cm^{3}" << std::flush;
   }  
+  tmp << " ( Z_{max} = " << GetIZRHGH();
+  tmp << ", (N-Z)_{max} = " << GetIMRHGH() + GetK();
+  tmp << ", (N-Z)_{min} = " << GetK()+1 << " )" << std::flush;
+  
 
   return tmp.str();
 }

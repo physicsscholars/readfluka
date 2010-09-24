@@ -60,6 +60,7 @@ namespace ReadFluka {
     
     const char *GetXtitle() const {return "Z";} 
     const char *GetYtitle() const {return "A";} 
+    const char *GetZtitle() const {return "Residual nuclei per cm^{3} per primary";}
 
     inline unsigned int GetNbinsZ() const {return GetZmax()-GetZmin();}
     inline unsigned int GetNbinsA() const {return GetAmax()-GetAmin();}

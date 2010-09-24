@@ -35,7 +35,7 @@ usage:\tfluka2root file.inp [N] [M]
         usage()
         sys.exit(1)
 
-    estimators = {"EVENTDAT" : [], "USRBDX" : [], "USRBIN" : []} # dictionary of supported estimators and their file units
+    estimators = {"EVENTDAT" : [], "USRBDX" : [], "USRBIN" : [], "RESNUCLE" : []} # dictionary of supported estimators and their file units
     opened = {} # dictionary of the opened units (if any)
     out_root_files = [] # list of output ROOT files
     
@@ -92,7 +92,10 @@ usage:\tfluka2root file.inp [N] [M]
                             estimators[e] = ["_%s" % name]
             else:
                 if re.search("\A%s" % e, line) and not re.search("\&", line[70:80]):
-                    unit = line[30:40].strip()
+                    if e == "RESNUCLE":
+                        unit = line[20:30].strip()
+                    else:
+                        unit = line[30:40].strip()
                     name = line[70:80].strip()
                     print "\t", e, unit, name
                     if str2int(unit)<0: # we are interested in binary files only
@@ -126,13 +129,18 @@ usage:\tfluka2root file.inp [N] [M]
         for e in estimators:
             for s in estimators[e]:
                 binfilename = inpname.replace(".inp", "%.3d%s" % (run, s))
-                rootfilenames.append(binfilename + ".root")
-                command =  "%s2root %s" % (e.lower(), binfilename)
-                printincolor(command)
-                return_value = os.system(command)
-                if return_value is not 0:
-                    print "warning: " % return_value
-                    sys.exit(return_value)
+                if os.path.isfile(binfilename):
+                    rootfilenames.append(binfilename + ".root")
+                    if re.search("RESNUCLE", e): # RESNUCLE = RESNUCLEi = RESNUCLEI
+                        e = "RESNUCLEI"
+                    command =  "%s2root %s" % (e.lower(), binfilename)
+                    printincolor(command)
+                    return_value = os.system(command)
+                    if return_value is not 0:
+                        print "warning: " % return_value
+                        sys.exit(return_value)
+                else:
+                    printincolor("WARNING: can't open file %s" % binfilename, 33)
 # hadd
         out_root_file = inpname.replace(".inp", "%.3d%s" % (run, ".root"))
         command = "hadd %s %s" % (out_root_file, string.join(rootfilenames))

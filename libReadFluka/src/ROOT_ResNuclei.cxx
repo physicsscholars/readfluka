@@ -11,7 +11,7 @@ ROOT_ResNuclei::ROOT_ResNuclei(const char *fname) : ResNuclei(fname)
 TString ROOT_ResNuclei::GetBinTitle() const
 {
   TString str = ResNuclei::GetBinTitle();
-  str = str + ";" + GetXtitle() + ";" + GetYtitle();
+  str = str + ";" + GetXtitle() + ";" + GetYtitle() + ";" + GetZtitle();
   return str;
 }
 
@@ -24,9 +24,9 @@ TH2F *ROOT_ResNuclei::Histogram() const
   Float_t amax = GetAmax();
 
 
-  TH2F *h = new TH2F(GetBinName().data(), "", //ROOT_ResNuclei::GetBinTitle().Data(), 
+  TH2F *h = new TH2F(GetBinName().data(), ROOT_ResNuclei::GetBinTitle().Data(), 
   		     GetNbinsZ(), zmin, zmax,
-  		     GetNbinsA(), amin, amax);
+  		     GetNbinsA()+2, amin, amax+2);
 
   std::cout << h->GetName() << " " << h->GetNbinsX() << " " << h->GetXaxis()->GetXmin() << " " << h->GetXaxis()->GetXmax() << std::endl;
   std::cout << h->GetName() << " " << h->GetNbinsY() << " " << h->GetYaxis()->GetXmin() << " " << h->GetYaxis()->GetXmax() << std::endl;
