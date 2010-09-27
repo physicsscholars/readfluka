@@ -42,7 +42,7 @@ TH2F *ROOT_ResNuclei::Histogram() const
       }
     }
  
-  h->SetBit(TH1::kAverage); // see NOTE1 in the source code of hadd.cxx
+  h->SetBit(TH1::kIsAverage); // see NOTE1 in the source code of hadd.cxx
   // h->Sumw2(); // !!! do I need to call this?
   h->SetEntries(GetEntryNumber());
  
