@@ -36,11 +36,14 @@ TH2F *ROOT_ResNuclei::Histogram() const
     for (int j=0; j<GetIMRHGH(); j++) {
       tmp = GetRNDATA()[j][i];
       //      cout << "\t" << i+1 << " " << j+1 << " " << GetK() << endl;
-      if (tmp>0)
-	h->SetBinContent(i+1, GetA(i,j), tmp);
+      if (tmp>0) {
+ 	h->SetBinContent(i+1, GetA(i,j), tmp);
+	//h->Fill(i+1, GetA(i,j), tmp);
+      }
     }
  
- 
+  h->SetBit(TH1::kAverage); // see NOTE1 in the source code of hadd.cxx
+  // h->Sumw2(); // !!! do I need to call this?
   h->SetEntries(GetEntryNumber());
  
  return h;
