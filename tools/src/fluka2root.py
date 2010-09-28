@@ -35,6 +35,8 @@ usage:\tfluka2root file.inp [N] [M]
         usage()
         sys.exit(1)
 
+    printincolor("Note that the corresponding histograms from different ROOT files will be summed up but not averaged unless it is not been implemented in the ROOT's hadd.", 33)
+
     estimators = {"EVENTDAT" : [], "USRBDX" : [], "USRBIN" : [], "RESNUCLE" : []} # dictionary of supported estimators and their file units
     opened = {} # dictionary of the opened units (if any)
     out_root_files = [] # list of output ROOT files
