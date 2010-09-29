@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <sstream>
 #include <cstring>
@@ -38,8 +39,12 @@ void UsrSuw::Reset()
   fVURSNC = 0.0f;
   fIMRHGH = fIZRHGH = 0;
   fK = 0;
-  fAmax = -1;
   fRNDATA.clear();
+  fTotalResp = fTotalRespErr = 0.0f;
+  fYieldA.clear();
+  fYieldAErr.clear();
+  fYieldZ.clear();
+  fYieldZErr.clear();
 }
 
 bool UsrSuw::ReadHeader()
@@ -66,8 +71,8 @@ bool UsrSuw::Read()
 
   fNRN = ReadInt();
 
-  char *mychar = new char[10];
-  fin->read(mychar, 10); mychar[10] = '\0';
+  char *mychar = new char[11];
+  fin->read(mychar, 10); mychar[10] = '\0'; // !!! is it necessary \0?
   fTIURSN = Trimmed(std::string(mychar));
 
   fITURSN = ReadInt();
@@ -86,11 +91,76 @@ bool UsrSuw::Read()
     val.clear();
     for (int j=0; j<fIZRHGH; j++) {
       tmp = ReadFloat();
-      if ((tmp>0) && (GetA(j,i)>fAmax)) fAmax = GetA(j,i);
-      //      std::cout << tmp << "\t\t" << std::flush;
       val.push_back(tmp);
     }
     fRNDATA.push_back(val);
+  }
+
+  CheckFormat();
+
+  fin->read(mychar, 10); mychar[10] = '\0'; // !!! is is necessary \0?
+  std::cout << mychar << std::flush;
+  if (strcmp(mychar, "STATISTICS") != 0) {
+    std::cerr << std::endl << "file format error" << std::endl;
+    exit(1);
+  } else {
+    std::cout << " -> OK" << std::endl;
+  }
+
+  for (int i=0; i<1; i++) std::cout << "int: " <<  ReadInt() << std::endl;
+  CheckFormat();
+
+  fTotalResp    = ReadFloat();
+  fTotalRespErr = ReadFloat();
+  std::cout << "total responce: " << fTotalResp << " ± "  << fTotalRespErr << std::endl;
+
+  CheckFormat();
+
+  // Isotope Yield as a function of Mass Number
+  
+  for (int i=GetAmin(); i<=GetAmax(); i++) { 
+    tmp = ReadFloat();
+    fYieldA.push_back(tmp);
+  }
+
+  CheckFormat();
+
+  std::cout << std::endl;
+  for (int i=GetAmin(); i<=GetAmax(); i++) {
+    tmp = ReadFloat();
+    fYieldAErr.push_back(tmp);
+  }
+
+  CheckFormat();
+
+  // Isotope Yield as a function of Atomic Number
+  
+  for (int i=GetZmin(); i<=GetZmax(); i++) {
+    tmp = ReadFloat();
+    fYieldZ.push_back(tmp);
+  }  
+
+  CheckFormat();
+
+  for (int i=GetZmin(); i<=GetZmax(); i++) {
+    tmp = ReadFloat();
+    fYieldZErr.push_back(tmp);
+  }  
+
+  CheckFormat();
+
+
+  // Residual nuclei distribution
+  for (int i=0; i<fIMRHGH; i++) {
+    val.clear();
+    for (int j=0; j<fIZRHGH; j++) {
+      tmp = ReadFloat();//*100.0;
+      //std::cout << tmp << "\t\t" << std::flush;
+      val.push_back(tmp);
+      //  ReadFloat(2);
+    }
+    //std::cout << std::endl << std::endl;
+    fRNERR.push_back(val);
   }
 
   CheckFormat();
@@ -120,27 +190,68 @@ float UsrSuw::GetRNDATA(unsigned int Z, unsigned int A) const
   return fRNDATA[A][Z];
 }
 
+float UsrSuw::GetRNERR(unsigned int Z, unsigned int A) const
+{
+  /*
+    Return residual nuclei production with specified Z and A
+   */
+
+  if (Z>GetZmax()) {
+    std::cerr << "WARNING by GetRNDATA: Z = " << Z << " > Zmax = " << GetZmax() << std::endl;
+    return 0.0f;
+  }
+  if (A>GetAmax()) {
+    std::cerr << "WARNING by GetRNDATA: A = " << A << " > Amax" << GetAmax() << std::endl;
+    return 0.0f;
+  }
+  Z = Z-1;
+  A = A-1-fK-2*(Z+1);
+  //std::cout << "arguments for GetRNDATA: " << Z << " " << A << std::endl;
+  return fRNERR[A][Z];
+}
+
 void UsrSuw::Print() const
 {
   /*
     Print the info about the current RESNUCLEi card
    */
   
-  std::cout << "\tZ\tA\tresidual nuclei" << std::endl;
-  std::cout << "\t\t\tper cm**3 per primary" << std::endl;
+  std::cout << std::endl;
+  std::cout << "**** Isotope Yield as a function of Mass Number ****" << std::endl;
+  std::cout << "**** (nuclei / cmc / pr)                        ****" << std::endl;
+  std::cout << std::endl << "A_min: " << GetAmin() << " - A_max: " << GetAmax() << std::endl << std::endl;
+  for (int i=GetAmax()-1; i>=GetAmin()-1; --i) { 
+    if (fYieldA[i]>0)
+      std::cout << "A:\t" << i+1 <<"\t"<< fYieldA[i] << " +/- " << 100*fYieldAErr[i] << " %" << std::endl;
+  }
+  std::cout << std::endl << std::endl;
 
-  float tmp;
+  std::cout << "**** Isotope Yield as a function of Atomic Number ****" << std::endl;
+  std::cout << "****   (nuclei / cmc / pr)                        ****" << std::endl;
+  std::cout << std::endl << "Z_min: " << GetZmin()  << " - Z_max: " << GetZmax() << std::endl << std::endl;
+  for (int i=GetZmax()-1; i>=GetZmin()-1; --i) {
+    if (fYieldZ[i]>0)
+      std::cout << "Z:\t" << i+1 <<"\t"<< fYieldZ[i] << " +/- " << 100*fYieldZErr[i] << " %" << std::endl;
+  }
+
+  std::cout << std::endl;
+  std::cout << "**** Residual nuclei distribution  ****" << std::endl
+	    << "****    (nuclei / cmc / pr)        ****" << std::endl;
+  std::cout << std::endl;
+
+  float val, err;
   int iCount=0;
   for (int i=0; i<GetIZRHGH(); i++)
     for (int j=0; j<GetIMRHGH(); j++) {
-      tmp = GetRNDATA()[j][i];
+      val = GetRNDATA()[j][i];
+      err = GetRNERR()[j][i];
       //      cout << "\t" << i+1 << " " << j+1 << " " << GetK() << endl;
-      if (tmp>0)
-	std::cout << "\t" << i+1 << "\t" << GetA(i,j) << "\t" << tmp << std::endl;
+      if (val>0)
+	std::cout << "\t" << GetA(i,j) << "\t" << i+1 << "\t" << val << "\t" << 100*err << std::endl;
       iCount++;
     }
   std::cout << "total: " << iCount << std::endl;
-  
+
 }
 
 std::string UsrSuw::GetBinTitle() const

@@ -1,4 +1,3 @@
-
 #include "UsrSuw.h"
 #include <iostream>
 
@@ -7,48 +6,48 @@ using namespace std;
 int main(int argc, const char **argv)
 {
   ReadFluka::Base::gVerbose = ReadFluka::kPRINT_NOTHING;
-  ReadFluka::UsrSuw *resnuclei = new ReadFluka::UsrSuw(argv[1]);
+  ReadFluka::UsrSuw *usrsuw = new ReadFluka::UsrSuw(argv[1]);
   
-  cout << "***** " << resnuclei->GetRunTitle() << " *****" << endl;
-  cout << resnuclei->GetRunTime() << endl;
-  cout << "Total number of particles followed " << resnuclei->GetEntryNumber();
-  cout << ", for a total weight of " << resnuclei->GetWeight() << endl;
+  cout << "***** " << usrsuw->GetRunTitle() << " *****" << endl;
+  cout << usrsuw->GetRunTime() << endl;
+  cout << "Total number of particles followed " << usrsuw->GetEntryNumber();
+  cout << ", for a total weight of " << usrsuw->GetWeight() << endl;
   
-  while (resnuclei->Read()) {
+  while (usrsuw->Read()) {
 
-    if (abs((float)resnuclei->GetITURSN())<1) { // see page 211
-      cout << "Res. nuclei n. " << resnuclei->GetNRN() << " \"" << resnuclei->GetTIURSN() 
-	   << "\", 'high' energy products, region n. " << resnuclei->GetNRURSN() << endl;
-      cout << "\tdetector volume: " << resnuclei->GetVURSNC() << " cm**3" << endl;
-      cout << "\tMax. Z: " << resnuclei->GetIZRHGH();
-      cout << ", Max. N-Z: " << resnuclei->GetIMRHGH() + resnuclei->GetK();
-      cout << ", Min. N-Z: " << resnuclei->GetK()+1 << endl;
-    } else if (abs((float)resnuclei->GetITURSN())<2) {
-      cout << "Res. nuclei n. " << resnuclei->GetNRN() << " \"" << resnuclei->GetTIURSN() 
-	   << "\", 'low' energy products, region n. " << resnuclei->GetNRURSN() << endl;
-      cout << "\tdetector volume: " << resnuclei->GetVURSNC() << " cm**3" << endl;
-      cout << "\tMax. Z: " << resnuclei->GetIZRHGH();
-      cout << ", Max. N-Z: " << resnuclei->GetIMRHGH() + resnuclei->GetK();
-      cout << ", Min. N-Z: " << resnuclei->GetK()+1 << endl;
+        if (abs((float)usrsuw->GetITURSN())<1) { // see page 211
+      cout << "Res. nuclei n. " << usrsuw->GetNRN() << " \"" << usrsuw->GetTIURSN() 
+	   << "\", 'high' energy products, region n. " << usrsuw->GetNRURSN() << endl;
+      cout << "\tdetector volume: " << usrsuw->GetVURSNC() << " cm**3" << endl;
+      cout << "\tMax. Z: " << usrsuw->GetIZRHGH();
+      cout << ", Max. N-Z: " << usrsuw->GetIMRHGH() + usrsuw->GetK();
+      cout << ", Min. N-Z: " << usrsuw->GetK()+1 << endl;
+    } else if (abs((float)usrsuw->GetITURSN())<2) {
+      cout << "Res. nuclei n. " << usrsuw->GetNRN() << " \"" << usrsuw->GetTIURSN() 
+	   << "\", 'low' energy products, region n. " << usrsuw->GetNRURSN() << endl;
+      cout << "\tdetector volume: " << usrsuw->GetVURSNC() << " cm**3" << endl;
+      cout << "\tMax. Z: " << usrsuw->GetIZRHGH();
+      cout << ", Max. N-Z: " << usrsuw->GetIMRHGH() + usrsuw->GetK();
+      cout << ", Min. N-Z: " << usrsuw->GetK()+1 << endl;
     } else {
-      cout << "Res. nuclei n. " << resnuclei->GetNRN() << " \"" << resnuclei->GetTIURSN() 
-	   << "\", all products, region n. " << resnuclei->GetNRURSN() << endl;
-      cout << "\tdetector volume: " << resnuclei->GetVURSNC() << " cm**3" << endl;
-      cout << "\tMax. Z: " << resnuclei->GetIZRHGH();
-      cout << ", Max. N-Z: " << resnuclei->GetIMRHGH() + resnuclei->GetK();
-      cout << ", Min. N-Z: " << resnuclei->GetK()+1 << endl;
+      cout << "Res. nuclei n. " << usrsuw->GetNRN() << " \"" << usrsuw->GetTIURSN() 
+	   << "\", all products, region n. " << usrsuw->GetNRURSN() << endl;
+      cout << "\tdetector volume: " << usrsuw->GetVURSNC() << " cm**3" << endl;
+      cout << "\tMax. Z: " << usrsuw->GetIZRHGH();
+      cout << ", Max. N-Z: " << usrsuw->GetIMRHGH() + usrsuw->GetK();
+      cout << ", Min. N-Z: " << usrsuw->GetK()+1 << endl;
     }  
     
-    resnuclei->Print();
+    usrsuw->Print();
   }
 
   int Z = 12;
   int A = 22;
-  cout << "Z=" << Z << "\tA=" << A << "\t" << resnuclei->GetRNDATA(Z, A) << endl;
-  cout << "Zmax = " << resnuclei->GetZmax() << endl;
-  cout << "Amax = " << resnuclei->GetAmax() << endl;
+  // cout << "Z=" << Z << "\tA=" << A << "\t" << usrsuw->GetRNDATA(Z, A) << endl;
+  //cout << "Zmax = " << usrsuw->GetZmax() << endl;
+  //cout << "Amax = " << usrsuw->GetAmax() << endl;
 
-  delete resnuclei;
+  delete usrsuw;
  
   return 0;
 }
