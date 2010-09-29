@@ -49,7 +49,7 @@ obj/UsrSuw.o: src/UsrSuw.cxx src/UsrSuw.h
 
 ########################## libReadFlukaROOT #####
 
-libReadFlukaROOT.so: obj/ROOT_UsrBin.o obj/ROOT_UsrBdx.o obj/ROOT_ResNuclei.o
+libReadFlukaROOT.so: obj/ROOT_UsrBin.o obj/ROOT_UsrBdx.o obj/ROOT_ResNuclei.o obj/ROOT_UsrSuw.o
 	@echo "Compiling $@"
 	@$(GCC) $(SOFLAGS) $^ -o $@
 

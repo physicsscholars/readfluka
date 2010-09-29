@@ -14,30 +14,6 @@ int main(int argc, const char **argv)
   cout << ", for a total weight of " << usrsuw->GetWeight() << endl;
   
   while (usrsuw->Read()) {
-
-        if (abs((float)usrsuw->GetITURSN())<1) { // see page 211
-      cout << "Res. nuclei n. " << usrsuw->GetNRN() << " \"" << usrsuw->GetTIURSN() 
-	   << "\", 'high' energy products, region n. " << usrsuw->GetNRURSN() << endl;
-      cout << "\tdetector volume: " << usrsuw->GetVURSNC() << " cm**3" << endl;
-      cout << "\tMax. Z: " << usrsuw->GetIZRHGH();
-      cout << ", Max. N-Z: " << usrsuw->GetIMRHGH() + usrsuw->GetK();
-      cout << ", Min. N-Z: " << usrsuw->GetK()+1 << endl;
-    } else if (abs((float)usrsuw->GetITURSN())<2) {
-      cout << "Res. nuclei n. " << usrsuw->GetNRN() << " \"" << usrsuw->GetTIURSN() 
-	   << "\", 'low' energy products, region n. " << usrsuw->GetNRURSN() << endl;
-      cout << "\tdetector volume: " << usrsuw->GetVURSNC() << " cm**3" << endl;
-      cout << "\tMax. Z: " << usrsuw->GetIZRHGH();
-      cout << ", Max. N-Z: " << usrsuw->GetIMRHGH() + usrsuw->GetK();
-      cout << ", Min. N-Z: " << usrsuw->GetK()+1 << endl;
-    } else {
-      cout << "Res. nuclei n. " << usrsuw->GetNRN() << " \"" << usrsuw->GetTIURSN() 
-	   << "\", all products, region n. " << usrsuw->GetNRURSN() << endl;
-      cout << "\tdetector volume: " << usrsuw->GetVURSNC() << " cm**3" << endl;
-      cout << "\tMax. Z: " << usrsuw->GetIZRHGH();
-      cout << ", Max. N-Z: " << usrsuw->GetIMRHGH() + usrsuw->GetK();
-      cout << ", Min. N-Z: " << usrsuw->GetK()+1 << endl;
-    }  
-    
     usrsuw->Print();
   }
 

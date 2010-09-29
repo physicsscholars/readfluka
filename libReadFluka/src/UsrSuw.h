@@ -72,6 +72,8 @@ namespace ReadFluka {
     inline unsigned int GetNbinsZ() const {return GetZmax()-GetZmin();}
     inline unsigned int GetNbinsA() const {return GetAmax()-GetAmin();}
     
+    inline float GetYieldA(int i) const {return fYieldA[i];}
+    inline float GetYieldAErr(int i) const {return fYieldAErr[i];}
 
     void Print() const;
   };
