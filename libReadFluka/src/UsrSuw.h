@@ -16,6 +16,9 @@
 namespace ReadFluka {
   class UsrSuw : protected ResNuclei {
   private:
+    std::vector<int> fNRN;
+    std::vector<std::string> fTIURSN;
+    std::vector<int> fITURSN;
     unsigned short fN; // number of RESNUCLEI cards read
     std::vector<float> fTotalResp;
     std::vector<float> fTotalRespErr;

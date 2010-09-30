@@ -21,6 +21,9 @@ void UsrSuw::Reset()
   /*
     Reset the private members
    */
+  fNRN.clear();
+  fTIURSN.clear();
+  fITURSN.clear();
   fN = 0;
   fRNERR.clear();
   fTotalResp.clear();
@@ -47,13 +50,13 @@ bool UsrSuw::Read()
   for (;;) {
     after = fin->tellg();
     //    std::cout << "before and after: " << before << " " << after << std::endl;
-    fNRN = ReadInt(); //std::cout << "NRN: " << fNRN << std::endl;
+    fNRN.push_back(ReadInt()); //std::cout << "NRN: " << fNRN << std::endl;
     
     fin->read(mychar, 10); mychar[10] = '\0'; // !!! is it necessary \0?
-    fTIURSN = Trimmed(std::string(mychar)); std::cout << "name: " << fTIURSN << std::endl;
+    fTIURSN.push_back(Trimmed(std::string(mychar))); std::cout << "name: " << mychar << std::endl;
     
-    fITURSN = ReadInt();
-    fNRURSN = ReadInt();
+    fITURSN.push_back(ReadInt());
+    fNRURSN = ReadInt(); // !!!!!!!!! TODO TOMORROW - make it to array
     fVURSNC = ReadFloat();
     fIMRHGH = ReadInt(); 
     fIZRHGH = ReadInt();//std::cout << "dimentions: " << fIMRHGH << " " << fIZRHGH << std::endl;
@@ -202,65 +205,55 @@ void UsrSuw::Print() const
     Print the info about the current RESNUCLEi card
    */
 
- if (abs(GetITURSN())<1) { // see page 211
-      std::cout << "Res. nuclei n. " << GetNRN() << " \"" << GetTIURSN() 
-	   << "\", 'high' energy products, region n. " << GetNRURSN() << std::endl;
-      std::cout << "\tdetector volume: " << GetVURSNC() << " cm**3" << std::endl;
-      std::cout << "\tMax. Z: " << GetIZRHGH();
-      std::cout << ", Max. N-Z: " << GetIMRHGH() + GetK();
-      std::cout << ", Min. N-Z: " << GetK()+1 << std::endl;
-    } else if (abs(GetITURSN())<2) {
-      std::cout << "Res. nuclei n. " << GetNRN() << " \"" << GetTIURSN() 
-	   << "\", 'low' energy products, region n. " << GetNRURSN() << std::endl;
-      std::cout << "\tdetector volume: " << GetVURSNC() << " cm**3" << std::endl;
-      std::cout << "\tMax. Z: " << GetIZRHGH();
-      std::cout << ", Max. N-Z: " << GetIMRHGH() + GetK();
-      std::cout << ", Min. N-Z: " << GetK()+1 << std::endl;
-    } else {
-      std::cout << "Res. nuclei n. " << GetNRN() << " \"" << GetTIURSN() 
-	   << "\", all products, region n. " << GetNRURSN() << std::endl;
-      std::cout << "\tdetector volume: " << GetVURSNC() << " cm**3" << std::endl;
-      std::cout << "\tMax. Z: " << GetIZRHGH();
-      std::cout << ", Max. N-Z: " << GetIMRHGH() + GetK();
-      std::cout << ", Min. N-Z: " << GetK()+1 << std::endl;
+  for (int iN=0; iN<1; iN++) {
+    std::cout << "Res. nuclei n. " << fNRN[iN] << " \"" << fTIURSN[iN]; 
+    if (abs(fITURSN[iN])<1) // see page 211
+      std::cout	<< "\", 'high' energy products, region n. " << fNRURSN[iN] << std::endl;
+    else if (abs(fITURSN[iN])<2) 
+	std::cout << "\", 'low' energy products, region n. " << fNRURSN[iN] << std::endl;
+    else 
+      std::cout << "\", all products, region n. " << fNRURSN[iN] << std::endl;
+    std::cout << "\tdetector volume: " << fVURSNC[iN] << " cm**3" << std::endl;
+    std::cout << "\tMax. Z: " << GetIZRHGH[iN];
+    std::cout << ", Max. N-Z: " << GetIMRHGH[iN] + GetK[iN];
+    std::cout << ", Min. N-Z: " << GetK[iN]+1 << std::endl;
     }  
-  
- for (int iN=0; iN<fN; iN++) {
-  std::cout << std::endl;
-  std::cout << "**** Isotope Yield as a function of Mass Number ****" << std::endl;
-  std::cout << "**** (nuclei / cmc / pr)                        ****" << std::endl;
-  std::cout << std::endl << "A_min: " << GetAmin() << " - A_max: " << GetAmax() << std::endl << std::endl;
-  for (int i=GetAmax()-1; i>=GetAmin()-1; --i) { 
-    if (fYieldA[iN][i]>0)
-      std::cout << "A:\t" << i+1 <<"\t"<< fYieldA[iN][i] << " +/- " << 100*fYieldAErr[iN][i] << " %" << std::endl;
-  }
-  std::cout << std::endl << std::endl;
-
-  std::cout << "**** Isotope Yield as a function of Atomic Number ****" << std::endl;
-  std::cout << "****   (nuclei / cmc / pr)                        ****" << std::endl;
-  std::cout << std::endl << "Z_min: " << GetZmin()  << " - Z_max: " << GetZmax() << std::endl << std::endl;
-  for (int i=GetZmax()-1; i>=GetZmin()-1; --i) {
-    if (fYieldZ[iN][i]>0)
-      std::cout << "Z:\t" << i+1 <<"\t"<< fYieldZ[iN][i] << " +/- " << 100*fYieldZErr[iN][i] << " %" << std::endl;
-  }
-
-  std::cout << std::endl;
-  std::cout << "**** Residual nuclei distribution  ****" << std::endl
-	    << "****    (nuclei / cmc / pr)        ****" << std::endl;
-  std::cout << std::endl;
-
-  float val, err;
-  int iCount=0;
-  for (int i=0; i<GetIZRHGH(); i++)
-    for (int j=0; j<GetIMRHGH(); j++) {
-      //   val = GetRNDATA()[iN][j][i];
-      err = GetRNERR()[iN][j][i];
-      //      cout << "\t" << i+1 << " " << j+1 << " " << GetK() << endl;
-      if (val>0)
-	std::cout << "\t" << GetA(i,j) << "\t" << i+1 << "\t" << val << "\t" << 100*err << std::endl;
-      iCount++;
+    
+    std::cout << std::endl;
+    std::cout << "**** Isotope Yield as a function of Mass Number ****" << std::endl;
+    std::cout << "**** (nuclei / cmc / pr)                        ****" << std::endl;
+    std::cout << std::endl << "A_min: " << GetAmin[iN] << " - A_max: " << GetAmax[iN] << std::endl << std::endl;
+    for (int i=GetAmax[iN]-1; i>=GetAmin[iN]-1; --i) { 
+      if (fYieldA[iN][i]>0)
+	std::cout << "A:\t" << i+1 <<"\t"<< fYieldA[iN][i] << " +/- " << 100*fYieldAErr[iN][i] << " %" << std::endl;
     }
- }
+    std::cout << std::endl << std::endl;
+    
+    std::cout << "**** Isotope Yield as a function of Atomic Number ****" << std::endl;
+    std::cout << "****   (nuclei / cmc / pr)                        ****" << std::endl;
+    std::cout << std::endl << "Z_min: " << GetZmin[iN]  << " - Z_max: " << GetZmax[iN] << std::endl << std::endl;
+    for (int i=GetZmax[iN]-1; i>=GetZmin[iN]-1; --i) {
+      if (fYieldZ[iN][i]>0)
+	std::cout << "Z:\t" << i+1 <<"\t"<< fYieldZ[iN][i] << " +/- " << 100*fYieldZErr[iN][i] << " %" << std::endl;
+    }
+    
+    std::cout << std::endl;
+    std::cout << "**** Residual nuclei distribution  ****" << std::endl
+	      << "****    (nuclei / cmc / pr)        ****" << std::endl;
+    std::cout << std::endl;
+    
+    float val, err;
+    int iCount=0;
+    for (int i=0; i<GetIZRHGH[iN]; i++)
+      for (int j=0; j<GetIMRHGH[iN]; j++) {
+	//   val = GetRNDATA()[iN][j][i];
+	err = GetRNERR()[iN][j][i];
+	//      cout << "\t" << i+1 << " " << j+1 << " " << GetK() << endl;
+	if (val>0)
+	  std::cout << "\t" << GetA(i,j) << "\t" << i+1 << "\t" << val << "\t" << 100*err << std::endl;
+	iCount++;
+      }
+  }
 }
 
 std::string UsrSuw::GetBinTitle() const
