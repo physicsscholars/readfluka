@@ -216,14 +216,14 @@ void UsrSuw::Print() const
     Print the info about the current RESNUCLEi card
    */
 
- if (abs((float)GetITURSN())<1) { // see page 211
+ if (abs(GetITURSN())<1) { // see page 211
       std::cout << "Res. nuclei n. " << GetNRN() << " \"" << GetTIURSN() 
 	   << "\", 'high' energy products, region n. " << GetNRURSN() << std::endl;
       std::cout << "\tdetector volume: " << GetVURSNC() << " cm**3" << std::endl;
       std::cout << "\tMax. Z: " << GetIZRHGH();
       std::cout << ", Max. N-Z: " << GetIMRHGH() + GetK();
       std::cout << ", Min. N-Z: " << GetK()+1 << std::endl;
-    } else if (abs((float)GetITURSN())<2) {
+    } else if (abs(GetITURSN())<2) {
       std::cout << "Res. nuclei n. " << GetNRN() << " \"" << GetTIURSN() 
 	   << "\", 'low' energy products, region n. " << GetNRURSN() << std::endl;
       std::cout << "\tdetector volume: " << GetVURSNC() << " cm**3" << std::endl;

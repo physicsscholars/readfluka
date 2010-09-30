@@ -37,6 +37,7 @@ int main(int argc, const char **argv)
   while (usrsuw->Read()) {
     usrsuw->Histogram()->Write();
     usrsuw->HistogramA()->Write();
+    usrsuw->HistogramZ()->Write();
     clog << usrsuw->GetBinName() << "  " << flush;
   }
   clog << endl;

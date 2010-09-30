@@ -46,6 +46,8 @@ namespace ReadFluka {
     inline std::string GetTIURSN() const {return fTIURSN;}
     inline std::string GetBinName() const {return fTIURSN;} // the same as GetTIURSN()
     std::string GetBinTitle() const;
+    inline std::string GetBinTitleA() const {return "Isotope Yield as a function of Mass Number";}
+    inline std::string GetBinTitleZ() const {return "Isotope Yield as a function of Atomic Number";}
     inline int GetITURSN() const {return fITURSN;}
     inline unsigned int   GetNRURSN() const {return fNRURSN;}
     inline float          GetVURSNC() const {return fVURSNC;}
@@ -74,6 +76,9 @@ namespace ReadFluka {
     
     inline float GetYieldA(int i) const {return fYieldA[i];}
     inline float GetYieldAErr(int i) const {return fYieldAErr[i];}
+
+    inline float GetYieldZ(int i) const {return fYieldZ[i];}
+    inline float GetYieldZErr(int i) const {return fYieldZErr[i];}
 
     void Print() const;
   };
