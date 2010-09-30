@@ -221,6 +221,7 @@ bool Base::SizeEnd(bool doExit)
   */
 
   // Read size end and compare it with size start
+  int position = fin->tellg();
   int tmp = fSize_end;
   fSize_end = ReadInt();
   
@@ -230,28 +231,28 @@ bool Base::SizeEnd(bool doExit)
       exit(WRONG_FORMAT);
     } else {
       fSize_end = tmp;
+      fin->seekg(position, std::ios::beg);
     }
     return false;
   }  
+
+  if (doExit == false) fin->seekg(position, std::ios::beg);
 
   return true;
 }
 
 bool Base::CheckFormat(bool doExit)
 {
-  bool status = false;
-  int position = fin->tellg();
-  if (bCheckFormat1st == false) {
+  bool status;
+  if (bCheckFormat1st == false) { std::cout << "checkformat1st" << std::endl;
     status = SizeEnd(doExit); 
-    if (doExit == false) bCheckFormat1st = true;
-    if ( (doExit == true) && (status == false) ) {
-      fin->seekg(position, std::ios::beg);
-      return false;
+    if (doExit == true) {
+      bCheckFormat1st = true;
+      if (status == false) return false;
     }
   }
   
   if (doExit == true) SizeStart();
-  else fin->seekg(position, std::ios::beg);
   
   return true;
 }
