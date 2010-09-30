@@ -21,21 +21,14 @@ void UsrSuw::Reset()
   /*
     Reset the private members
    */
-  //fIsReadHeader = false;
-  fNRN = 0;
-  fTIURSN = "";
-  fITURSN = 0;
-  fNRURSN = 0;
-  fVURSNC = 0.0f;
-  fIMRHGH = fIZRHGH = 0;
-  fK = 0;
-  fRNDATA.clear();
-  fTotalResp = fTotalRespErr = 0.0f;
+  fN = 0;
+  fRNERR.clear();
+  fTotalResp.clear();
+  fTotalRespErr.clear();
   fYieldA.clear();
   fYieldAErr.clear();
   fYieldZ.clear();
   fYieldZErr.clear();
-
 }
 
 
@@ -47,7 +40,7 @@ bool UsrSuw::Read()
 
   char *mychar = new char[11];
   std::vector <float> val; // scored values
-  float tmp;
+  float tmp, tmperr;
   int before = fin->tellg();
   int after;
   //ReadStatFlag(false);
@@ -79,72 +72,78 @@ bool UsrSuw::Read()
       fRNDATA.push_back(val);
     }
 
+    fN++;
     CheckFormat();
     if (ReadStatFlag(false) == true) break;
-    before = fin->tellg(); 
+    before = fin->tellg();
   }
   
-  CheckFormat();
+  std::cout << "total number of histograms found: " << fN << std::endl;
 
-  fTotalResp    = ReadFloat();
-  fTotalRespErr = ReadFloat();
-  std::cout << "total responce: " << fTotalResp << " ± "  << fTotalRespErr << std::endl;
-  CheckFormat();
-  fTotalResp    = ReadFloat();
-  fTotalRespErr = ReadFloat();
-  std::cout << "total responce: " << fTotalResp << " ± "  << fTotalRespErr << std::endl;
- 
   CheckFormat();
   
-
-  // Isotope Yield as a function of Mass Number
-  
-  for (int i=GetAmin(); i<=GetAmax(); i++) { 
+  for (unsigned short iN=0; iN<fN; iN++) {
     tmp = ReadFloat();
-    fYieldA.push_back(tmp);
-  }
-
-  CheckFormat();
-
-  std::cout << std::endl;
-  for (int i=GetAmin(); i<=GetAmax(); i++) {
-    tmp = ReadFloat();
-    fYieldAErr.push_back(tmp);
-  }
-
-  CheckFormat();
-
-  // Isotope Yield as a function of Atomic Number
-  
-  for (int i=GetZmin(); i<=GetZmax(); i++) {
-    tmp = ReadFloat();
-    fYieldZ.push_back(tmp);
-  }  
-
-  CheckFormat();
-
-  for (int i=GetZmin(); i<=GetZmax(); i++) {
-    tmp = ReadFloat();
-    fYieldZErr.push_back(tmp);
-  }  
-
-  CheckFormat();
-
-
-  // Residual nuclei distribution
-  for (int i=0; i<fIMRHGH; i++) {
-    val.clear();
-    for (int j=0; j<fIZRHGH; j++) {
-      tmp = ReadFloat();//*100.0;
-      //std::cout << tmp << "\t\t" << std::flush;
-      val.push_back(tmp);
-      //  ReadFloat(2);
+    tmperr = ReadFloat();
+    fTotalResp.push_back(tmp);
+    fTotalRespErr.push_back(tmperr);
+    std::cout << "total responce: " << tmp << " ± "  << tmperr << std::endl;
+    
+    CheckFormat();
+    
+    // Isotope Yield as a function of Mass Number
+    std::cerr << "yield " << std::flush;
+    for (int i=GetAmin(); i<=GetAmax(); i++) { 
+      tmp = ReadFloat();
+      fYieldA.push_back(tmp);
     }
-    //std::cout << std::endl << std::endl;
-    fRNERR.push_back(val);
-  }
+    
+    CheckFormat();
+    
+    for (int i=GetAmin(); i<=GetAmax(); i++) {
+      tmp = ReadFloat();
+      fYieldAErr.push_back(tmp);
+    }
+    
+    CheckFormat();
+    
+    // Isotope Yield as a function of Atomic Number
+    
+    for (int i=GetZmin(); i<=GetZmax(); i++) {
+      tmp = ReadFloat();
+      fYieldZ.push_back(tmp);
+    }  
+    
+    CheckFormat();
+    
+    for (int i=GetZmin(); i<=GetZmax(); i++) {
+      tmp = ReadFloat();
+      fYieldZErr.push_back(tmp);
+    }  
+    std::cerr << "done" << std::endl;
+    
+    CheckFormat();
 
-  CheckFormat();
+    std::cerr << "residual nuclei distribution " << std::flush;
+    
+    // Residual nuclei distribution
+    for (int i=0; i<fIMRHGH; i++) {
+      val.clear();
+      for (int j=0; j<fIZRHGH; j++) {
+	tmp = ReadFloat();//*100.0;
+	//std::cout << tmp << "\t\t" << std::flush;
+	val.push_back(tmp);
+	//  ReadFloat(2);
+      }
+      //std::cout << std::endl << std::endl;
+      fRNERR.push_back(val);
+    }
+
+    CheckFormat();
+
+    std::cerr << " done" << std::endl;
+    
+  }
 
   delete [] mychar; mychar = 0;
 

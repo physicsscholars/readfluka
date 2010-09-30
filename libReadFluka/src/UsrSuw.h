@@ -16,10 +16,12 @@
 namespace ReadFluka {
   class UsrSuw : protected ResNuclei {
   private:
+    unsigned short fN; // number of RESNUCLEI cards read
+    std::vector<float> fTotalResp;
+    std::vector<float> fTotalRespErr;
+
     std::vector< std::vector<float> > fRNERR; // residual nuclei relative errors [%]
-    
-    float fTotalResp;
-    float fTotalRespErr;
+
     std::vector<float> fYieldA; // isotope yield as a function of mass number
     std::vector<float> fYieldAErr;
     std::vector<float> fYieldZ; // isotope yield as a function of atomic number
