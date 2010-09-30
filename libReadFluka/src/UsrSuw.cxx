@@ -50,8 +50,8 @@ bool UsrSuw::Read()
   float tmp;
   int before = fin->tellg();
   int after;
-  // ReadStatFlag(false);
-  //   while (ReadStatFlag(false) == false) {
+  ReadStatFlag(false);
+  //while (ReadStatFlag(false) == false) {
       after = fin->tellg();
       std::cout << "before and after: " << before << " " << after << std::endl;
     fNRN = ReadInt(); std::cout << "NRN: " << fNRN << std::endl;

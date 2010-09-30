@@ -244,12 +244,12 @@ bool Base::SizeEnd(bool doExit)
 bool Base::CheckFormat(bool doExit)
 {
   bool status;
-  if (bCheckFormat1st == false) { std::cout << "checkformat1st" << std::endl;
+  if (bCheckFormat1st == false) {
     status = SizeEnd(doExit); 
     if (doExit == true) {
       bCheckFormat1st = true;
-      if (status == false) return false;
     }
+    if (status == false) return false; // !!! is it ok? put it in prev if?
   }
   
   if (doExit == true) SizeStart();
