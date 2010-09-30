@@ -21,8 +21,6 @@ TH2F *ROOT_ResNuclei::Histogram() const
   Float_t zmax = GetZmax();
 
   Float_t amin = GetAmin();
-  Float_t amax = GetAmax();
-
 
   TH2F *h = new TH2F(GetBinName().data(), ROOT_ResNuclei::GetBinTitle().Data(), 
   		     GetNbinsZ(),   zmin, zmax-zmin+1,

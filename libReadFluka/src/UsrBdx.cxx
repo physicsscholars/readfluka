@@ -175,7 +175,7 @@ const char* UsrBdx::GetXtitle() const
 
 const char* UsrBdx::GetYtitle() const
 {
-  if (abs((float)GetType())<=1) return "#Omega [sr]";
+  if (abs(GetType())<=1) return "#Omega [sr]";
   else return "lg(#Omega/1 sr)";
 }
 

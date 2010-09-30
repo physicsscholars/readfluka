@@ -114,9 +114,9 @@ void EventDat::fReadScoredDistributions()
     CheckFormat();
 
     int position = fin->tellg();
-    int   ndum = ReadInt();
+    int   ndum = ReadInt(); cout << "ndum: " << ndum << endl;
     float dum1 = ReadFloat();
-    float dum2 = ReadFloat();
+    float dum2 = ReadFloat(); cout << "dum2: " << dum2 << endl;
     
     if (dum1 < 0) {
       cerr << "seeds follow" << endl;

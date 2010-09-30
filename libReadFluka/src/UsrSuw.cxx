@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <sstream>
 #include <cstring>
@@ -8,17 +7,8 @@
 
 using namespace ReadFluka;
 
-UsrSuw::UsrSuw(const char *fname) : Base(fname)
+UsrSuw::UsrSuw(const char *fname) : ResNuclei(fname)
 {
-  //  fIsReadHeader = false;
-  //fWEIPRI = 0;
-  //fNCASE  = 0;
-  //fENGMAX = 0;
-  //fScored = 0;
-  Reset();
-
-  fIsReadHeader = false;
-  ReadHeader();
 }
 
 UsrSuw::~UsrSuw()
@@ -45,23 +35,7 @@ void UsrSuw::Reset()
   fYieldAErr.clear();
   fYieldZ.clear();
   fYieldZErr.clear();
-}
 
-bool UsrSuw::ReadHeader()
-{
-  if (fIsReadHeader == true) return false;
-  fIsReadHeader = true;
-  ReadRunTitle(); // here also SizeStart called 
-  ReadRunTime();
-  //ReadInt();
-  //std::cerr << SizeStart() << std::endl;
-  fWEIPRI = ReadFloat();
-  fNCASE  = ReadInt();
-  if (1) ReadInt(2); // strange numbers
-  else  std::cout << "->strange numbers: " << ReadInt() << " " << ReadInt() << std::endl;
-  CheckFormat();
-
-  return true;
 }
 
 bool UsrSuw::Read()
@@ -170,27 +144,7 @@ bool UsrSuw::Read()
   return true;
 }
 
-float UsrSuw::GetRNDATA(unsigned int Z, unsigned int A) const
-{
-  /*
-    Return residual nuclei production with specified Z and A
-   */
-
-  if (Z>GetZmax()) {
-    std::cerr << "WARNING by GetRNDATA: Z = " << Z << " > Zmax = " << GetZmax() << std::endl;
-    return 0.0f;
-  }
-  if (A>GetAmax()) {
-    std::cerr << "WARNING by GetRNDATA: A = " << A << " > Amax" << GetAmax() << std::endl;
-    return 0.0f;
-  }
-  Z = Z-1;
-  A = A-1-fK-2*(Z+1);
-  //std::cout << "arguments for GetRNDATA: " << Z << " " << A << std::endl;
-  return fRNDATA[A][Z];
-}
-
-float UsrSuw::GetRNERR(unsigned int Z, unsigned int A) const
+float UsrSuw::GetRNERR(int Z, int A) const
 {
   /*
     Return residual nuclei production with specified Z and A

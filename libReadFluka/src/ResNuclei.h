@@ -15,7 +15,7 @@
 
 namespace ReadFluka {
   class ResNuclei : public Base {
-  private:
+  protected:
     bool fIsReadHeader;
     int  fNRN;
     std::string fTIURSN; // scoring name
@@ -27,8 +27,6 @@ namespace ReadFluka {
     int fK; // what is it? !!!
     std::vector< std::vector<float> > fRNDATA; // residual nuclei data - the scored values
     //float fRNDATA[100][260];
-
-    mutable int fAmax;
 
     bool ReadHeader();
   public:
@@ -48,15 +46,14 @@ namespace ReadFluka {
     inline int            GetIZRHGH() const {return fIZRHGH;}
     inline int            GetK() const {return fK;}
 
-    inline unsigned int GetAmin() const {return 1;} 
-    inline unsigned int GetAmax() const {return fAmax;}
-    inline unsigned int GetZmin() const {return 1;}
-    inline unsigned int GetZmax() const {return fIZRHGH;} // the same as GetIZRHGH()
+    inline int GetAmin() const {return 1;} 
+    inline int GetAmax() const {return fIMRHGH + 2*fIZRHGH + fK;}
+    inline int GetZmin() const {return 1;}
+    inline int GetZmax() const {return fIZRHGH;} // the same as GetIZRHGH()
     inline int GetA(int i, int j) const {return j+1+fK+2*(i+1);}
 
-    //inline const float *GetRNDATA() const {return fRNDATA;}
     std::vector< std::vector<float> > GetRNDATA() const {return fRNDATA;}
-    float GetRNDATA(unsigned int Z, unsigned int A) const;
+    float GetRNDATA(int Z, int A) const;
     
     const char *GetXtitle() const {return "Z";} 
     const char *GetYtitle() const {return "A";} 
