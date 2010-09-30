@@ -8,6 +8,11 @@ ROOT_UsrSuw::ROOT_UsrSuw(const char *fname) : UsrSuw(fname)
 
 }
 
+ROOT_UsrSuw::~ROOT_UsrSuw()
+{
+
+}
+
 TString ROOT_UsrSuw::GetBinTitle() const
 {
   TString str = UsrSuw::GetBinTitle();

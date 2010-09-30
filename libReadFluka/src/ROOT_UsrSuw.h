@@ -17,6 +17,7 @@ namespace ReadFluka {
   class ROOT_UsrSuw : public UsrSuw {
   public:
     ROOT_UsrSuw(const char *fname);
+    virtual ~ROOT_UsrSuw();
 
     TString GetBinTitle() const;
     TString GetBinTitleA() const;
