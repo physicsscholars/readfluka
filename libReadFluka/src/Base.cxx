@@ -223,11 +223,10 @@ bool Base::SizeEnd(bool doExit)
   // Read size end and compare it with size start
   int tmp = fSize_end;
   fSize_end = ReadInt();
-  //std::clog << std::setw(100) << std::right << "*** SizeEnd: " << fSize_end << std::endl;
   
   if (fSize_start != fSize_end) {
     if (doExit == true) {
-      std::cerr << "Base::CheckSize() warning:\t" << fSize_start << " " << fSize_end << std::endl;
+      std::cerr<<"Base::CheckSize() warning:\t" << fSize_start << " " << fSize_end << std::endl;
       exit(WRONG_FORMAT);
     } else {
       fSize_end = tmp;
@@ -250,8 +249,10 @@ bool Base::CheckFormat(bool doExit)
       return false;
     }
   }
+  
   if (doExit == true) SizeStart();
   else fin->seekg(position, std::ios::beg);
+  
   return true;
 }
 
@@ -260,10 +261,11 @@ bool Base::ReadStatFlag(bool doExit)
   /*
     Read STATISTICS, returns true if succeeded
   */
+  std::cerr << "       read stat flag" << std::endl;
   int position = fin->tellg(); // remember the current position
   CheckFormat(doExit);
-  int position0 = fin->tellg();
-  std::cout << "position: " << position0 << " " << position << std::endl;
+  //int position0 = fin->tellg();
+  //  std::cout << "position: " << position0 << " " << position << std::endl;
   char *value = "STATISTICS";
   const unsigned short n = strlen(value);
   char flag[n];
@@ -277,11 +279,11 @@ bool Base::ReadStatFlag(bool doExit)
   CheckFormat(doExit);
 
   if (strcmp(flag, value) == 0) {
-    if (gVerbose>kPRINT_MISC) std::cout << "statistics ok" << std::endl;
+    if (gVerbose>kPRINT_MISC)  std::cout << "statistics ok" << std::endl;
     return true;
   } else {
     std::cout << "not statistics" << std::endl;
-    //    fin->seekg(-n*sizeof(char)-3*sizeof(int), std::ios::cur); // go back
+    //        fin->seekg(-n*sizeof(char)-3*sizeof(int), std::ios::cur); // go back
     fin->seekg(position, std::ios::beg);
     return false;
   }

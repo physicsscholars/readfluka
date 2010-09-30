@@ -42,7 +42,6 @@ void UsrSuw::Reset()
 
 bool UsrSuw::Read()
 {
-  std::cout << "read" << std::endl;
   if (fin->eof()) return false;
   Reset();
 
@@ -51,10 +50,10 @@ bool UsrSuw::Read()
   float tmp;
   int before = fin->tellg();
   int after;
-  //while (ReadStatFlag() == false) {
-    {
-    after = fin->tellg();
-    std::cout << "before and after: " << before << " " << after << std::endl;
+  ReadStatFlag(false);
+  //   while (ReadStatFlag(false) == false) {
+      after = fin->tellg();
+      std::cout << "before and after: " << before << " " << after << std::endl;
     fNRN = ReadInt(); std::cout << "NRN: " << fNRN << std::endl;
     
     fin->read(mychar, 10); mychar[10] = '\0'; // !!! is it necessary \0?
@@ -63,12 +62,13 @@ bool UsrSuw::Read()
     fITURSN = ReadInt();
     fNRURSN = ReadInt();
     fVURSNC = ReadFloat();
-    fIMRHGH = ReadInt();
-    fIZRHGH = ReadInt();
+    fIMRHGH = ReadInt(); 
+    fIZRHGH = ReadInt();std::cout << "dimentions: " << fIMRHGH << " " << fIZRHGH << std::endl;
     fK = ReadInt();
     
+    std::cout << "checkpoint1: " << fin->tellg() << std::endl;
     CheckFormat();
-
+    std::cout << "checkpoint2: " << fin->tellg() << std::endl;
     for (int i=0; i<fIMRHGH; i++) {
       val.clear();
       for (int j=0; j<fIZRHGH; j++) {
@@ -77,13 +77,16 @@ bool UsrSuw::Read()
       }
       fRNDATA.push_back(val);
     }
-    }
 
+    std::cout << "->loop done" << std::endl;
+    before = fin->tellg(); std::cout << "end loop: " << before << std::endl;
+    //}
+  
     ReadStatFlag();
-    
-    fTotalResp    = ReadFloat();
-    fTotalRespErr = ReadFloat();
-    std::cout << "total responce: " << fTotalResp << " ± "  << fTotalRespErr << std::endl;
+  
+  fTotalResp    = ReadFloat();
+  fTotalRespErr = ReadFloat();
+  std::cout << "total responce: " << fTotalResp << " ± "  << fTotalRespErr << std::endl;
  
   CheckFormat();
   
