@@ -60,10 +60,10 @@ namespace ReadFluka {
     
     int                    Nint(float   x) const;
     int  SizeStart();
-    bool SizeEnd();
-    bool CheckFormat();
+    bool SizeEnd(bool doExit=true);
+    bool CheckFormat(bool doExit=true);
 
-    bool ReadStatFlag();
+    bool ReadStatFlag(bool doExit=true);
     
     std::string                 Trimmed(std::string const& str, char const* sepSet=" ");
     std::ifstream              *GetFile() const {return fin;}

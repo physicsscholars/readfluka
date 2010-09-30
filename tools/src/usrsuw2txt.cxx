@@ -13,7 +13,7 @@ int main(int argc, const char **argv)
   cout << "Total number of particles followed " << usrsuw->GetEntryNumber();
   cout << ", for a total weight of " << usrsuw->GetWeight() << endl;
   */
-  cout << "before while" << endl;
+
   while (usrsuw->Read()) {
     usrsuw->Print();
   }

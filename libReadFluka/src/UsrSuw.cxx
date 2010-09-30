@@ -42,46 +42,51 @@ void UsrSuw::Reset()
 
 bool UsrSuw::Read()
 {
+  std::cout << "read" << std::endl;
   if (fin->eof()) return false;
   Reset();
 
-  fNRN = ReadInt();
-
   char *mychar = new char[11];
-  fin->read(mychar, 10); mychar[10] = '\0'; // !!! is it necessary \0?
-  fTIURSN = Trimmed(std::string(mychar));
-
-  fITURSN = ReadInt();
-  fNRURSN = ReadInt();
-  fVURSNC = ReadFloat();
-  fIMRHGH = ReadInt();
-  fIZRHGH = ReadInt();
-  fK = ReadInt();
-
-  CheckFormat();
-
   std::vector <float> val; // scored values
   float tmp;
-  //std::cout << "IZRHGH and IMRHGH: " << fIZRHGH << " " << fIMRHGH << std::endl;
-  for (int i=0; i<fIMRHGH; i++) {
-    val.clear();
-    for (int j=0; j<fIZRHGH; j++) {
-      tmp = ReadFloat();
-      val.push_back(tmp);
+  int before = fin->tellg();
+  int after;
+  //while (ReadStatFlag() == false) {
+    {
+    after = fin->tellg();
+    std::cout << "before and after: " << before << " " << after << std::endl;
+    fNRN = ReadInt(); std::cout << "NRN: " << fNRN << std::endl;
+    
+    fin->read(mychar, 10); mychar[10] = '\0'; // !!! is it necessary \0?
+    fTIURSN = Trimmed(std::string(mychar)); std::cout << "name: " << fTIURSN << std::endl;
+    
+    fITURSN = ReadInt();
+    fNRURSN = ReadInt();
+    fVURSNC = ReadFloat();
+    fIMRHGH = ReadInt();
+    fIZRHGH = ReadInt();
+    fK = ReadInt();
+    
+    CheckFormat();
+
+    for (int i=0; i<fIMRHGH; i++) {
+      val.clear();
+      for (int j=0; j<fIZRHGH; j++) {
+	tmp = ReadFloat();
+	val.push_back(tmp);
+      }
+      fRNDATA.push_back(val);
     }
-    fRNDATA.push_back(val);
-  }
+    }
 
-  ReadStatFlag();
-
-  for (int i=0; i<1; i++) std::cout << "int: " <<  ReadInt() << std::endl;
+    ReadStatFlag();
+    
+    fTotalResp    = ReadFloat();
+    fTotalRespErr = ReadFloat();
+    std::cout << "total responce: " << fTotalResp << " ± "  << fTotalRespErr << std::endl;
+ 
   CheckFormat();
-
-  fTotalResp    = ReadFloat();
-  fTotalRespErr = ReadFloat();
-  std::cout << "total responce: " << fTotalResp << " ± "  << fTotalRespErr << std::endl;
-
-  CheckFormat();
+  
 
   // Isotope Yield as a function of Mass Number
   

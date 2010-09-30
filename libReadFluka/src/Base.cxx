@@ -205,11 +205,9 @@ int Base::SizeStart()
   return fSize_start;
 }
 
-bool Base::SizeEnd()
+bool Base::SizeEnd(bool doExit)
 {
-  // Read size end and compare it with size start
-
-  fSize_end = ReadInt();
+  /*  fSize_end = ReadInt();
   //std::clog << std::setw(100) << std::right << "*** SizeEnd: " << fSize_end << std::endl;
   
   if (fSize_start != fSize_end) {
@@ -220,40 +218,71 @@ bool Base::SizeEnd()
   
   //std::cerr << "->check format ok: " << fSize_start << std::endl;
   return true;
-}
+  */
 
-bool Base::CheckFormat()
-{
-  if (bCheckFormat1st == false) {
-    SizeEnd(); 
-    bCheckFormat1st = true;
-  }
-  SizeStart();
+  // Read size end and compare it with size start
+  int tmp = fSize_end;
+  fSize_end = ReadInt();
+  //std::clog << std::setw(100) << std::right << "*** SizeEnd: " << fSize_end << std::endl;
+  
+  if (fSize_start != fSize_end) {
+    if (doExit == true) {
+      std::cerr << "Base::CheckSize() warning:\t" << fSize_start << " " << fSize_end << std::endl;
+      exit(WRONG_FORMAT);
+    } else {
+      fSize_end = tmp;
+    }
+    return false;
+  }  
+
   return true;
 }
 
-bool Base::ReadStatFlag()
+bool Base::CheckFormat(bool doExit)
+{
+  bool status = false;
+  int position = fin->tellg();
+  if (bCheckFormat1st == false) {
+    status = SizeEnd(doExit); 
+    if (doExit == false) bCheckFormat1st = true;
+    if ( (doExit == true) && (status == false) ) {
+      fin->seekg(position, std::ios::beg);
+      return false;
+    }
+  }
+  if (doExit == true) SizeStart();
+  else fin->seekg(position, std::ios::beg);
+  return true;
+}
+
+bool Base::ReadStatFlag(bool doExit)
 {
   /*
     Read STATISTICS, returns true if succeeded
   */
-
-  CheckFormat();
   int position = fin->tellg(); // remember the current position
+  CheckFormat(doExit);
+  int position0 = fin->tellg();
+  std::cout << "position: " << position0 << " " << position << std::endl;
   char *value = "STATISTICS";
-  const unsigned short n = strlen(value); std::cout << "n: " << n << std::endl;
+  const unsigned short n = strlen(value);
   char flag[n];
   fin->read(flag, n);
   flag[n] = '\0';
-  //ReadInt();
+
   if (gVerbose>kPRINT_MISC) std::cout << "stat.flag:\t" << flag << std::endl;
   
+  std::cout << "int: " <<  ReadInt() << std::endl;
+  
+  CheckFormat(doExit);
+
   if (strcmp(flag, value) == 0) {
-    std::cout << "statistics ok" << std::endl;
+    if (gVerbose>kPRINT_MISC) std::cout << "statistics ok" << std::endl;
     return true;
   } else {
-    fin->seekg(-n*sizeof(char)-3*sizeof(int), std::ios::cur); // go back
-    //fin->seekg(position, std::ios::beg);
+    std::cout << "not statistics" << std::endl;
+    //    fin->seekg(-n*sizeof(char)-3*sizeof(int), std::ios::cur); // go back
+    fin->seekg(position, std::ios::beg);
     return false;
   }
 }

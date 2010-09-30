@@ -37,7 +37,6 @@ void ResNuclei::Reset()
 
 bool ResNuclei::ReadHeader()
 {
-  std::cout << "here" << std::endl;
   if (fIsReadHeader == true) return false;
   fIsReadHeader = true;
   ReadRunTitle(); // here also SizeStart called 
