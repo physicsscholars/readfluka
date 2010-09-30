@@ -39,12 +39,11 @@ bool UsrSuw::Read()
   Reset();
 
   char *mychar = new char[11];
-  std::vector <float> val; // scored values
+  std::vector <float> vec; // scored values
+  std::vector< std::vector<float> > vec2;
   float tmp, tmperr;
   int before = fin->tellg();
   int after;
-  //ReadStatFlag(false);
-  int icounter = 0;
   for (;;) {
     after = fin->tellg();
     //    std::cout << "before and after: " << before << " " << after << std::endl;
@@ -63,14 +62,17 @@ bool UsrSuw::Read()
     //std::cout << "checkpoint1: " << fin->tellg() << std::endl;
     CheckFormat();
     //std::cout << "checkpoint2: " << fin->tellg() << std::endl;
+    vec2.clear();
     for (int i=0; i<fIMRHGH; i++) {
-      val.clear();
+      vec.clear();
       for (int j=0; j<fIZRHGH; j++) {
 	tmp = ReadFloat();
-	val.push_back(tmp); //std::cout << tmp << std::endl;
+	vec.push_back(tmp); //std::cout << tmp << std::endl;
       }
-      fRNDATA.push_back(val);
+      vec2.push_back(vec);
     }
+    fRNDATA.push_back(vec2);
+    
 
     fN++;
     CheckFormat();
@@ -93,33 +95,38 @@ bool UsrSuw::Read()
     
     // Isotope Yield as a function of Mass Number
     std::cerr << "yield " << std::flush;
+    vec.clear();
     for (int i=GetAmin(); i<=GetAmax(); i++) { 
       tmp = ReadFloat();
-      fYieldA.push_back(tmp);
+      vec.push_back(tmp);
     }
+    fYieldA.push_back(vec);
     
     CheckFormat();
-    
+    vec.clear();
     for (int i=GetAmin(); i<=GetAmax(); i++) {
       tmp = ReadFloat();
-      fYieldAErr.push_back(tmp);
+      vec.push_back(tmp);
     }
+    fYieldAErr.push_back(vec);
     
     CheckFormat();
     
     // Isotope Yield as a function of Atomic Number
-    
+    vec.clear();
     for (int i=GetZmin(); i<=GetZmax(); i++) {
       tmp = ReadFloat();
-      fYieldZ.push_back(tmp);
+      vec.push_back(tmp);
     }  
-    
+    fYieldZ.push_back(vec);
+
     CheckFormat();
-    
+    vec.clear();
     for (int i=GetZmin(); i<=GetZmax(); i++) {
       tmp = ReadFloat();
-      fYieldZErr.push_back(tmp);
-    }  
+      vec.push_back(tmp);
+    }
+    fYieldZ.push_back(vec);
     std::cerr << "done" << std::endl;
     
     CheckFormat();
@@ -127,17 +134,17 @@ bool UsrSuw::Read()
     std::cerr << "residual nuclei distribution " << std::flush;
     
     // Residual nuclei distribution
+    vec2.clear();
     for (int i=0; i<fIMRHGH; i++) {
-      val.clear();
+      vec.clear();
       for (int j=0; j<fIZRHGH; j++) {
 	tmp = ReadFloat();//*100.0;
-	//std::cout << tmp << "\t\t" << std::flush;
-	val.push_back(tmp);
-	//  ReadFloat(2);
+	vec.push_back(tmp);
       }
       //std::cout << std::endl << std::endl;
-      fRNERR.push_back(val);
+      vec2.push_back(vec);
     }
+    fRNERR.push_back(vec2);
 
     CheckFormat();
 
@@ -149,8 +156,7 @@ bool UsrSuw::Read()
 
   return true;
 }
-
-float UsrSuw::GetRNERR(int Z, int A) const
+float UsrSuw::GetRNDATA(int i, int Z, int A) const
 {
   /*
     Return residual nuclei production with specified Z and A
@@ -167,7 +173,27 @@ float UsrSuw::GetRNERR(int Z, int A) const
   Z = Z-1;
   A = A-1-fK-2*(Z+1);
   //std::cout << "arguments for GetRNDATA: " << Z << " " << A << std::endl;
-  return fRNERR[A][Z];
+  return fRNDATA[i][A][Z];
+}
+
+float UsrSuw::GetRNERR(int i, int Z, int A) const
+{
+  /*
+    Return residual nuclei production with specified Z and A
+   */
+
+  if (Z>GetZmax()) {
+    std::cerr << "WARNING by GetRNDATA: Z = " << Z << " > Zmax = " << GetZmax() << std::endl;
+    return 0.0f;
+  }
+  if (A>GetAmax()) {
+    std::cerr << "WARNING by GetRNDATA: A = " << A << " > Amax" << GetAmax() << std::endl;
+    return 0.0f;
+  }
+  Z = Z-1;
+  A = A-1-fK-2*(Z+1);
+  //std::cout << "arguments for GetRNDATA: " << Z << " " << A << std::endl;
+  return fRNERR[i][A][Z];
 }
 
 void UsrSuw::Print() const
@@ -199,13 +225,14 @@ void UsrSuw::Print() const
       std::cout << ", Min. N-Z: " << GetK()+1 << std::endl;
     }  
   
+ for (int iN=0; iN<fN; iN++) {
   std::cout << std::endl;
   std::cout << "**** Isotope Yield as a function of Mass Number ****" << std::endl;
   std::cout << "**** (nuclei / cmc / pr)                        ****" << std::endl;
   std::cout << std::endl << "A_min: " << GetAmin() << " - A_max: " << GetAmax() << std::endl << std::endl;
   for (int i=GetAmax()-1; i>=GetAmin()-1; --i) { 
-    if (fYieldA[i]>0)
-      std::cout << "A:\t" << i+1 <<"\t"<< fYieldA[i] << " +/- " << 100*fYieldAErr[i] << " %" << std::endl;
+    if (fYieldA[iN][i]>0)
+      std::cout << "A:\t" << i+1 <<"\t"<< fYieldA[iN][i] << " +/- " << 100*fYieldAErr[iN][i] << " %" << std::endl;
   }
   std::cout << std::endl << std::endl;
 
@@ -213,8 +240,8 @@ void UsrSuw::Print() const
   std::cout << "****   (nuclei / cmc / pr)                        ****" << std::endl;
   std::cout << std::endl << "Z_min: " << GetZmin()  << " - Z_max: " << GetZmax() << std::endl << std::endl;
   for (int i=GetZmax()-1; i>=GetZmin()-1; --i) {
-    if (fYieldZ[i]>0)
-      std::cout << "Z:\t" << i+1 <<"\t"<< fYieldZ[i] << " +/- " << 100*fYieldZErr[i] << " %" << std::endl;
+    if (fYieldZ[iN][i]>0)
+      std::cout << "Z:\t" << i+1 <<"\t"<< fYieldZ[iN][i] << " +/- " << 100*fYieldZErr[iN][i] << " %" << std::endl;
   }
 
   std::cout << std::endl;
@@ -226,15 +253,14 @@ void UsrSuw::Print() const
   int iCount=0;
   for (int i=0; i<GetIZRHGH(); i++)
     for (int j=0; j<GetIMRHGH(); j++) {
-      val = GetRNDATA()[j][i];
-      err = GetRNERR()[j][i];
+      //   val = GetRNDATA()[iN][j][i];
+      err = GetRNERR()[iN][j][i];
       //      cout << "\t" << i+1 << " " << j+1 << " " << GetK() << endl;
       if (val>0)
 	std::cout << "\t" << GetA(i,j) << "\t" << i+1 << "\t" << val << "\t" << 100*err << std::endl;
       iCount++;
     }
-  std::cout << "total: " << iCount << std::endl;
-
+ }
 }
 
 std::string UsrSuw::GetBinTitle() const

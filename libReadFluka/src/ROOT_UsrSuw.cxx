@@ -46,8 +46,8 @@ TH2F *ROOT_UsrSuw::Histogram() const
   float val, err;
   for (int i=0; i<GetIZRHGH(); i++)
     for (int j=0; j<GetIMRHGH(); j++) {
-      val = GetRNDATA()[j][i];
-      err = GetRNERR()[j][i];
+      val = GetRNDATA()[0][j][i];
+      err = GetRNERR()[0][j][i];
       if (val>0) {
 	h->SetBinContent(i+1, GetA(i,j), val);
 	h->SetBinError(i+1, GetA(i,j), err);
@@ -72,8 +72,8 @@ TH1F *ROOT_UsrSuw::HistogramZ() const
 
   float val, err;
   for (int i=GetZmin()-1; i<GetZmax(); i++) {
-    val = GetYieldZ(i);
-    err = GetYieldZErr(i);
+    val = GetYieldZ(i,0);
+    err = GetYieldZErr(i,0);
     if (val>0) {
       h->SetBinContent(i+1, val);
       h->SetBinError(i+1,   err*val); // the error is relative, but we need absolute
@@ -99,8 +99,8 @@ TH1F *ROOT_UsrSuw::HistogramA() const
 
   float val, err;
   for (int i=GetAmin()-1; i<GetAmax(); i++) {
-    val = GetYieldA(i);
-    err = GetYieldAErr(i);
+    val = GetYieldA(i,0);
+    err = GetYieldAErr(i,0);
     if (val>0) {
       h->SetBinContent(i+1, val);
       h->SetBinError(i+1,   err*val); // the error is relative, but we need absolute
