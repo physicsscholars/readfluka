@@ -62,7 +62,8 @@ namespace ReadFluka {
     int  SizeStart();
     bool SizeEnd();
     bool CheckFormat();
-    
+
+    bool ReadStatFlag();
     
     std::string                 Trimmed(std::string const& str, char const* sepSet=" ");
     std::ifstream              *GetFile() const {return fin;}

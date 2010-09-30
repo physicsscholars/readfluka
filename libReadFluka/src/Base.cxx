@@ -232,6 +232,32 @@ bool Base::CheckFormat()
   return true;
 }
 
+bool Base::ReadStatFlag()
+{
+  /*
+    Read STATISTICS, returns true if succeeded
+  */
+
+  CheckFormat();
+  int position = fin->tellg(); // remember the current position
+  char *value = "STATISTICS";
+  const unsigned short n = strlen(value); std::cout << "n: " << n << std::endl;
+  char flag[n];
+  fin->read(flag, n);
+  flag[n] = '\0';
+  //ReadInt();
+  if (gVerbose>kPRINT_MISC) std::cout << "stat.flag:\t" << flag << std::endl;
+  
+  if (strcmp(flag, value) == 0) {
+    std::cout << "statistics ok" << std::endl;
+    return true;
+  } else {
+    fin->seekg(-n*sizeof(char)-3*sizeof(int), std::ios::cur); // go back
+    //fin->seekg(position, std::ios::beg);
+    return false;
+  }
+}
+
 std::string Base::Trimmed(std::string const& str, char const* sepSet)
 {
   /* Return a string with leading/trailing characters of a set stripped

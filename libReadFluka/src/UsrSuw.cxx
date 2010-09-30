@@ -38,6 +38,8 @@ void UsrSuw::Reset()
 
 }
 
+
+
 bool UsrSuw::Read()
 {
   if (fin->eof()) return false;
@@ -70,16 +72,7 @@ bool UsrSuw::Read()
     fRNDATA.push_back(val);
   }
 
-  CheckFormat();
-
-  fin->read(mychar, 10); mychar[10] = '\0'; // !!! is is necessary \0?
-  std::cout << mychar << std::flush;
-  if (strcmp(mychar, "STATISTICS") != 0) {
-    std::cerr << std::endl << "file format error" << std::endl;
-    exit(1);
-  } else {
-    std::cout << " -> OK" << std::endl;
-  }
+  ReadStatFlag();
 
   for (int i=0; i<1; i++) std::cout << "int: " <<  ReadInt() << std::endl;
   CheckFormat();
