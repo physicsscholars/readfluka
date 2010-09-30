@@ -262,9 +262,9 @@ bool Base::ReadStatFlag(bool doExit)
   /*
     Read STATISTICS, returns true if succeeded
   */
-  std::cerr << "       read stat flag" << std::endl;
+  //  std::cerr << "       read stat flag" << std::endl;
   int position = fin->tellg(); // remember the current position
-  CheckFormat(doExit);
+  //CheckFormat(doExit);
   //int position0 = fin->tellg();
   //  std::cout << "position: " << position0 << " " << position << std::endl;
   char *value = "STATISTICS";
@@ -275,7 +275,7 @@ bool Base::ReadStatFlag(bool doExit)
 
   if (gVerbose>kPRINT_MISC) std::cout << "stat.flag:\t" << flag << std::endl;
   
-  std::cout << "int: " <<  ReadInt() << std::endl;
+  std::cout << "\t->ReadStatFlag: int = " <<  ReadInt() << std::endl;
   
   CheckFormat(doExit);
 
@@ -283,7 +283,7 @@ bool Base::ReadStatFlag(bool doExit)
     if (gVerbose>kPRINT_MISC)  std::cout << "statistics ok" << std::endl;
     return true;
   } else {
-    std::cout << "not statistics" << std::endl;
+    //   std::cout << "not statistics" << std::endl;
     //        fin->seekg(-n*sizeof(char)-3*sizeof(int), std::ios::cur); // go back
     fin->seekg(position, std::ios::beg);
     return false;

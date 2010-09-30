@@ -50,11 +50,12 @@ bool UsrSuw::Read()
   float tmp;
   int before = fin->tellg();
   int after;
-  ReadStatFlag(false);
-  //while (ReadStatFlag(false) == false) {
-      after = fin->tellg();
-      std::cout << "before and after: " << before << " " << after << std::endl;
-    fNRN = ReadInt(); std::cout << "NRN: " << fNRN << std::endl;
+  //ReadStatFlag(false);
+  int icounter = 0;
+  for (;;) {
+    after = fin->tellg();
+    //    std::cout << "before and after: " << before << " " << after << std::endl;
+    fNRN = ReadInt(); //std::cout << "NRN: " << fNRN << std::endl;
     
     fin->read(mychar, 10); mychar[10] = '\0'; // !!! is it necessary \0?
     fTIURSN = Trimmed(std::string(mychar)); std::cout << "name: " << fTIURSN << std::endl;
@@ -63,27 +64,32 @@ bool UsrSuw::Read()
     fNRURSN = ReadInt();
     fVURSNC = ReadFloat();
     fIMRHGH = ReadInt(); 
-    fIZRHGH = ReadInt();std::cout << "dimentions: " << fIMRHGH << " " << fIZRHGH << std::endl;
+    fIZRHGH = ReadInt();//std::cout << "dimentions: " << fIMRHGH << " " << fIZRHGH << std::endl;
     fK = ReadInt();
     
-    std::cout << "checkpoint1: " << fin->tellg() << std::endl;
+    //std::cout << "checkpoint1: " << fin->tellg() << std::endl;
     CheckFormat();
-    std::cout << "checkpoint2: " << fin->tellg() << std::endl;
+    //std::cout << "checkpoint2: " << fin->tellg() << std::endl;
     for (int i=0; i<fIMRHGH; i++) {
       val.clear();
       for (int j=0; j<fIZRHGH; j++) {
 	tmp = ReadFloat();
-	val.push_back(tmp);
+	val.push_back(tmp); //std::cout << tmp << std::endl;
       }
       fRNDATA.push_back(val);
     }
 
-    std::cout << "->loop done" << std::endl;
-    before = fin->tellg(); std::cout << "end loop: " << before << std::endl;
-    //}
+    CheckFormat();
+    if (ReadStatFlag(false) == true) break;
+    before = fin->tellg(); 
+  }
   
-    ReadStatFlag();
-  
+  CheckFormat();
+
+  fTotalResp    = ReadFloat();
+  fTotalRespErr = ReadFloat();
+  std::cout << "total responce: " << fTotalResp << " ± "  << fTotalRespErr << std::endl;
+  CheckFormat();
   fTotalResp    = ReadFloat();
   fTotalRespErr = ReadFloat();
   std::cout << "total responce: " << fTotalResp << " ± "  << fTotalRespErr << std::endl;

@@ -15,7 +15,7 @@ int main(int argc, const char **argv)
   */
 
   while (usrsuw->Read()) {
-    usrsuw->Print();
+    //usrsuw->Print();
   }
 
   int Z = 12;
