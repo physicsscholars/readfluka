@@ -35,7 +35,7 @@ int main(int argc, const char **argv)
   TFile *file = TFile::Open(fname_out.Data(), "recreate");
 
   while (usrsuw->Read()) {
-    usrsuw->Histograms();//->Write();
+    usrsuw->Histograms()->Write();
     usrsuw->HistogramsA()->Write();
     usrsuw->HistogramsZ()->Write();
   }

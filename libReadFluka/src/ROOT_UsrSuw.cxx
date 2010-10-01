@@ -49,15 +49,15 @@ TH2F *ROOT_UsrSuw::Histogram(int iHist) const
   h->SetDirectory(0);
 
   float val, err;
-  for (int i=0; i<GetIZRHGH(i); i++)
-    for (int j=0; j<GetIMRHGH(i); j++) {
-      std::cout << iHist << std::endl;
+  for (int i=0; i<GetIZRHGH(iHist); i++)
+    for (int j=0; j<GetIMRHGH(iHist); j++) {
+      //std::cout << iHist << std::endl;
       val = GetRNDATA()[iHist][j][i];
       err = GetRNERR()[iHist][j][i];
       // std::cerr << val << " " << err << std::endl;
       if (val>0) {
 	h->SetBinContent(i+1, GetA(iHist, i,j), val);
-	h->SetBinError(i+1, GetA(iHist,  i,j), err);
+	h->SetBinError(i+1, GetA(iHist,  i,j), err*val);
       }
     }
 
@@ -125,7 +125,7 @@ TObjArray *ROOT_UsrSuw::Histograms() const
 {
   fHistograms->Clear();
   TH2F *h;
-  for (int i=0; i<GetN(); i++) { std::cout << i << std::endl;
+  for (int i=0; i<GetN(); i++) {
     h = Histogram(i);
     //h->Print();
     fHistograms->Add(h);
