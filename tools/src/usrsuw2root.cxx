@@ -35,10 +35,9 @@ int main(int argc, const char **argv)
   TFile *file = TFile::Open(fname_out.Data(), "recreate");
 
   while (usrsuw->Read()) {
-    usrsuw->Histogram()->Write();
-    usrsuw->HistogramA()->Write();
-    usrsuw->HistogramZ()->Write();
-    //clog << usrsuw->GetBinName() << "  " << flush;
+    usrsuw->Histograms();//->Write();
+    usrsuw->HistogramsA()->Write();
+    usrsuw->HistogramsZ()->Write();
   }
   clog << endl;
 

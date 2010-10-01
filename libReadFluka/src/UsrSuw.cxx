@@ -58,7 +58,7 @@ bool UsrSuw::Read()
     fNRN.push_back(ReadInt()); //std::cout << "NRN: " << fNRN << std::endl;
     
     fin->read(mychar, 10); mychar[10] = '\0'; // !!! is it necessary \0?
-    fTIURSN.push_back(Trimmed(std::string(mychar))); std::cout << "name: " << mychar << std::endl;
+    fTIURSN.push_back(Trimmed(std::string(mychar))); //std::cout << "name: " << mychar << std::endl;
     
     fITURSN.push_back(ReadInt());
     fNRURSN.push_back(ReadInt());
@@ -97,12 +97,12 @@ bool UsrSuw::Read()
     tmperr = ReadFloat();
     fTotalResp.push_back(tmp);
     fTotalRespErr.push_back(tmperr);
-    std::cout << "total responce: " << tmp << " ± "  << tmperr << std::endl;
+    //    std::cout << "total responce: " << tmp << " ± "  << tmperr << std::endl;
     
     CheckFormat();
     
     // Isotope Yield as a function of Mass Number
-    std::cerr << "yield " << std::flush;
+    //    std::cerr << "yield " << std::flush;
     vec.clear();
     for (int i=GetAmin(iN); i<=GetAmax(iN); i++) { 
       tmp = ReadFloat();
@@ -135,11 +135,11 @@ bool UsrSuw::Read()
       vec.push_back(tmp);
     }
     fYieldZErr.push_back(vec);
-    std::cerr << "done" << std::endl;
+    //    std::cerr << "done" << std::endl;
     
     CheckFormat();
 
-    std::cerr << "residual nuclei distribution " << std::flush;
+    //    std::cerr << "residual nuclei distribution " << std::flush;
     
     // Residual nuclei distribution
     vec2.clear();
@@ -156,7 +156,7 @@ bool UsrSuw::Read()
 
     CheckFormat();
 
-    std::cerr << " done" << std::endl;
+    //    std::cerr << " done" << std::endl;
     
   }
 
@@ -266,21 +266,21 @@ void UsrSuw::Print() const
   }
 }
 
-std::string UsrSuw::GetBinTitle() const
+std::string UsrSuw::GetBinTitle(int i) const
 {
   std::ostringstream tmp;
 
-  if (abs(GetITURSN())<1) { // see page 211
-    tmp << "Res. nuclei production rate: 'high' energy products in the region " << GetNRURSN() << std::flush;
-  } else if (abs(GetITURSN())<2) {
-    tmp << "Res. nuclei production rate: 'low' energy products in the region " << GetNRURSN() << std::flush;
+  if (abs(fITURSN[i])<1) { // see page 211
+    tmp << "Res. nuclei production rate: 'high' energy products in the region " << fNRURSN[i] << std::flush;
+  } else if (abs(fITURSN[i])<2) {
+    tmp << "Res. nuclei production rate: 'low' energy products in the region " << fNRURSN[i] << std::flush;
   } else {
-    tmp << "Res. nuclei production rate: all products in the region " << GetNRURSN() << std::flush;
+    tmp << "Res. nuclei production rate: all products in the region " << fNRURSN[i] << std::flush;
   }  
-  tmp << ", detector volume: " << GetVURSNC() << " cm^{3}" << std::flush;
-  tmp << " ( Z_{max} = " << GetIZRHGH();
-  tmp << ", (N-Z)_{max} = " << GetIMRHGH() + GetK();
-  tmp << ", (N-Z)_{min} = " << GetK()+1 << " )" << std::flush;
+  tmp << ", detector volume: " << fVURSNC[i] << " cm^{3}" << std::flush;
+  tmp << " ( Z_{max} = " << fIZRHGH[i];
+  tmp << ", (N-Z)_{max} = " << fIMRHGH[i] + fK[i];
+  tmp << ", (N-Z)_{min} = " << fK[i]+1 << " )" << std::flush;
 
   return tmp.str();
 }

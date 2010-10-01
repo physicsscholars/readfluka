@@ -37,18 +37,19 @@ namespace ReadFluka {
     std::vector< std::vector< std::vector<float> > > fRNDATA; // residual nuclei production rate
     std::vector< std::vector< std::vector<float> > > fRNERR; // residual nuclei relative errors [%]
 
-   
-
-
   public:
     UsrSuw(const char *fname);
     virtual ~UsrSuw();
     void Reset();
     bool Read();
-
-    std::string GetBinTitle() const;
-    inline std::string GetBinTitleA() const {return "Isotope Yield as a function of Mass Number";}
-    inline std::string GetBinTitleZ() const {return "Isotope Yield as a function of Atomic Number";}
+    
+    inline unsigned short GetN() const {return fN;}
+    
+    inline std::string GetTIURSN(int i) const {return fTIURSN[i];}
+    inline std::string GetBinName(int i) const {return GetTIURSN(i);}
+    std::string GetBinTitle(int i) const;
+    inline std::string GetBinTitleA(int i) const {return "Isotope Yield as a function of Mass Number in the region";}
+    inline std::string GetBinTitleZ(int i) const {return "Isotope Yield as a function of Atomic Number";}
 
     inline int GetA(int k, int i, int j) const {return j+1+fK[k]+2*(i+1);}
 
@@ -63,11 +64,16 @@ namespace ReadFluka {
     inline float GetYieldZ(int i, int j) const {return fYieldZ[i][j];}
     inline float GetYieldZErr(int i, int j) const {return fYieldZErr[i][j];}
 
+    inline int GetIZRHGH(int i) const {return fIZRHGH[i];}
+    inline int GetIMRHGH(int i) const {return fIMRHGH[i];}
+
     inline int GetAmin(int i) const {return 1;} 
     inline int GetZmin(int i) const {return 1;} 
     inline int GetAmax(int i) const {return fIMRHGH[i] + 2*fIZRHGH[i] + fK[i];}
     inline int GetZmax(int i) const {return fIZRHGH[i];}
 
+    inline unsigned int GetNbinsZ(int i) const {return GetZmax(i)-GetZmin(i);}
+    inline unsigned int GetNbinsA(int i) const {return GetAmax(i)-GetAmin(i);}
 
     void Print() const;
   };
