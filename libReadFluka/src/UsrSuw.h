@@ -17,8 +17,13 @@ namespace ReadFluka {
   class UsrSuw : protected ResNuclei {
   private:
     std::vector<int> fNRN;
-    std::vector<std::string> fTIURSN;
-    std::vector<int> fITURSN;
+    std::vector<std::string> fTIURSN; // scoring names
+    std::vector<int> fITURSN; // type of binning: 1 = spallation products, 2 = low-energy neutrons products, 3=all products
+    std::vector<unsigned int> fNRURSN; // regions
+    std::vector<float> fVURSNC; // volume of the detector [cm^3]
+    std::vector<int> fIMRHGH; // maximum M=N-Z-NMZ_min of the scoring (minimum M: 1). Note: N-Z=M+NMZ_min,N=M+Z+NMZ_min
+    std::vector<int> fIZRHGH; // maximum Z of the scoring (minimum Z: 1)
+    std::vector<int> fK;
     unsigned short fN; // number of RESNUCLEI cards read
     std::vector<float> fTotalResp;
     std::vector<float> fTotalRespErr;
@@ -45,7 +50,7 @@ namespace ReadFluka {
     inline std::string GetBinTitleA() const {return "Isotope Yield as a function of Mass Number";}
     inline std::string GetBinTitleZ() const {return "Isotope Yield as a function of Atomic Number";}
 
-    inline int GetA(int i, int j) const {return j+1+fK+2*(i+1);}
+    inline int GetA(int k, int i, int j) const {return j+1+fK[k]+2*(i+1);}
 
     std::vector< std::vector< std::vector<float> > > GetRNDATA()  const {return fRNDATA;}
     float GetRNDATA(int i, int Z, int A) const;
@@ -57,6 +62,12 @@ namespace ReadFluka {
 
     inline float GetYieldZ(int i, int j) const {return fYieldZ[i][j];}
     inline float GetYieldZErr(int i, int j) const {return fYieldZErr[i][j];}
+
+    inline int GetAmin(int i) const {return 1;} 
+    inline int GetZmin(int i) const {return 1;} 
+    inline int GetAmax(int i) const {return fIMRHGH[i] + 2*fIZRHGH[i] + fK[i];}
+    inline int GetZmax(int i) const {return fIZRHGH[i];}
+
 
     void Print() const;
   };
