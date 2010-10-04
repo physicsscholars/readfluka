@@ -37,7 +37,7 @@ int main(int argc, const char **argv)
   while (usrsuw->Read()) {
     usrsuw->Histograms()->Write();
     usrsuw->HistogramsA()->Write();
-    usrsuw->HistogramsZ()->Write();
+     usrsuw->HistogramsZ()->Write();
   }
   clog << endl;
 
