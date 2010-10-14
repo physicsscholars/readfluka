@@ -1,5 +1,6 @@
 #! /usr/bin/python -Qwarn
 import sys, getopt, re, string, os
+import tempfile
 
 def usage():
     print main.__doc__
@@ -37,7 +38,8 @@ usage:\tfluka2root file.inp [N] [M]
 
     printincolor("Note that the corresponding histograms from different ROOT files will be summed up but not averaged unless it is not been implemented in the ROOT's hadd.", 33)
 
-    estimators = {"EVENTDAT" : [], "USRBDX" : [], "USRBIN" : [], "RESNUCLE" : []} # dictionary of supported estimators and their file units
+#    estimators = {"EVENTDAT" : [], "USRBDX" : [], "USRBIN" : [], "RESNUCLE" : []} # dictionary of supported estimators and their file units
+    estimators = {"RESNUCLE" : []} # dictionary of supported estimators and their file units
     opened = {} # dictionary of the opened units (if any)
     out_root_files = [] # list of output ROOT files
     
@@ -66,8 +68,6 @@ usage:\tfluka2root file.inp [N] [M]
             notsupported()
             sys.exit(2)
 
-#    inp.seek(0)
-#    for line in inp.readlines():
         if isname is True:
             name = line[0:10].strip()
             opened[str2int(unit)] = name
@@ -124,6 +124,7 @@ usage:\tfluka2root file.inp [N] [M]
 
 # run converters
     return_value = 0
+    resnuclei_binary_files = []
     for run in range(N, M+1):
         binfilename = ""
         rootfilenames = []
@@ -135,28 +136,44 @@ usage:\tfluka2root file.inp [N] [M]
                     rootfilenames.append(binfilename + ".root")
                     if re.search("RESNUCLE", e): # RESNUCLE = RESNUCLEi = RESNUCLEI
                         e = "RESNUCLEI"
-                    command =  "%s2root %s" % (e.lower(), binfilename)
-                    printincolor(command)
-                    return_value = os.system(command)
-                    if return_value is not 0:
-                        print "warning: " % return_value
-                        sys.exit(return_value)
-                else:
-                    printincolor("WARNING: can't open file %s" % binfilename, 33)
+                        resnuclei_binary_files.append(binfilename)
+                    else:
+                        command =  "%s2root %s" % (e.lower(), binfilename)
+                        printincolor(command)
+                        return_value = os.system(command)
+                        if return_value is not 0:
+                            print "warning: " % return_value
+                            sys.exit(return_value)
+                        else:
+                            printincolor("WARNING: can't open file %s" % binfilename, 33)
 # hadd
-        out_root_file = inpname.replace(".inp", "%.3d%s" % (run, ".root"))
-        command = "hadd %s %s" % (out_root_file, string.join(rootfilenames))
-        printincolor(command)
-        return_value = os.system(command)
-# remove tmp files
-        if return_value is 0:
-            command = "rm -v %s" % string.join(rootfilenames)
+        if not re.search("RESNUCLE", e):
+            out_root_file = inpname.replace(".inp", "%.3d%s" % (run, ".root"))
+            command = "hadd %s %s" % (out_root_file, string.join(rootfilenames))
             printincolor(command)
             return_value = os.system(command)
+# remove tmp files
             if return_value is 0:
-                out_root_files.append(out_root_file)
-            else:
-                sys.exit(return_value)
+                command = "rm -v %s" % string.join(rootfilenames)
+                printincolor(command)
+                return_value = os.system(command)
+                if return_value is 0:
+                    out_root_files.append(out_root_file)
+                else:
+                    sys.exit(return_value)
+
+    if len(resnuclei_binary_files):
+#        tmpfile = tempfile.NamedTemproraryFile(delete=False) #("fluka2root", "tmp", None, True)
+        tmpfile = tempfile.NamedTemporaryFile(delete=False)
+        print tmpfile.name
+        for f in resnuclei_binary_files:
+            tmpfile.write("%s\n" % f)
+        tmpfile.write("\n")
+        tmpfile.write("%s\n" % inpname.replace(".inp", "resnuclei"))
+        tmpfile.close()
+        command = "cat %s | $FLUTIL/usrsuw" % tmpfile.name
+        print command
+        os.system(command)
 
     print out_root_files
     if return_value is 0 and len(out_root_files)>1:
