@@ -58,7 +58,7 @@ bool UsrSuw::Read()
     fNRN.push_back(ReadInt()); //std::cout << "NRN: " << fNRN << std::endl;
     
     fin->read(mychar, 10); mychar[10] = '\0'; // !!! is it necessary \0?
-    fTIURSN.push_back(Trimmed(std::string(mychar))); //std::cout << "name: " << mychar << std::endl;
+    fTIURSN.push_back(Trimmed(std::string(mychar))); std::cout << mychar << " " << std::flush;
     
     fITURSN.push_back(ReadInt());
     fNRURSN.push_back(ReadInt());
@@ -88,7 +88,7 @@ bool UsrSuw::Read()
     before = fin->tellg();
   }
   
-  std::cout << "total number of histograms found: " << fN << std::endl;
+  //  std::cout << "total number of histograms found: " << fN << std::endl;
 
   CheckFormat();
   

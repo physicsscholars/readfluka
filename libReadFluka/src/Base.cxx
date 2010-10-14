@@ -275,7 +275,8 @@ bool Base::ReadStatFlag(bool doExit)
 
   if (gVerbose>kPRINT_MISC) std::cout << "stat.flag:\t" << flag << std::endl;
   
-  std::cout << "\t->ReadStatFlag: int = " <<  ReadInt() << std::endl;
+  if (true) ReadInt();
+  else std::cout << "\t->ReadStatFlag: int = " <<  ReadInt() << std::endl;
   
   CheckFormat(doExit);
 

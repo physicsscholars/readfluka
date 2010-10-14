@@ -9,6 +9,6 @@ fi
 inp=$1
 n=$2
 
-for i in `seq 0 $n`; do ~/fluka/calet/macros/clone_inp.py $inp `basename $inp .inp`"$i"_.inp; done
+for i in `seq 0 $n`; do $READFLUKA_SYS/../tools/src/clone_inp.py $inp `basename $inp .inp`"$i"_.inp; done
 
 echo "do not forget to remove $inp"
