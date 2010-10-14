@@ -146,7 +146,7 @@ usage:\tfluka2root file.inp [N] [M]
                             sys.exit(return_value)
                         else:
                             printincolor("WARNING: can't open file %s" % binfilename, 33)
-# hadd
+# hadd within one sample
         if not re.search("RESNUCLE", e):
             out_root_file = inpname.replace(".inp", "%.3d%s" % (run, ".root"))
             command = "hadd %s %s" % (out_root_file, string.join(rootfilenames))
@@ -162,18 +162,23 @@ usage:\tfluka2root file.inp [N] [M]
                 else:
                     sys.exit(return_value)
 
-    if len(resnuclei_binary_files):
+    if len(resnuclei_binary_files): # usrsuw to sum RESNUCLEI
 #        tmpfile = tempfile.NamedTemproraryFile(delete=False) #("fluka2root", "tmp", None, True)
-        tmpfile = tempfile.NamedTemporaryFile(delete=False)
+        usrsuwfile = inpname.replace(".inp", "%.3d-%.3d_usrsuw" % (N, M) )
+        tmpfile = open("usrsuw.txt", "w")
         print tmpfile.name
         for f in resnuclei_binary_files:
             tmpfile.write("%s\n" % f)
         tmpfile.write("\n")
-        tmpfile.write("%s\n" % inpname.replace(".inp", "resnuclei"))
+        tmpfile.write("%s\n" % usrsuwfile)
         tmpfile.close()
         command = "cat %s | $FLUTIL/usrsuw" % tmpfile.name
         print command
         os.system(command)
+        os.unlink(tmpfile.name)
+        command = "usrsuw2root %s" % usrsuwfile
+        os.system(command)
+        out_root_files.append("%s.root" % usrsuwfile)
 
     print out_root_files
     if return_value is 0 and len(out_root_files)>1:
