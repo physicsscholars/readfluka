@@ -167,7 +167,7 @@ usage:\tfluka2root file.inp [N] [M]
 
     if len(resnuclei_binary_files): # usrsuw to sum RESNUCLEI
         usrsuwfile = inpname.replace(".inp", "%.3d-%.3d_usrsuw" % (N, M) )
-        fd, temp_path = tempfile.mktemp()
+        temp_path = tempfile.mktemp()
         tmpfile = open(temp_path, "w")
         print tmpfile.name
         for f in resnuclei_binary_files:
