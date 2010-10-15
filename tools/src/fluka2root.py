@@ -176,6 +176,8 @@ usage:\tfluka2root file.inp [N] [M]
         tmpfile.write("\n")
         tmpfile.write("%s\n" % usrsuwfile)
         tmpfile.close()
+        os.close(fd)
+        os.remove(temp_path)
         command = "cat %s | $FLUTIL/usrsuw" % tmpfile.name
         print command
         os.system(command)
