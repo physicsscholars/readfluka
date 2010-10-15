@@ -175,8 +175,6 @@ usage:\tfluka2root file.inp [N] [M]
         tmpfile.write("\n")
         tmpfile.write("%s\n" % usrsuwfile)
         tmpfile.close()
-#        os.close(fd)
-#        os.remove(temp_path)
         command = "cat %s | $FLUTIL/usrsuw" % tmpfile.name
         print command
         os.system(command)
@@ -187,7 +185,7 @@ usage:\tfluka2root file.inp [N] [M]
 
     if len(usrbin_binary_files): # usbsuw to sum RESNUCLEI
         usbsuwfile = inpname.replace(".inp", "%.3d-%.3d_usbsuw" % (N, M) )
-        fd, temp_path = tempfile.mkstemp()
+        temp_path = tempfile.mktemp()
         tmpfile = open(temp_path, "w")
         print tmpfile.name
         for f in resnuclei_binary_files:
@@ -195,8 +193,6 @@ usage:\tfluka2root file.inp [N] [M]
         tmpfile.write("\n")
         tmpfile.write("%s\n" % usbsuwfile)
         tmpfile.close()
-#        os.close(fd)
-#        os.remove(temp_path)
         command = "cat %s | $FLUTIL/usbsuw" % tmpfile.name
         print command
         os.system(command)
