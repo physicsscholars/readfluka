@@ -3,8 +3,8 @@
 
 //////////////////////////////////////////////////////
 //
-// UsrSuw - a class to read the $FLUTIL/usrsuw binary output
-//
+// UsrSuw - a class to read the $FLUTIL/usrsuw binary output (RESNUCLEI)
+// 
 //////////////////////////////////////////////////////
 
 #include <fstream>
