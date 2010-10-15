@@ -166,7 +166,6 @@ usage:\tfluka2root file.inp [N] [M]
                 sys.exit(return_value)
 
     if len(resnuclei_binary_files): # usrsuw to sum RESNUCLEI
-#        tmpfile = tempfile.NamedTemproraryFile(delete=False) #("fluka2root", "tmp", None, True)
         usrsuwfile = inpname.replace(".inp", "%.3d-%.3d_usrsuw" % (N, M) )
         fd, temp_path = tempfile.mkstemp()
         tmpfile = open(temp_path, "w")
@@ -177,7 +176,7 @@ usage:\tfluka2root file.inp [N] [M]
         tmpfile.write("%s\n" % usrsuwfile)
         tmpfile.close()
 #        os.close(fd)
-        os.remove(temp_path)
+#        os.remove(temp_path)
         command = "cat %s | $FLUTIL/usrsuw" % tmpfile.name
         print command
         os.system(command)
@@ -185,6 +184,27 @@ usage:\tfluka2root file.inp [N] [M]
         command = "usrsuw2root %s" % usrsuwfile
         os.system(command)
         out_root_files.append("%s.root" % usrsuwfile)
+
+    if len(usrbin_binary_files): # usbsuw to sum RESNUCLEI
+        usbsuwfile = inpname.replace(".inp", "%.3d-%.3d_usbsuw" % (N, M) )
+        fd, temp_path = tempfile.mkstemp()
+        tmpfile = open(temp_path, "w")
+        print tmpfile.name
+        for f in resnuclei_binary_files:
+            tmpfile.write("%s\n" % f)
+        tmpfile.write("\n")
+        tmpfile.write("%s\n" % usbsuwfile)
+        tmpfile.close()
+#        os.close(fd)
+#        os.remove(temp_path)
+        command = "cat %s | $FLUTIL/usbsuw" % tmpfile.name
+        print command
+        os.system(command)
+        os.unlink(tmpfile.name)
+        command = "usbsuw2root %s" % usbsuwfile
+        print command
+#        os.system(command)
+#        out_root_files.append("%s.root" % usbsuwfile)
 
     print out_root_files
     if return_value is 0 and len(out_root_files)>1:
