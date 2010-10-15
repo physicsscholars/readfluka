@@ -125,6 +125,7 @@ usage:\tfluka2root file.inp [N] [M]
 # run converters
     return_value = 0
     resnuclei_binary_files = []
+    usrbin_binary_files = []
     for run in range(N, M+1):
         binfilename = ""
         rootfilenames = []
@@ -136,6 +137,8 @@ usage:\tfluka2root file.inp [N] [M]
                     if re.search("RESNUCLE", e): # RESNUCLE = RESNUCLEi = RESNUCLEI
                         e = "RESNUCLEI"
                         resnuclei_binary_files.append(binfilename)
+                    if re.search("USRBIN", e):
+                        usrbin_binary_files.append(binfilename)
                     else:
                         rootfilenames.append(binfilename + ".root")
                         command =  "%s2root %s" % (e.lower(), binfilename)
@@ -165,7 +168,8 @@ usage:\tfluka2root file.inp [N] [M]
     if len(resnuclei_binary_files): # usrsuw to sum RESNUCLEI
 #        tmpfile = tempfile.NamedTemproraryFile(delete=False) #("fluka2root", "tmp", None, True)
         usrsuwfile = inpname.replace(".inp", "%.3d-%.3d_usrsuw" % (N, M) )
-        tmpfile = open("usrsuw.txt", "w")
+        fd, temp_path = tempfile.mkstemp()
+        tmpfile = open(temp_path, "w")
         print tmpfile.name
         for f in resnuclei_binary_files:
             tmpfile.write("%s\n" % f)
