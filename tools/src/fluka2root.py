@@ -188,7 +188,7 @@ usage:\tfluka2root file.inp [N] [M]
         temp_path = tempfile.mktemp()
         tmpfile = open(temp_path, "w")
         print tmpfile.name
-        for f in resnuclei_binary_files:
+        for f in usrbin_binary_files:
             tmpfile.write("%s\n" % f)
         tmpfile.write("\n")
         tmpfile.write("%s\n" % usbsuwfile)
@@ -196,7 +196,7 @@ usage:\tfluka2root file.inp [N] [M]
         command = "cat %s | $FLUTIL/usbsuw" % tmpfile.name
         print command
         os.system(command)
-        os.unlink(tmpfile.name)
+#        os.unlink(tmpfile.name)
         command = "usbsuw2root %s" % usbsuwfile
         print command
 #        os.system(command)

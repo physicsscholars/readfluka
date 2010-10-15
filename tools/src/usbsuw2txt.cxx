@@ -14,9 +14,10 @@ int main(int argc, const char **argv)
   cout << ", for a total weight of " << usbsuw->GetWeight() << endl;
   */
 
-  while (usbsuw->Read()) {
+  usbsuw->Read();
+  //while (usbsuw->Read()) {
     usbsuw->Print();
-  }
+    //}
 
   delete usbsuw;
  
