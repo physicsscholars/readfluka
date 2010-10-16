@@ -1,11 +1,13 @@
 #ifndef UsbSuw_h
 #define UsbSuw_h
 
-//////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 //
 // UsbSuw - a class to read the $FLUTIL/usbsuw binary output (USRBIN)
 // 
-//////////////////////////////////////////////////////
+// The corresponding FLUKA program is called 'usbrea'
+//
+/////////////////////////////////////////////////////////////////////////
 
 #include <fstream>
 #include <vector>
@@ -27,15 +29,23 @@ namespace ReadFluka {
     std::vector<float> fZLOW;
     std::vector<float> fZHIGH;
 
-    std::vector<int> fDXUSBN;
-    std::vector<int> fDYUSBN;
-    std::vector<int> fDZUSBN;
+    std::vector<int> fNXBIN;
+    std::vector<int> fNYBIN;
+    std::vector<int> fNZBIN;
+
+    std::vector<float> fDXUSBN;
+    std::vector<float> fDYUSBN;
+    std::vector<float> fDZUSBN;
+
+    std::vector< std::vector<float> > fScored; // GMSTOR?
 
   public:
     UsbSuw(const char *fname);
     virtual ~UsbSuw();
     void Reset();
     bool Read();
+
+    inline const int GetNbins(int i) const {return fNXBIN[i]*fNYBIN[i]*fNZBIN[i];}
 
     void Print() const;
   };

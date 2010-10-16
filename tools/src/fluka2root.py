@@ -157,7 +157,7 @@ usage:\tfluka2root file.inp [N] [M]
         return_value = os.system(command)
 # remove tmp files
         if return_value is 0:
-            command = "rm -v %s" % string.join(rootfilenames)
+            command = "rm -f %s" % string.join(rootfilenames)
             printincolor(command)
             return_value = os.system(command)
             if return_value is 0:
@@ -209,7 +209,7 @@ usage:\tfluka2root file.inp [N] [M]
         printincolor(command)
         return_value = os.system(command)
         if return_value is 0:
-            command = "rm -v %s" % string.join(out_root_files)
+            command = "rm -f %s" % string.join(out_root_files)
             printincolor(command)
             return_value = os.system(command)
 

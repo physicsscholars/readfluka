@@ -22,6 +22,7 @@
 ////////////////////////////////////////////////////
 
 #include <fstream>
+#include <vector>
 #include "Base.h"
 
 namespace ReadFluka {
@@ -57,6 +58,7 @@ namespace ReadFluka {
     
   protected:
     float      *fScored;          // array of scored values
+    std::vector<float> fScoredVec;
     bool        fUsbReaFlag;      // true if we are reading usbrea output
   public:
     UsrBin(const char *fname);
@@ -91,11 +93,17 @@ namespace ReadFluka {
     const float GetdZ() const {return fDZUSBN;}
     
     const int GetDistType() const {return fIDUSBN;}
+
     const int GetBinType() const {return fITUSBN;}
+    inline const int GetITUSBN() const {return fITUSBN;}
+
     const float *GetScored() const {return fScored;}
     float  GetScored(int x, int y=1, int z=1) const;
+    std::vector<float> GetScoredVec() const {return fScoredVec;}
 		
     const char *GetBinName() const {return fTITUSB;}
+    inline const char *GetTITUSB() const {return fTITUSB;}
+
     bool      Read(); // read 1 user binning
     void Print() const;
   };

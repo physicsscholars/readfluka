@@ -208,7 +208,7 @@ int Base::SizeStart()
 bool Base::SizeEnd(bool doExit)
 {
   /*  fSize_end = ReadInt();
-  //std::clog << std::setw(100) << std::right << "*** SizeEnd: " << fSize_end << std::endl;
+      std::clog << std::setw(100) << std::right << "*** SizeEnd: " << fSize_end << std::endl;
   
   if (fSize_start != fSize_end) {
     std::cerr << "Base::CheckSize() warning:\t" << fSize_start << " " << fSize_end << std::endl;
@@ -243,6 +243,7 @@ bool Base::SizeEnd(bool doExit)
 
 bool Base::CheckFormat(bool doExit)
 {
+  std::cerr << "Base::CheckFormat" << std::endl;
   bool status;
   if (bCheckFormat1st == false) {
     status = SizeEnd(doExit); 

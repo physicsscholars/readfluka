@@ -16,6 +16,7 @@ UsrBin::UsrBin(const char *fname) : Base(fname)
   fNXBIN = fNYBIN = fNZBIN = 0;
   fDXUSBN = fDYUSBN = fDZUSBN = 0.0f;
   fScored = 0;
+  fScoredVec.clear();
   fIsReadHeader = false;
   fUsbReaFlag = false;
   fFirstRead = true;
@@ -27,6 +28,7 @@ UsrBin::~UsrBin()
 {
   if (fTITUSB) delete [] fTITUSB; fTITUSB = 0;
   if (fScored) delete [] fScored; fScored = 0;
+  fScoredVec.clear();
 }
 
 void UsrBin::fReadHeader()
@@ -51,14 +53,17 @@ void UsrBin::fReadHeader()
       std::cout << std::setprecision(4) << fWEIPRI << std::endl;
     }
   }
+  std::cout << ReadInt() << " " << ReadInt() << std::endl;
+  //std::cout << "a" << std::endl;
+  //CheckFormat();
+  // std::cout << "b" << std::endl; 
+  ReadInt(2);
 }
 
 bool UsrBin::Read()
 {
-  ReadInt(2);
-  
   if (!fin->good()) return false;
-  
+
   fMB = ReadInt();
   
   if (fFirstRead == true) {
@@ -148,6 +153,7 @@ bool UsrBin::fReadCartesian()
   
   if (fScored) delete fScored;
   fScored = new float[GetNbins()];
+  fScoredVec.clear();
   
   //	std::cout << ReadInt() << std::endl;	std::cout << ReadInt() << std::endl;
   //  CheckFormat();
@@ -155,6 +161,7 @@ bool UsrBin::fReadCartesian()
   if (gVerbose>=kPRINT_TITLE) std::cout << "fScored:\t";
   for (int i=0; i<GetNbins(); i++) {
     fScored[i]  = ReadFloat();
+    fScoredVec.push_back(fScored[i]);
     if (gVerbose>=kPRINT_SCORED)	std::cout << fScored[i] << ' ';
   }
   if (gVerbose>=kPRINT_TITLE) std::cout << std::endl;

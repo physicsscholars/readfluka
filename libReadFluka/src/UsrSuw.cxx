@@ -50,10 +50,10 @@ bool UsrSuw::Read()
   std::vector <float> vec; // scored values
   std::vector< std::vector<float> > vec2;
   float tmp, tmperr;
-  int before = fin->tellg();
-  int after;
+  //  int before = fin->tellg();
+  //  int after;
   for (;;) {
-    after = fin->tellg();
+    //    after = fin->tellg();
     //    std::cout << "before and after: " << before << " " << after << std::endl;
     fNRN.push_back(ReadInt()); //std::cout << "NRN: " << fNRN << std::endl;
     
@@ -85,7 +85,7 @@ bool UsrSuw::Read()
     fN++;
     CheckFormat();
     if (ReadStatFlag(false) == true) break;
-    before = fin->tellg();
+    //    before = fin->tellg();
   }
   
   //  std::cout << "total number of histograms found: " << fN << std::endl;
