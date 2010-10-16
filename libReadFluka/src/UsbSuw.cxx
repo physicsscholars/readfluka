@@ -4,7 +4,7 @@
 
 using namespace ReadFluka;
 
-UsbSuw::UsbSuw(const char *fname) : UsrBin(fname)
+UsbSuw::UsbSuw(const char *fname) : UsrBin(fname, true)
 {
   
 }
@@ -43,14 +43,9 @@ bool UsbSuw::Read()
   if (fin->eof()) return false;
   Reset();
 
-  char *mychar = new char[11];
-  
-  //std::cout << ReadInt() << std::endl;
-  //  fin->read(mychar, 10); mychar[10] = '\0';
-  //std::cout << mychar << std::endl;
-
-  for (;;) {
-    UsrBin::Read();
+  //  for (;;) {
+  UsrBin::fUsbReaFlag = true;
+  UsrBin::Read();
     
     fITUSBN.push_back(UsrBin::GetITUSBN());
     fTITUSB.push_back(UsrBin::GetBinName());
@@ -72,11 +67,12 @@ bool UsbSuw::Read()
     
     fScored.push_back(UsrBin::GetScoredVec());
 
+    //    CheckFormat();
     ReadInt(2);
 
     std::cout << "read" << std::endl;
-    if (ReadStatFlag(false) == true) break;
-  }
+    //    if (ReadStatFlag(false) == true) break;
+    // }
 
   return true;
 }

@@ -32,6 +32,8 @@ namespace ReadFluka {
   protected:
     std::ifstream        *fin;             //! file descriptor
     int                   fNCASE;          // number of primaries handled so far (current one included)
+    int                   fMCASE;  // used when reading output of
+    int                   fNBATCH; // such programs as 'usbsuw'
     float                 fWEIPRI;         // weight of a primary particle
     int                   fMB;             // number of binning
     
@@ -45,7 +47,7 @@ namespace ReadFluka {
     
     int                    ReadInt(unsigned int   n=1) const;    // read n integers
     float                  ReadFloat(unsigned int   n=1) const;  // read n floats
-    bool                   ReadBool(unsigned int   n = 1) const; // read n bools
+    bool                   ReadBool(unsigned int n = 1) const {return ReadInt(n);} //in fortran sizeof(bool)=sizeof(int)
     void                   ReadRunTitle();              // read run titie
     void                   ReadRunTime();               // read run time
     float                 *Read(int size) const;

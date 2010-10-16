@@ -34,10 +34,6 @@ Base::Base(const char *fname)
 
 Base::~Base()
 {
-  /*
-    Destructor
-  */
-  
   delete [] fRunTime;  fRunTime = 0;
   delete [] fRunTitle; fRunTitle = 0;
   delete [] fchar;     fchar = 0;
@@ -58,15 +54,15 @@ int Base::ReadInt(unsigned int n/* =1 */) const
   fin->read((char *)data, sizeof(int)*n);
   if (fin->fail()) {
     if (gVerbose>=kPRINT_HEADER) std::cerr << "read error in Base::ReadInt()" << std::endl;
-  };
-
+  }
+  
   return data[0];
 }
- 
+
 float Base::ReadFloat(unsigned int n/* =1 */) const
 {
   /*
-    Read n doubles
+    Read n floats
   */
   
   float data[n];
@@ -76,17 +72,6 @@ float Base::ReadFloat(unsigned int n/* =1 */) const
   };
 
   return data[0];
-}
-
-bool Base::ReadBool(unsigned int n/* =1 */) const
-{
-  /* 
-     Read n bools
-     since we're reading FORTRAN binary output, sizeof(bool) = sizeof(int)
-     => read n ints:
-  */
-  
-  return (bool)ReadInt(n);
 }
 
 void Base::ReadRunTitle()
@@ -201,7 +186,7 @@ int Base::SizeStart()
 {
   fSize_start = ReadInt();
   bCheckFormat1st = false;
-  //std::clog << std::setw(100) << std::right << "*** SizeStart: " << fSize_start << std::endl;
+  //  std::clog << std::setw(100) << std::right << "*** SizeStart: " << fSize_start << std::endl;
   return fSize_start;
 }
 
@@ -246,6 +231,7 @@ bool Base::CheckFormat(bool doExit)
   std::cerr << "Base::CheckFormat" << std::endl;
   bool status;
   if (bCheckFormat1st == false) {
+    //    std::cerr << "bCheckFormat1st is false" << std::endl;
     status = SizeEnd(doExit); 
     if (doExit == true) {
       bCheckFormat1st = true;

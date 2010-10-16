@@ -61,7 +61,7 @@ namespace ReadFluka {
     std::vector<float> fScoredVec;
     bool        fUsbReaFlag;      // true if we are reading usbrea output
   public:
-    UsrBin(const char *fname);
+    UsrBin(const char *fname, bool UsbReaFlag=false);
     virtual ~UsrBin();
     
     const float GetXmin() const {return fXLOW;}

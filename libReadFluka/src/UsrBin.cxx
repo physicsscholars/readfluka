@@ -4,7 +4,7 @@
 
 using namespace ReadFluka;
 
-UsrBin::UsrBin(const char *fname) : Base(fname)
+UsrBin::UsrBin(const char *fname, bool UsbReaFlag) : Base(fname)
 {
   fTITUSB = new char[11];
   fITUSBN = 0;
@@ -18,7 +18,7 @@ UsrBin::UsrBin(const char *fname) : Base(fname)
   fScored = 0;
   fScoredVec.clear();
   fIsReadHeader = false;
-  fUsbReaFlag = false;
+  fUsbReaFlag = UsbReaFlag;
   fFirstRead = true;
   
   fReadHeader();
@@ -53,11 +53,16 @@ void UsrBin::fReadHeader()
       std::cout << std::setprecision(4) << fWEIPRI << std::endl;
     }
   }
-  std::cout << ReadInt() << " " << ReadInt() << std::endl;
-  //std::cout << "a" << std::endl;
-  //CheckFormat();
-  // std::cout << "b" << std::endl; 
-  ReadInt(2);
+
+  if (fUsbReaFlag == true) {
+    fMCASE = ReadInt();
+    fNBATCH= ReadInt();
+  }
+  //  ReadInt(2);
+  std::cout << "a" << std::endl;
+  CheckFormat();
+  std::cout << "b" << std::endl; 
+  // ReadInt(2);
 }
 
 bool UsrBin::Read()
@@ -66,7 +71,7 @@ bool UsrBin::Read()
 
   fMB = ReadInt();
   
-  if (fFirstRead == true) {
+  if ((fFirstRead == true) && (fUsbReaFlag == false)) {
     //		ReadInt(2); // these 2 ints were introduced in FLUKA2008 => understand what are they and use them
     if (gVerbose==kPRINT_NOTHING) ReadInt(2);
     else std::cerr << "fluka2008: " << ReadInt() << " " << ReadInt() << std::endl;
@@ -109,10 +114,13 @@ bool UsrBin::Read()
   
   bool LNTZER=false;
   float BKUSBN=0.0, B2USBN=0.0, TCUSBN=1.0E+38;
-  LNTZER =  (bool)ReadInt();
+  LNTZER = ReadBool();
   BKUSBN = ReadFloat();
   B2USBN = ReadFloat();
   TCUSBN = ReadFloat();
+
+  //  CheckFormat();
+
   if (gVerbose>=kPRINT_MISC) {
     std::cout << "LNTZER: " << LNTZER << std::endl;
     std::cout << "BKUSBN: " << BKUSBN << std::endl;
