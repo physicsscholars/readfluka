@@ -1,12 +1,35 @@
 #include "UsbSuw.h"
 #include <iostream>
 #include <sstream>
+#include <cmath> // for max
 
 using namespace ReadFluka;
 
-UsbSuw::UsbSuw(const char *fname) : UsrBin(fname, true)
+UsbSuw::UsbSuw(const char *fname) : Base(fname)
 {
+  Reset();
+
+  ReadRunTitle();
+  ReadRunTime();
+
+  fWEIPRI = ReadFloat();
+  fNCASE = ReadInt();
+  fMCASE = ReadInt();
+  fNBATCH = ReadInt();
+
+  //  CheckFormat();
+
+  fNCTOT += fNCASE;
+  fMCTOT += fMCASE;
   
+  if ( fNCTOT > 1000000000 ) {
+    fNCTOT -= 1000000000;
+    fMCTOT += fMCTOT;
+  }
+  
+  fWCTOT += fWEIPRI;
+  fKLAST = 0;
+  fKMAX = 0;
 }
 
 UsbSuw::~UsbSuw()
@@ -16,6 +39,14 @@ UsbSuw::~UsbSuw()
 
 void UsbSuw::Reset()
 {
+  fReadCounter = 0;
+  fMCASE = 0;
+  fNBATCH = 0;
+  fNCTOT = 0;
+  fMCTOT = 0;
+  fWCTOT = 0.0;
+  fKLAST = 0;
+  fKMAX = 0;
   fITUSBN.clear();
   fTITUSB.clear();
   fIDUSBN.clear();
@@ -34,64 +65,163 @@ void UsbSuw::Reset()
   fDYUSBN.clear();
   fDZUSBN.clear();
 
+  fLNTZER.clear();
+  fBKUSBN.clear();
+  fB2USBN.clear();
+  fTCUSBN.clear();
+
+  fIRECRD = 0;
+
+  fJB.clear();
+
+  fLTRKBN.clear();
+  fNUSRBN = 0;
+  fLSTATI = false;
+  fKBUSBN.clear();
+
   fScored.clear();
+  fGBSTOR.clear();
 }
 
 bool UsbSuw::Read()
 {
   std::cout << "UsbSuw::Read()" << std::endl;
   if (fin->eof()) return false;
-  Reset();
 
-  //  for (;;) {
-  UsrBin::fUsbReaFlag = true;
-  UsrBin::Read();
-    
-    fITUSBN.push_back(UsrBin::GetITUSBN());
-    fTITUSB.push_back(UsrBin::GetBinName());
-    
-    fXLOW.push_back(UsrBin::GetXmin());
-    fXHIGH.push_back(UsrBin::GetXmax());
-    fNXBIN.push_back(UsrBin::GetNbinsX());
-    fDXUSBN.push_back(UsrBin::GetdX());
-    
-    fYLOW.push_back(UsrBin::GetYmin());
-    fYHIGH.push_back(UsrBin::GetYmax());
-    fNYBIN.push_back(UsrBin::GetNbinsY());
-    fDYUSBN.push_back(UsrBin::GetdY());
-    
-    fZLOW.push_back(UsrBin::GetZmin());
-    fZHIGH.push_back(UsrBin::GetZmax());
-    fNZBIN.push_back(UsrBin::GetNbinsZ());
-    fDZUSBN.push_back(UsrBin::GetdZ());
-    
-    fScored.push_back(UsrBin::GetScoredVec());
+  int K0 = 0;
+  int K1 = 0;
+  int NB, MB;
 
-    //    CheckFormat();
-    ReadInt(2);
+  //  CheckFormat();
+  for (int IB=0; IB<1; IB++) {
+    CheckFormat();
+    std::cout << "start loop IB" << std::endl;
+    NB = IB;
+    MB = ReadInt(); std::cout << MB << std::endl;
+  
+    char *strtmp = new char[11];
+    fin->read(strtmp, 10); strtmp[10] = '\0';
+    fTITUSB.push_back(strtmp);
+    delete strtmp;
+    
+    fITUSBN.push_back(ReadInt());
+    fIDUSBN.push_back(ReadInt());
+    
+    fXLOW.push_back(ReadFloat());
+    fXHIGH.push_back(ReadFloat());
+    fNXBIN.push_back(ReadInt());
+    fDXUSBN.push_back(ReadFloat());
+    
+    fYLOW.push_back(ReadFloat());
+    fYHIGH.push_back(ReadFloat());
+    fNYBIN.push_back(ReadInt());
+    fDYUSBN.push_back(ReadFloat());
+    
+    fZLOW.push_back(ReadFloat());
+    fZHIGH.push_back(ReadFloat());
+    fNZBIN.push_back(ReadInt());
+    fDZUSBN.push_back(ReadFloat());
+    
+    fLNTZER.push_back(ReadBool());
+    fBKUSBN.push_back(ReadInt());
+    fB2USBN.push_back(ReadInt());
+    fTCUSBN.push_back(ReadFloat()); // line 186
+    
+    fIRECRD ++;
+    
+    CheckFormat();
+    
+    // line 223
+    fJB.push_back(NB);
 
-    std::cout << "read" << std::endl;
+    if ((fIDUSBN[IB]!=208) && (fITUSBN[IB])>=10)
+      fLTRKBN.push_back(true);
+    else
+      fLTRKBN.push_back(false);
+    
+    K0 = fKLAST+1;
+    fKBUSBN.push_back(K0);
+    K1 = GetNbins(IB) + K0 - 1;
+    fKLAST = K1;
+    fKMAX = std::max(fKMAX, fKLAST);
+    
+    std::vector<float> tmpvec; // ??? what if LSNGBN is set to score double? !!!
+    for (int i=0; i<GetNbins(IB); i++)
+      tmpvec.push_back(ReadFloat());
+    
+    fScored.push_back(tmpvec);
+    tmpvec.clear();
+    
+    CheckFormat();
+
+    fIRECRD++;
+  
+    // line 242
+    IB--;
+    fNUSRBN = IB;
+
+    if (fLSTATI) { // 'STATISTICS'
+      std::cout << "statistics" << std::endl;
+      fKLAST = 0;
+      for (int jj = 0; jj < IB; jj++) {
+	NB = fJB[jj];
+	K0 = fKLAST+1;
+	K1 = GetNbins(NB) + K0-1;
+	fKLAST = K1;
+	tmpvec.clear();
+	for (int j=K0; j<K1; j++)
+	  tmpvec.push_back(ReadFloat());
+	fGBSTOR.push_back(tmpvec);
+
+	//	CheckFormat();
+      }
+    } else
+      std::cout << "no statistics" << std::endl;
+    
     //    if (ReadStatFlag(false) == true) break;
-    // }
+  }
 
+  //  fReadCounter++;
   return true;
 }
 
 void UsbSuw::Print() const
 {
-  std::cout << "UsbSuw::Print" << std::endl;
-  for (int i=0; i<1; i++) {
-    std::cout << "bin type: " << fITUSBN[i] << std::endl;
-    std::cout << "bin name: " << fTITUSB[i] << std::endl;
-    std::cout << fXLOW[i] << " < x < " << fXHIGH[i] << "\t" << fNXBIN[i] << "\t" << fDXUSBN[i] << std::endl;
-    std::cout << fYLOW[i] << " < y < " << fYHIGH[i] << "\t" << fNYBIN[i] << "\t" << fDYUSBN[i] << std::endl;
-    std::cout << fZLOW[i] << " < z < " << fZHIGH[i] << "\t" << fNZBIN[i] << "\t" << fDZUSBN[i] << std::endl;
+  std::cout << std::scientific;// << std::setprecision(4);
 
-    /*
-    std::cout << "scored: " << std::flush;
-    for (int ibin=0; ibin<GetNbins(i); ibin++)
+  std::cout << "UsbSuw::Print" << std::endl;
+  std::cout << GetRunTitle() << std::endl;
+  std::cout << GetRunTime() << std::endl;
+  std::cout << "weight: " << GetWEIPRI() << std::endl;
+  std::cout << "ncase: " << GetNCASE() << std::endl;
+  std::cout << "mcase: " << GetMCASE() << std::endl;
+  std:: cout << "nbatch: " << GetNBATCH() << std::endl;
+
+  for (int i=0; i<1; i++) {
+    if (fITUSBN[i] == 10) std::cout << "Cartesian ";
+    std::cout << " binning n. " << fMCASE+1 << " \"" << fTITUSB[i] << "\"";
+    std::cout << ", generalized particle n. " << fIDUSBN[i] << std::endl;
+    
+    std::cout << "\tX coordinate from " << fXLOW[i] << " to " << fXHIGH[i] << " cm,\t" << fNXBIN[i] << " bins (" << fDXUSBN[i] << " cm wide)" << std::endl;
+    std::cout << "\tY coordinate from " << fYLOW[i] << " to " << fYHIGH[i] << " cm,\t" << fNYBIN[i] << " bins (" << fDYUSBN[i] << " cm wide)" << std::endl;
+    std::cout << "\tZ coordinate from " << fZLOW[i] << " to " << fZHIGH[i] << " cm,\t" << fNZBIN[i] << " bins (" << fDZUSBN[i] << " cm wide)" << std::endl;
+
+    std::cout << "\tData follow in a matrix A(ix,iy,iz), format (1(5x,1p,10(1x,e11.4)))" << std::endl << std::endl;
+    if (fITUSBN[i]>=10) std::cout << "\taccurate deposition along the tracks requested" << std::endl;
+    if (fIDUSBN[i]<200) std::cout << "\tthis is a track-length binning" << std::endl; // is it correct?
+
+    //    std::cout << "lntzer: " << fLNTZER[i] << std::endl;
+    // std::cout << "Birk's parameters: " << fBKUSBN[i] << " " << fB2USBN[i] << std::endl;
+    //std::cout << "TCUSBN: " << fTCUSBN[i] << " sec" << std::endl;
+    //return;
+    
+    std::cerr << "nbins: " << GetNbins(i) << std::endl;
+
+    for (int ibin=0; ibin<GetNbins(i); ibin++) {
+      if (i==0) std::cout << "\t";
       std::cout << fScored[i][ibin] << " " << std::flush;
-    std::cout << std::endl;
-    */
+      if ( (i+1)%10 == 0) std::cout << std::endl << '\t';
+    }
+    
   }
 }

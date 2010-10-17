@@ -32,8 +32,6 @@ namespace ReadFluka {
   protected:
     std::ifstream        *fin;             //! file descriptor
     int                   fNCASE;          // number of primaries handled so far (current one included)
-    int                   fMCASE;  // used when reading output of
-    int                   fNBATCH; // such programs as 'usbsuw'
     float                 fWEIPRI;         // weight of a primary particle
     int                   fMB;             // number of binning
     
@@ -54,8 +52,13 @@ namespace ReadFluka {
     float                 *ReadFortran(); // Read a fortran structure
     char                  *GetRunTitle() const {return fRunTitle;}
     char                  *GetRunTime() const {return fRunTime;}
+
     const int              GetEntryNumber() const {return fNCASE;}
+    inline const int       GetNCASE() const {return fNCASE;} // the same as GetEntryNumber
+
     const float            GetWeight() const {return fWEIPRI;}
+    inline const float     GetWEIPRI() const {return fWEIPRI;} // the same as GetWeight
+
     const int              GetBinNumber() const {return fMB;}
     
     const char            *Code2Name(int code, bool replace = false) const;

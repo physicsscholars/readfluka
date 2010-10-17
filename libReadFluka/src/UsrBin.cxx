@@ -54,10 +54,6 @@ void UsrBin::fReadHeader()
     }
   }
 
-  if (fUsbReaFlag == true) {
-    fMCASE = ReadInt();
-    fNBATCH= ReadInt();
-  }
   //  ReadInt(2);
   std::cout << "a" << std::endl;
   CheckFormat();
