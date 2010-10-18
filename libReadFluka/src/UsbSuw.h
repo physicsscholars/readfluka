@@ -23,7 +23,7 @@ namespace ReadFluka {
     int                   fNBATCH; //
     int fNCTOT;
     int fMCTOT;
-    int fWCTOT;
+    float fWCTOT; // total weight
     int fKLAST;
     int fKMAX;
 

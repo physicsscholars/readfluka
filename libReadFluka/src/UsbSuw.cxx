@@ -17,7 +17,7 @@ UsbSuw::UsbSuw(const char *fname) : Base(fname)
   fMCASE = ReadInt();
   fNBATCH = ReadInt();
 
-  //  CheckFormat();
+  CheckFormat();
 
   fNCTOT += fNCASE;
   fMCTOT += fMCASE;
@@ -29,7 +29,7 @@ UsbSuw::UsbSuw(const char *fname) : Base(fname)
   
   fWCTOT += fWEIPRI;
   fKLAST = 0;
-  fKMAX = 0;
+  fKMAX = 0; // line 177
 }
 
 UsbSuw::~UsbSuw()
@@ -91,14 +91,16 @@ bool UsbSuw::Read()
   int K0 = 0;
   int K1 = 0;
   int NB, MB;
+  int IB=0;
+  std::vector<float> tmpvec; // what if we need to read double instead fo float? !!!
 
   //  CheckFormat();
-  for (int IB=0; IB<1; IB++) {
-    CheckFormat();
+  for (IB=0; IB<1; IB++) {
+    //    CheckFormat();
     std::cout << "start loop IB" << std::endl;
     NB = IB;
     MB = ReadInt(); std::cout << MB << std::endl;
-  
+    
     char *strtmp = new char[11];
     fin->read(strtmp, 10); strtmp[10] = '\0';
     fTITUSB.push_back(strtmp);
@@ -127,15 +129,15 @@ bool UsbSuw::Read()
     fB2USBN.push_back(ReadInt());
     fTCUSBN.push_back(ReadFloat()); // line 186
     
-    fIRECRD ++;
-    
     CheckFormat();
+
+    fIRECRD ++;
     
     // line 223
     fJB.push_back(NB);
 
-    if ((fIDUSBN[IB]!=208) && (fITUSBN[IB])>=10)
-      fLTRKBN.push_back(true);
+    if ((fIDUSBN[NB]!=208) && (fIDUSBN[NB]!=211) && (fITUSBN[NB]>=10) )
+      fLTRKBN.push_back(true); // this is a track-length binning
     else
       fLTRKBN.push_back(false);
     
@@ -144,42 +146,43 @@ bool UsbSuw::Read()
     K1 = GetNbins(IB) + K0 - 1;
     fKLAST = K1;
     fKMAX = std::max(fKMAX, fKLAST);
+    //    std::cout << "K0 and K1: " << K0 << " " << K1 << std::endl;
     
-    std::vector<float> tmpvec; // ??? what if LSNGBN is set to score double? !!!
-    for (int i=0; i<GetNbins(IB); i++)
+    for (int i=K0; i<=K1; i++)
       tmpvec.push_back(ReadFloat());
     
     fScored.push_back(tmpvec);
     tmpvec.clear();
     
     CheckFormat();
-
-    fIRECRD++;
-  
-    // line 242
-    IB--;
-    fNUSRBN = IB;
-
-    if (fLSTATI) { // 'STATISTICS'
-      std::cout << "statistics" << std::endl;
-      fKLAST = 0;
-      for (int jj = 0; jj < IB; jj++) {
-	NB = fJB[jj];
-	K0 = fKLAST+1;
-	K1 = GetNbins(NB) + K0-1;
-	fKLAST = K1;
-	tmpvec.clear();
-	for (int j=K0; j<K1; j++)
-	  tmpvec.push_back(ReadFloat());
-	fGBSTOR.push_back(tmpvec);
-
-	//	CheckFormat();
-      }
-    } else
-      std::cout << "no statistics" << std::endl;
     
-    //    if (ReadStatFlag(false) == true) break;
+    fIRECRD++;
   }
+  
+  // line 242
+  IB--;
+  fNUSRBN = IB;
+  
+  if (fLSTATI) { // 'STATISTICS'
+    std::cout << "statistics" << std::endl;
+    fKLAST = 0;
+    for (int jj = 0; jj < IB; jj++) {
+      NB = fJB[jj];
+      K0 = fKLAST+1;
+      K1 = GetNbins(NB) + K0-1;
+      fKLAST = K1;
+      tmpvec.clear();
+      for (int j=K0; j<K1; j++)
+	tmpvec.push_back(ReadFloat());
+      fGBSTOR.push_back(tmpvec);
+      
+      CheckFormat();
+    }
+    } else
+    std::cout << "no statistics" << std::endl;
+  
+  //    if (ReadStatFlag(false) == true) break;
+
 
   //  fReadCounter++;
   return true;
@@ -218,9 +221,9 @@ void UsbSuw::Print() const
     std::cerr << "nbins: " << GetNbins(i) << std::endl;
 
     for (int ibin=0; ibin<GetNbins(i); ibin++) {
-      if (i==0) std::cout << "\t";
+      if (ibin==0) std::cout << "\t";
       std::cout << fScored[i][ibin] << " " << std::flush;
-      if ( (i+1)%10 == 0) std::cout << std::endl << '\t';
+      if ( (ibin+1)%10 == 0) std::cout << std::endl << '\t';
     }
     
   }
