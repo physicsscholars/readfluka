@@ -20,6 +20,8 @@ TH2F *ROOT_UsrBin::Histogram2(unsigned int z) const
       h->SetBinContent(x, y, GetScored(x, y, z));
       //      cout << h->GetBinContent(x,y) << endl;
     }
+
+  h->SetEntries(GetWEIPRI());
   
   return h;
 }
@@ -33,6 +35,8 @@ TH3F *ROOT_UsrBin::Histogram() const
     for (int y=1; y<=GetNbinsY(); y++)
       for (int z=1; z<=GetNbinsZ(); z++)
 	h->SetBinContent(x, y, z, GetScored(x, y, z));
+
+  h->SetEntries(GetWEIPRI());
   
   return h;
 }

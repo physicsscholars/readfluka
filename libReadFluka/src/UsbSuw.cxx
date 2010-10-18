@@ -206,6 +206,21 @@ float UsbSuw::GetScored(int i, int x, int y, int z) const
   return fScored[i][ishift];
 }
 
+float UsbSuw::GetError(int i, int x, int y, int z) const
+{
+  /*
+    Return the scored value for xyz cell in the i-th histogram.
+    The sell indises must be >= 1
+   */
+  x = x-1;
+  y = y-1;
+  z = z-1;
+  
+  int ishift = x + y*fNXBIN[i] + z*fNXBIN[i]*fNYBIN[i];
+
+  return fGBSTOR[i][ishift];
+}
+
 
 void UsbSuw::Print() const
 {

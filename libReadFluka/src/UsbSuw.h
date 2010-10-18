@@ -74,6 +74,7 @@ namespace ReadFluka {
     bool Read();
 
     float GetScored(int i, int x, int y, int z) const;
+    float GetError(int i, int x, int y, int z) const;
 
     inline const int GetMCASE() const {return fMCASE;}
     inline const int GetNBATCH() const {return fNBATCH;}
