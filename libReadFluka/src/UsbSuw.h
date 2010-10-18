@@ -65,15 +65,35 @@ namespace ReadFluka {
     std::vector< std::vector<float> > fScored; // GMSTOR?
     std::vector< std::vector<float> > fGBSTOR;
 
+    int fN; // total number of histograms (USRBIN records)
+
   public:
     UsbSuw(const char *fname);
     virtual ~UsbSuw();
     void Reset();
     bool Read();
 
+    float GetScored(int i, int x, int y, int z) const;
+
     inline const int GetMCASE() const {return fMCASE;}
     inline const int GetNBATCH() const {return fNBATCH;}
     inline const int GetNbins(int i) const {return fNXBIN[i]*fNYBIN[i]*fNZBIN[i];}
+    inline const int GetN() const {return 1;} // total number of histograms (USRBIN records)
+
+    inline std::string GetTITUSB(int i) const { return fTITUSB[i]; }
+    inline int GetIDUSBN(int i) const {return fIDUSBN[i]; }
+    inline int GetNXBIN(int i) const {return fNXBIN[i]; }
+    inline int GetNYBIN(int i) const {return fNYBIN[i]; }
+    inline int GetNZBIN(int i) const {return fNZBIN[i]; }
+
+    inline float GetXLOW(int i) const {return fXLOW[i]; }
+    inline float GetYLOW(int i) const {return fYLOW[i]; }
+    inline float GetZLOW(int i) const {return fZLOW[i]; }
+
+    inline float GetXHIGH(int i) const {return fXHIGH[i]; }
+    inline float GetYHIGH(int i) const {return fYHIGH[i]; }
+    inline float GetZHIGH(int i) const {return fZHIGH[i]; }
+
 
     void Print() const;
   };

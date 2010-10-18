@@ -1,7 +1,7 @@
 include ../Makefile.inc
 
 BINARY := eventdat2txt  usrbin2txt  usrbdx2txt  mgdraw2txt resnuclei2txt   usrsuw2txt   usbsuw2txt
-ROOT   := eventdat2root usrbin2root usrbdx2root            resnuclei2root  usrsuw2root
+ROOT   := eventdat2root usrbin2root usrbdx2root            resnuclei2root  usrsuw2root  usbsuw2root
 
 targets := $(BINARY) $(ROOT)
 

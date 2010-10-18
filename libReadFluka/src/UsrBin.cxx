@@ -4,7 +4,7 @@
 
 using namespace ReadFluka;
 
-UsrBin::UsrBin(const char *fname, bool UsbReaFlag) : Base(fname)
+UsrBin::UsrBin(const char *fname) : Base(fname)
 {
   fTITUSB = new char[11];
   fITUSBN = 0;
@@ -18,7 +18,6 @@ UsrBin::UsrBin(const char *fname, bool UsbReaFlag) : Base(fname)
   fScored = 0;
   fScoredVec.clear();
   fIsReadHeader = false;
-  fUsbReaFlag = UsbReaFlag;
   fFirstRead = true;
   
   fReadHeader();
@@ -54,11 +53,10 @@ void UsrBin::fReadHeader()
     }
   }
 
-  //  ReadInt(2);
-  std::cout << "a" << std::endl;
+  std::cout << "UsrBin::ReadHeader: " << ReadInt() << " " << ReadInt() << std::endl;
+  std::cout << "here" << std::endl;
   CheckFormat();
   std::cout << "b" << std::endl; 
-  // ReadInt(2);
 }
 
 bool UsrBin::Read()
@@ -67,19 +65,21 @@ bool UsrBin::Read()
 
   fMB = ReadInt();
   
-  if ((fFirstRead == true) && (fUsbReaFlag == false)) {
-    //		ReadInt(2); // these 2 ints were introduced in FLUKA2008 => understand what are they and use them
+  /*if (fFirstRead == true) {
+    std::cout << "here2" << std::endl;
+    //   ReadInt(2); // these 2 ints were introduced in FLUKA2008 => understand what are they and use them
     if (gVerbose==kPRINT_NOTHING) ReadInt(2);
     else std::cerr << "fluka2008: " << ReadInt() << " " << ReadInt() << std::endl;
     fFirstRead = false;
-  }
+    }*/
   
   fin->read(fTITUSB, 10);
   fTITUSB[10] = '\0';
   
   // cut the spaces from the both sides (if any):
   sprintf(fTITUSB, "%s", Base::Trimmed(std::string(fTITUSB)).c_str());
-  
+  std::cout << "titusb: " << fTITUSB << std::endl;
+
   fITUSBN = ReadInt();
   if ((fITUSBN<0) || (fITUSBN>17)) std::cerr << "error in UsrBin::Read():\tfITUSBN=" << fITUSBN << " - unknown type of binning" << std::endl;
   
@@ -115,7 +115,7 @@ bool UsrBin::Read()
   B2USBN = ReadFloat();
   TCUSBN = ReadFloat();
 
-  //  CheckFormat();
+  CheckFormat();
 
   if (gVerbose>=kPRINT_MISC) {
     std::cout << "LNTZER: " << LNTZER << std::endl;
@@ -124,16 +124,15 @@ bool UsrBin::Read()
     std::cout << "TCUSBN: " << TCUSBN << std::endl;
   }
   
-  if (fUsbReaFlag == false) {  
-    const int ituhlp = fITUSBN % 10;
-    
-    if (ituhlp == 0) {
-      return fReadCartesian();
-    } else {
-      std::cerr << "I can only read Cartesian binning for the time being: " << ituhlp << std::endl;
-      return false;
-    }
+  const int ituhlp = fITUSBN % 10;
+  
+  if (ituhlp == 0) {
+    return fReadCartesian();
+  } else {
+    std::cerr << "I can only read Cartesian binning for the time being: " << ituhlp << std::endl;
+    return false;
   }
+
   return true;
 }
 

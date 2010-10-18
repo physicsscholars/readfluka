@@ -81,6 +81,8 @@ void UsbSuw::Reset()
 
   fScored.clear();
   fGBSTOR.clear();
+
+  fN = 0;
 }
 
 bool UsbSuw::Read()
@@ -103,7 +105,7 @@ bool UsbSuw::Read()
     
     char *strtmp = new char[11];
     fin->read(strtmp, 10); strtmp[10] = '\0';
-    fTITUSB.push_back(strtmp);
+    fTITUSB.push_back(Trimmed(std::string(strtmp)));
     delete strtmp;
     
     fITUSBN.push_back(ReadInt());
@@ -157,6 +159,7 @@ bool UsbSuw::Read()
     CheckFormat();
     
     fIRECRD++;
+    fN++;
   }
   
   // line 242
@@ -187,6 +190,22 @@ bool UsbSuw::Read()
   //  fReadCounter++;
   return true;
 }
+
+float UsbSuw::GetScored(int i, int x, int y, int z) const
+{
+  /*
+    Return the scored value for xyz cell in the i-th histogram.
+    The sell indises must be >= 1
+   */
+  x = x-1;
+  y = y-1;
+  z = z-1;
+  
+  int ishift = x + y*fNXBIN[i] + z*fNXBIN[i]*fNYBIN[i];
+
+  return fScored[i][ishift];
+}
+
 
 void UsbSuw::Print() const
 {

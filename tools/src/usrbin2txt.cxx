@@ -42,11 +42,11 @@ int main(int argc, const char **argv)
       if (usrbin->GetBinType()>=10) cout<<"\taccurate deposition along the tracks requested" << endl;
       if (usrbin->GetDistType()<200) cout<<"\tthis is a track-length binning" << endl; // is it correct?
       
-      for (int i=0; i<usrbin->GetNbins(); i++) {
+      /*      for (int i=0; i<usrbin->GetNbins(); i++) {
 	if (i==0) cout << '\t';
 	cout << usrbin->GetScored()[i] << " ";
 	if ((i+1)%10 == 0) cout << endl << '\t';
-      }
+	}*/
     }
   }
   delete usrbin;
