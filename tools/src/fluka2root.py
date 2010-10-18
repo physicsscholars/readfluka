@@ -199,8 +199,8 @@ usage:\tfluka2root file.inp [N] [M]
 #        os.unlink(tmpfile.name)
         command = "usbsuw2root %s" % usbsuwfile
         print command
-#        os.system(command)
-#        out_root_files.append("%s.root" % usbsuwfile)
+        os.system(command)
+        out_root_files.append("%s.root" % usbsuwfile)
 
     print out_root_files
     if return_value is 0 and len(out_root_files)>1:
