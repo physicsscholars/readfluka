@@ -79,7 +79,7 @@ namespace ReadFluka {
     inline const int GetMCASE() const {return fMCASE;}
     inline const int GetNBATCH() const {return fNBATCH;}
     inline const int GetNbins(int i) const {return fNXBIN[i]*fNYBIN[i]*fNZBIN[i];}
-    inline const int GetN() const {return 1;} // total number of histograms (USRBIN records)
+    inline const int GetN() const {return fN;} // total number of histograms (USRBIN records)
 
     inline std::string GetTITUSB(int i) const { return fTITUSB[i]; }
     inline int GetIDUSBN(int i) const {return fIDUSBN[i]; }

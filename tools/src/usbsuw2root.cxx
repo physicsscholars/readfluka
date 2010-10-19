@@ -34,10 +34,10 @@ int main(int argc, const char **argv)
 
   TFile *file = TFile::Open(fname_out.Data(), "recreate");
 
-  usbsuw->Read();
-  //  while (usrsuw->Read()) {
-  usbsuw->Histograms()->Write();
-  // }
+  //  usbsuw->Read();
+  while (usbsuw->Read()) {
+    usbsuw->Histograms()->Write();
+  }
 
   clog << endl;
 
