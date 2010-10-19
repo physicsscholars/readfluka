@@ -97,7 +97,7 @@ bool UsbSuw::Read()
   std::vector<float> tmpvec; // what if we need to read double instead fo float? !!!
 
   //  CheckFormat();
-  for (IB=0; IB<1; IB++) {
+  for (IB=0; IB<10; IB++) {
     //    CheckFormat();
     std::cout << "start loop IB" << std::endl;
     NB = IB;
@@ -160,28 +160,37 @@ bool UsbSuw::Read()
     
     fIRECRD++;
     fN++;
+
+    if (ReadStatFlag(false) == true) {
+      fLSTATI = true;
+      break;
+    }
   }
   
   // line 242
   IB--;
   fNUSRBN = IB;
+
+  CheckFormat();
   
   if (fLSTATI) { // 'STATISTICS'
     std::cout << "statistics" << std::endl;
     fKLAST = 0;
-    for (int jj = 0; jj < IB; jj++) {
+    std::cout << "IB: " << IB << std::endl;
+    std::cout << "fN: " << fN << std::endl;
+    for (int jj = 0; jj < fN; jj++) { // in usbsuw.f IB instead of fN
       NB = fJB[jj];
       K0 = fKLAST+1;
       K1 = GetNbins(NB) + K0-1;
       fKLAST = K1;
       tmpvec.clear();
-      for (int j=K0; j<K1; j++)
+      for (int j=K0; j<=K1; j++)
 	tmpvec.push_back(ReadFloat());
       fGBSTOR.push_back(tmpvec);
       
       CheckFormat();
     }
-    } else
+  } else
     std::cout << "no statistics" << std::endl;
   
   //    if (ReadStatFlag(false) == true) break;
@@ -259,6 +268,15 @@ void UsbSuw::Print() const
       std::cout << fScored[i][ibin] << " " << std::flush;
       if ( (ibin+1)%10 == 0) std::cout << std::endl << '\t';
     }
-    
+    std::cout << std::endl;
+
+    std::cerr << "errors" << std::endl;
+
+    for (int ibin=0; ibin<GetNbins(i); ibin++) {
+      if (ibin==0) std::cout << "\t";
+      std::cout << fGBSTOR[i][ibin] << " " << std::flush;
+      if ( (ibin+1)%10 == 0) std::cout << std::endl << '\t';
+    }
+    std::cout << std::endl;
   }
 }

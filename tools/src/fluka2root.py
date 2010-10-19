@@ -36,7 +36,7 @@ usage:\tfluka2root file.inp [N] [M]
         usage()
         sys.exit(1)
 
-    printincolor("Note that the corresponding histograms from different ROOT files will be summed up but not averaged unless it is not been implemented in the ROOT's hadd.", 33)
+    printincolor("Note that the corresponding histograms from different ROOT files will be summed up but not averaged unless it is implemented in the ROOT's hadd.", 33)
 
     estimators = {"EVENTDAT" : [], "USRBDX" : [], "USRBIN" : [], "RESNUCLE" : []} # dictionary of supported estimators and their file units
 #    estimators = {"RESNUCLE" : []} # dictionary of supported estimators and their file units
@@ -145,10 +145,11 @@ usage:\tfluka2root file.inp [N] [M]
                         printincolor(command)
                         return_value = os.system(command)
                         if return_value is not 0:
-                            print "warning: " % return_value
+                            printincolor("ERROR: " % return_value, 33)
                             sys.exit(return_value)
-                        else:
-                            printincolor("WARNING: can't open file %s" % binfilename, 33)
+#                        else:
+#                            printincolor("WARNING: can't open file %s" % binfilename, 33)
+
 # hadd within one sample
         print rootfilenames
         out_root_file = inpname.replace(".inp", "%.3d%s" % (run, ".root"))
@@ -187,7 +188,7 @@ usage:\tfluka2root file.inp [N] [M]
         usbsuwfile = inpname.replace(".inp", "%.3d-%.3d_usbsuw" % (N, M) )
         temp_path = tempfile.mktemp()
         tmpfile = open(temp_path, "w")
-        print tmpfile.name
+
         for f in usrbin_binary_files:
             tmpfile.write("%s\n" % f)
         tmpfile.write("\n")
