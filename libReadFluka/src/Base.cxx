@@ -228,7 +228,7 @@ bool Base::SizeEnd(bool doExit)
 
 bool Base::CheckFormat(bool doExit)
 {
-  std::cerr << "Base::CheckFormat" << std::endl;
+  //std::cerr << "Base::CheckFormat" << std::endl;
   bool status;
   if (bCheckFormat1st == false) {
     //    std::cerr << "bCheckFormat1st is false" << std::endl;

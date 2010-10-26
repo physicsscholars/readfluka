@@ -60,7 +60,7 @@ void EventDat::fReadHeader()
     }
     if (gVerbose>kPRINT_MISC) clog << endl;
     //    ReadInt(); // should be SizeEnd, but for which SizeStart?
-    SizeEnd();
+    CheckFormat();
   }
 }
 
@@ -69,9 +69,7 @@ void EventDat::fReadENDIST()
   /*
     Read 12 energy contributions to the total energy balance ( NOT normalized to the weight of primary)
   */
-  cerr << " ->fReadENDIST" << endl;
-  CheckFormat();
-  cout << " ->fReadENDIST after check format" << endl;
+
   fin->read((char *)fENDIST, sizeof(float)*NENDIST); // 48=4*12
 }
 
@@ -80,9 +78,6 @@ void EventDat::fReadScoredDistributions()
   /* 
      read scored distributions
   */
-
-  cerr << "->fReadScoredDistributions" << endl;
-  CheckFormat();
 
   int iisc;
   int iscore[fNSCO];
@@ -106,26 +101,27 @@ void EventDat::fReadScoredDistributions()
     val.clear();
     float tmp;
     for (unsigned int region=0; region<fNREGS; region++) {
-      tmp = ReadFloat(); cout << tmp << " ";
+      tmp = ReadFloat(); //cout << tmp << " ";
       val.push_back(tmp);
-    } cout << endl;
+    } //cout << endl;
     fREGSCO.push_back(val);
     if (gVerbose>kPRINT_MISC) clog << " done" << endl;
+ 
     CheckFormat();
 
     int position = fin->tellg();
-    int   ndum = ReadInt(); cout << "ndum: " << ndum << endl;
+    int   ndum = ReadInt(); //cout << "ndum: " << ndum << endl;
     float dum1 = ReadFloat();
-    float dum2 = ReadFloat(); cout << "dum2: " << dum2 << endl;
+    float dum2 = ReadFloat(); //cout << "dum2: " << dum2 << endl;
     
     if (dum1 < 0) {
-      cerr << "seeds follow" << endl;
+      //  cerr << "seeds follow" << endl;
       fReadSeeds();
     } else {
-      cerr << "here5" << endl;
+      //cerr << "here5" << endl;
       //      clog << "****************** seek" << endl;
       //CheckFormat();
-      cerr << "here6" << endl;
+      //cerr << "here6" << endl;
       fin->seekg(position, ios::beg);
     }
   }
@@ -151,12 +147,8 @@ void EventDat::fReadSeeds()
 
 bool EventDat::ReadEvent()
 {
-  cerr << "->ReadEvent" << endl;
-    // read 1 event from the data file
-  if (fNCASE==0) {
-    cerr << "size start" << endl;
-    SizeStart();
-  }
+  if (!fin->good()) return false;
+
   fREGSCO.clear();
   
   fNCASE = ReadInt();
@@ -165,7 +157,11 @@ bool EventDat::ReadEvent()
   fWEIPRU = ReadFloat();
   fENETOT = ReadFloat();
 
+  CheckFormat();
+
   fReadENDIST();
+  
+  CheckFormat();
 
   fReadScoredDistributions();
   //  ReadInt(4);

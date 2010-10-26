@@ -22,17 +22,17 @@ int usage()
 int main(int argc, const char **argv)
 {
   if (argc < 2) return usage();
-
+  
   TString fname_in(argv[1]);
   TString fname_out;
   if (argc == 3) 
     fname_out = argv[2];
   else 
     fname_out = fname_in + ".root";
-
+  
   ReadFluka::Base::gVerbose = ReadFluka::kPRINT_MISC;
   ReadFluka::EventDat *eventdat = new ReadFluka::EventDat(fname_in.Data());
-
+  
   TString title = Form("%s\t%s", eventdat->GetRunTitle(), eventdat->GetRunTime()); cout << title << endl;
   const UInt_t Nregs = eventdat->GetNregs();
   cout << "number of regions: " << Nregs << "\t";
@@ -42,7 +42,7 @@ int main(int argc, const char **argv)
   cerr << "currently only one distribution at a time supported" << endl;
 	return NOT_IMPLEMENTED;
  }
-
+  
   TFile *file = new TFile(fname_out.Data(), "recreate", title.Data());
   if (file->IsZombie()) {
     cerr << "Can't create " << fname_out.Data() << endl;
@@ -59,10 +59,11 @@ int main(int argc, const char **argv)
   tree->Branch("SEEDS", seed, Form("seed[%d]/I", NSEED));
   tree->Branch("ENDIST", endist, Form("endist[%d]/F", NENDIST));
 
+
   while (eventdat->ReadEvent() == kTRUE) {
     for (unsigned int reg=0; reg<Nregs; reg++) {
       Ed[reg] = eventdat->GetValue(208, reg+1);
-      if (reg == 2) cout << "Ed[2]: " << Ed[reg] << endl;
+      ///if (reg == 2) cout << "Ed[2]: " << Ed[reg] << endl;
     }
 
     for (unsigned short iseed=0; iseed<NSEED; iseed++)
@@ -78,10 +79,11 @@ int main(int argc, const char **argv)
 
   //  cout << "delete tree:" << endl;
   //  delete tree;
-  delete [] endist;
-  delete [] seed;
-  delete [] Ed;
+  delete [] endist; endist = 0;
+  delete [] seed; seed = 0;
+  delete [] Ed; Ed = 0;
   SafeDelete(file);
+  SafeDelete(eventdat);
 
   return 0;
 }
