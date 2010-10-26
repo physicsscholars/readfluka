@@ -27,7 +27,6 @@ EventDat::~EventDat()
   if (gVerbose) clog << "EventDat read " << fNCASE << " events" << endl << endl;
   delete [] fISCORE; fISCORE = 0;
   delete [] fENDIST; fENDIST = 0;
-  //  delete [] fREGSCO; fREGSCO = 0;
   fREGSCO.clear();
 }
 
@@ -40,10 +39,7 @@ void EventDat::fReadHeader()
   
   if (fIsReadHeader == false) { // did not read the header yet?
     fIsReadHeader = true;
-    // read run title:
     ReadRunTitle();
-
-    // read run time:
     ReadRunTime();
 
     fNREGS = ReadInt(); // number of regions 
@@ -59,7 +55,7 @@ void EventDat::fReadHeader()
       if (gVerbose>kPRINT_MISC) clog << fISCORE[i] << ' ';
     }
     if (gVerbose>kPRINT_MISC) clog << endl;
-    //    ReadInt(); // should be SizeEnd, but for which SizeStart?
+
     CheckFormat();
   }
 }
@@ -83,8 +79,6 @@ void EventDat::fReadScoredDistributions()
   int iscore[fNSCO];
   vector <float> val; // scored values
   for (unsigned int isc=0; isc<fNSCO; isc++) {
-    //  vector <float> val;
-    //ReadInt(iisc);
     fin->read((char *)&iisc, 4);
     fin->read((char *)&iscore[isc], 4);
     //    clog << isc << "\treading distribution " << iscore[isc] << endl;
@@ -114,14 +108,9 @@ void EventDat::fReadScoredDistributions()
     float dum1 = ReadFloat();
     float dum2 = ReadFloat(); //cout << "dum2: " << dum2 << endl;
     
-    if (dum1 < 0) {
-      //  cerr << "seeds follow" << endl;
+    if (dum1 < 0) { // seeds follow
       fReadSeeds();
     } else {
-      //cerr << "here5" << endl;
-      //      clog << "****************** seek" << endl;
-      //CheckFormat();
-      //cerr << "here6" << endl;
       fin->seekg(position, ios::beg);
     }
   }
@@ -152,7 +141,6 @@ bool EventDat::ReadEvent()
   fREGSCO.clear();
   
   fNCASE = ReadInt();
-  if (!fin->good()) return false;
   if (gVerbose>kPRINT_MISC) clog << "reading event #: " << fNCASE << endl;
   fWEIPRU = ReadFloat();
   fENETOT = ReadFloat();
@@ -164,8 +152,6 @@ bool EventDat::ReadEvent()
   CheckFormat();
 
   fReadScoredDistributions();
-  //  ReadInt(4);
-  // CheckFormat(); 
   
   return true;
 }

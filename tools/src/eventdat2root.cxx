@@ -7,6 +7,7 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -17,6 +18,19 @@ int usage()
   cout << "\tSo, the region number in the root file produced is fulka region minus ONE." << endl;
   cout << "\tImplemented for a single scored distribution only." << endl << endl;
   return 1;
+}
+
+string code2name(ReadFluka::EventDat *ed)
+{
+  ostringstream str;
+  int id;
+  int nregs = ed->GetNregs();
+  for (int bin=0; bin<ed->GetNsco(); bin++) {
+    id = ed->GetSco(bin);
+    str << ed->Code2Name(id) << "[" << nregs << "]/F";
+    if (bin+1 != ed->GetNsco()) str << ":";
+  }
+  return str.str();
 }
 
 int main(int argc, const char **argv)
@@ -36,12 +50,12 @@ int main(int argc, const char **argv)
   TString title = Form("%s\t%s", eventdat->GetRunTitle(), eventdat->GetRunTime()); cout << title << endl;
   const UInt_t Nregs = eventdat->GetNregs();
   cout << "number of regions: " << Nregs << "\t";
-  UInt_t Nsco = eventdat->GetNsco();
+  const UInt_t Nsco = eventdat->GetNsco();
   cout << "number of scored distributions: " << Nsco << endl;
-  if (Nsco!=1) {
-  cerr << "currently only one distribution at a time supported" << endl;
-	return NOT_IMPLEMENTED;
- }
+  /*if (Nsco!=1) {
+    cerr << "currently only one distribution at a time supported" << endl;
+    return NOT_IMPLEMENTED;
+    }*/
   
   TFile *file = new TFile(fname_out.Data(), "recreate", title.Data());
   if (file->IsZombie()) {
@@ -50,20 +64,23 @@ int main(int argc, const char **argv)
   }
   file->SetTitle(argv[1]);
 
-  Float_t *Ed = new Float_t[Nregs];  //  memset(Ed, 0, sizeof(Float_t)*Nregs);
+  Float_t *Ed = new Float_t[Nsco*Nregs];  //  memset(Ed, 0, sizeof(Float_t)*Nregs);
   Int_t   *seed = new Int_t[NSEED];
   Float_t *endist = new Float_t[NENDIST];
 
   TTree *tree = new TTree("EVENTDAT", title.Data());
-  tree->Branch("DATA", Ed,  Form("%s[%d]/F", eventdat->Code2Name(208), Nregs));
+  //  tree->Branch("DATA", Ed,  Form("%s[%d]/F", eventdat->Code2Name(208), Nregs));
+  tree->Branch("DATA", Ed, code2name(eventdat).data());
   tree->Branch("SEEDS", seed, Form("seed[%d]/I", NSEED));
   tree->Branch("ENDIST", endist, Form("endist[%d]/F", NENDIST));
 
 
   while (eventdat->ReadEvent() == kTRUE) {
-    for (unsigned int reg=0; reg<Nregs; reg++) {
-      Ed[reg] = eventdat->GetValue(208, reg+1);
-      ///if (reg == 2) cout << "Ed[2]: " << Ed[reg] << endl;
+    for (unsigned int bin=0; bin<Nsco; bin++) {
+      for (unsigned int reg=0; reg<Nregs; reg++) {
+	Ed[bin+reg*Nsco] = eventdat->GetValue(eventdat->GetSco(bin), reg+1);
+	///if (reg == 2) cout << "Ed[2]: " << Ed[reg] << endl;
+      }
     }
 
     for (unsigned short iseed=0; iseed<NSEED; iseed++)
