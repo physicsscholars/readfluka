@@ -24,9 +24,9 @@ string code2name(ReadFluka::EventDat *ed)
   ostringstream str;
   int id;
   int nregs = ed->GetNregs();
-  for (int bin=0; bin<ed->GetNsco(); bin++) {
+  for (unsigned int bin=0; bin<ed->GetNsco(); bin++) {
     id = ed->GetSco(bin);
-    str << ed->Code2Name(id) << "[" << nregs << "]/F";
+    str << ed->Code2Name(id,true) << "[" << nregs << "]/F";
     if (bin+1 != ed->GetNsco()) str << ":";
   }
   return str.str();
@@ -68,7 +68,7 @@ int main(int argc, const char **argv)
   Float_t *endist = new Float_t[NENDIST];
 
   TTree *tree = new TTree("EVENTDAT", title.Data());
-  //  tree->Branch("DATA", Ed,  Form("%s[%d]/F", eventdat->Code2Name(208), Nregs));
+  //  tree->Branch("DATA", Ed,  Form("%s[%d]/F", eventdat->Code2Name(208,true), Nregs));
   tree->Branch("DATA", Ed, code2name(eventdat).data());
   tree->Branch("SEEDS", seed, Form("seed[%d]/I", NSEED));
   tree->Branch("ENDIST", endist, Form("endist[%d]/F", NENDIST));
