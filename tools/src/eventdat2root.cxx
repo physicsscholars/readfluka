@@ -15,8 +15,7 @@ int usage()
 {
   cout << "Usage: eventdat2root /path/to/eventdat_binary_output [out.root]" << endl;
   cout << "\tArray indices in FLUKA start from ONE (FORTRAN style), but here they start from ZERO (C++ style)." << endl;
-  cout << "\tSo, the region number in the root file produced is fulka region minus ONE." << endl;
-  cout << "\tImplemented for a single scored distribution only." << endl << endl;
+  cout << "\tSo, the region number in the root file produced is the FLUKA region minus ONE." << endl;
   return 1;
 }
 
@@ -78,7 +77,7 @@ int main(int argc, const char **argv)
   while (eventdat->ReadEvent() == kTRUE) {
     for (unsigned int bin=0; bin<Nsco; bin++) {
       for (unsigned int reg=0; reg<Nregs; reg++) {
-	Ed[bin+reg*Nsco] = eventdat->GetValue(eventdat->GetSco(bin), reg+1);
+	Ed[reg+bin*Nregs] = eventdat->GetValue(eventdat->GetSco(bin), reg+1);
 	///if (reg == 2) cout << "Ed[2]: " << Ed[reg] << endl;
       }
     }

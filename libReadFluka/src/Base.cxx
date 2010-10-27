@@ -137,6 +137,8 @@ const char *Base::Code2Name(int code, bool replace) const
     return "OPTIPHOT";
   case 1:
     return "PROTON";
+  case 8:
+    return "NEUTRON";
   case 201:
     return replace ? "ALL_PART" : "ALL-PART";
   case 202:
@@ -155,6 +157,16 @@ const char *Base::Code2Name(int code, bool replace) const
     return replace ? "PIONSPM" : "PIONS+-";
   case 210:
     return "BEAMPART";
+  case 222:
+    return replace ? "NEU_BALA" : "NEU-BALA";
+  case 228:
+    return "DOSE";
+  case 234:
+    return "ACTIVITY";
+  case 235:
+    return "ACTOMASS";
+  case 240:
+    return replace ? "DOSE_EQ" : "DOSE-EQ";
   default:
     std::ostringstream name;
     name << "id" << code;
