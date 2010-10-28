@@ -65,7 +65,7 @@ namespace ReadFluka {
     inline bool IsReadNeutrons() const { return fLLNUSX; }
     inline int GetMaxNeutronGroup() const { return fIGMUSX; }
     inline float GetENGMAX(int i) const { return fENGMAX[i]; }
-    inline bool IsOneWay() const { return fLWUSBX; }
+    inline bool IsOneWay() const { return !fLWUSBX; }
 
     inline bool IsFluence() const { return fLFUSBX; }
     inline bool IsCurrent() const { return !IsFluence(); }
