@@ -85,8 +85,10 @@
      &        TITUSX(NX), IDUSBX(NX), NR1USX(NX), NR2USX(NX), AUSBDX(NX)
 *     ------------ if low-en. neutrons, read group energies ---------
           IF ( LLNUSX (NX) ) THEN
-             write(*,*) IGMUSX(NX)
              READ (1) IGMUSX(NX), (ENGMAX(IG), IG = 1, IGMUSX(NX)+1)
+*             do 120 i=1, IGMUSX(NX)
+*                write(*,*) ENGMAX(i)
+* 120         continue
              WRITE (2,102) IGMUSX(NX)
           ELSE
              IGMUSX(NX) = 0
