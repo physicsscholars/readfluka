@@ -98,11 +98,12 @@ bool UsrBdx::Read()
 
   CheckFormat();
 
-  if (fLLNUSX) { // read low energy neutrons
+  if (fLLNUSX) { //std::cout << " read low energy neutrons" << std::endl;
     fIGMUSX = ReadInt();
     fENGMAX = new float[fIGMUSX+1];
-    for (int i=0; i<fIGMUSX+1; i++) fENGMAX[i] = ReadFloat();
-    //    ReadFloat(2); // !!! Why? !!!
+    for (int i=0; i<fIGMUSX+1; i++) {
+      fENGMAX[i] = ReadFloat();
+    }
     CheckFormat(); 
   } else fIGMUSX = 0;
   // + see page 239 for further reading
@@ -113,7 +114,6 @@ bool UsrBdx::Read()
   fNScored = INTERV*fNABXBN;
   fScored = new float[fNScored];
 
-  
   for (int i=0; i<fNScored; i++) fScored[i] = ReadFloat();
 
   CheckFormat(); // std::cerr << "+++ OK in the end of UsrBdx::Read +++" << std::endl;
@@ -242,8 +242,8 @@ void UsrBdx::Print() const
     std::cerr << "!!! check it again !!! WHY ZEROS? why do we need the neutron data?" << std::endl;
     
     
-    //  n = GetMaxNeutronGroup();
-    //  for (int i=0; i<n; i++) std::cout << GetENGMAX(i) << " "; std::cout << std::endl;
+    n = GetMaxNeutronGroup();
+    for (int i=0; i<n; i++) std::cout << GetENGMAX(i) << " "; std::cout << std::endl;
     n = GetNScored();
     //      for (int i= GetNbinsE()*GetNbinsA(); i<n; i++)  std::cout << GetScored(i) << " "; 
     std::cout << std::endl << std::endl;

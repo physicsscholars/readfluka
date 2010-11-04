@@ -64,11 +64,13 @@ int main(int argc, const char **argv)
       cout << "\tLow energy neutron data from group 1 to group " << usrbdx->GetMaxNeutronGroup() <<  " follow in a matrix A(ig,ia), format (1(5x,1p,10(1x,e11.4)))" << endl;
       
       
-      cerr << "!!! check it again !!! WHY ZEROS? why do we need the neutron data?" << endl;
-      
-      
-      //  n = usrbdx->GetMaxNeutronGroup();
-      //  for (int i=0; i<n; i++) cout << usrbdx->GetENGMAX(i) << " "; cout << endl;
+      n = usrbdx->GetMaxNeutronGroup();
+      cout << '\t';
+      for (int i=0; i<n; i++) {
+	cout << usrbdx->GetENGMAX(i) << " ";
+	if ((i+1)%10 == 0) cout << endl << '\t';
+      }
+
       n = usrbdx->GetNScored();
       //      for (int i= usrbdx->GetNbinsE()*usrbdx->GetNbinsA(); i<n; i++)  cout << usrbdx->GetScored(i) << " "; 
       cout << endl << endl;
