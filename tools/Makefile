@@ -3,7 +3,7 @@ include ../Makefile.inc
 BINARY := eventdat2txt  usrbin2txt  usrbdx2txt  mgdraw2txt resnuclei2txt   usrsuw2txt   usbsuw2txt
 ROOT   := eventdat2root usrbin2root usrbdx2root            resnuclei2root  usrsuw2root  usbsuw2root
 
-targets := $(BINARY) $(ROOT)
+targets := $(BINARY) $(ROOT) rdbin rdbdx ray
 
 all:	$(targets)
 binary: $(BINARY)
@@ -16,6 +16,11 @@ root:   $(ROOT)
 %2txt: src/%2txt.cxx
 	@echo "Compiling $@"
 	@$(GCC) -I$(READFLUKA_SYS)/src $^ -L $(READFLUKA_SYS) -lReadFluka -o $@
+
+%:      src/%.f
+	@echo "Compiling $@"
+	$(FLUTIL)/lfluka -o $@ $< && rm -fv $@.map
+
 
 clean:
 	@rm -fv {./,src/}*~ $(targets)
