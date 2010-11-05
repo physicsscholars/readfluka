@@ -114,10 +114,47 @@ bool UsrBdx::Read()
   fNScored = INTERV*fNABXBN;
   fScored = new float[fNScored];
 
+  // read the scoring results as a 1-dimentional array
   for (int i=0; i<fNScored; i++) fScored[i] = ReadFloat();
 
   CheckFormat(); // std::cerr << "+++ OK in the end of UsrBdx::Read +++" << std::endl;
 
+  // loop on angles
+  double cumul = 0.0;
+  for (unsigned int ia=1; ia<=fNABXBN; ia++) { // angular intervals
+    if (abs(fITUSBX)<1) { // linear in angle
+      std::cout << "UsrBdx::Read() - linear in angle" << std::endl;
+    } else { // logarithmic in angle
+      if (ia == 1) // fist bin
+	std::cout << "Angle 1 between 0 and " << fABXLOW << " sr" << std::endl;
+      else
+	std::cout << "Angle " << ia << " between " << fABXLOW*pow(fDABXBN, ia-1) << " and " << fABXLOW*pow(fDABXBN, ia) << " sr" << std::endl;
+    }
+    
+    std::cout << "                                Double Differential      Angle-Integrated Cumulative" << std::endl;
+    if (!GetLFUSBX()) // fluence
+      std::cout << "                              Fluence (dPhi/dE/dOmega)      dPhi/dE      Fluence" << std::endl;                 
+    else // current
+      std::cout << "                               Current (dJ/dE/dOmega)        dJ/dE        Current" << std::endl;
+    
+    std::cout << "Lower energy     Upper energy    cm**-2 GeV**-1 sr-1      cm**2 GeV-1     cm**-2" << std::endl;
+    
+    float ELIMIT = fEBXLOW;
+    if (fLLNUSX) { // low energy neutrons - data are stored backwards
+      int ig = fIGMUSX;// std::cout << "fIGMUSX: " << fIGMUSX << std::endl;
+      float en1 = fENGMAX[ig+1-1]; // +1-1 - it's a FORTRAN/C issue
+      unsigned int jg1 = ia*(fNEBXBN+fIGMUSX);
+      unsigned int jg2 = ia*(fNEBXBN+fIGMUSX)-fIGMUSX+1;
+      std::cout << "jg: " << jg1 << " " << jg2 << std::endl;
+      for (unsigned int jg= jg1; jg>=jg2; jg--) {
+	std::cout << "jg: " << jg << std::endl;
+	float en2 = fENGMAX[jg-1];
+	float angint = fScored[jg-1] * fDABXBN;
+	cumul += angint*(en2-en1);
+	std::cout << en1 << " " << en2 << " " << fScored[jg-1] << " " << angint << " " << cumul << std::endl;
+      }
+    }
+  }
   delete [] mychar; mychar = 0; // is it ok? !!!
   return true;
 }

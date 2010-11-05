@@ -67,7 +67,8 @@ namespace ReadFluka {
     inline float GetENGMAX(int i) const { return fENGMAX[i]; }
     inline bool IsOneWay() const { return !fLWUSBX; }
 
-    inline bool IsFluence() const { return fLFUSBX; }
+    inline bool GetLFUSBX() const { return fLFUSBX; }
+    inline bool IsFluence() const { return GetLFUSBX(); }
     inline bool IsCurrent() const { return !IsFluence(); }
 
     inline int  GetType() const { return fITUSBX; }
