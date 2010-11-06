@@ -99,7 +99,7 @@ bool UsrBdx::Read()
   CheckFormat();
 
   if (fLLNUSX) { //std::cout << " read low energy neutrons" << std::endl;
-    fIGMUSX = ReadInt();
+    fIGMUSX = ReadInt(); //std::cout << "igmusx: " << fIGMUSX << std::endl;
     fENGMAX = new float[fIGMUSX+1];
     for (int i=0; i<fIGMUSX+1; i++) {
       fENGMAX[i] = ReadFloat();
@@ -139,21 +139,60 @@ bool UsrBdx::Read()
     
     std::cout << "Lower energy     Upper energy    cm**-2 GeV**-1 sr-1      cm**2 GeV-1     cm**-2" << std::endl;
     
-    float ELIMIT = fEBXLOW;
+    float elimit = fEBXLOW;
+    float en1,en2, angint;
+    int nhigh;
     if (fLLNUSX) { // low energy neutrons - data are stored backwards
       int ig = fIGMUSX;// std::cout << "fIGMUSX: " << fIGMUSX << std::endl;
-      float en1 = fENGMAX[ig+1-1]; // +1-1 - it's a FORTRAN/C issue
+      en1 = fENGMAX[ig+1-1]; // +1-1 - it's a FORTRAN/C issue
       unsigned int jg1 = ia*(fNEBXBN+fIGMUSX);
+      // kbat
+      jg1--;
       unsigned int jg2 = ia*(fNEBXBN+fIGMUSX)-fIGMUSX+1;
+      // kbat
+      jg2--;
       std::cout << "jg: " << jg1 << " " << jg2 << std::endl;
-      for (unsigned int jg= jg1; jg>=jg2; jg--) {
-	std::cout << "jg: " << jg << std::endl;
-	float en2 = fENGMAX[jg-1];
-	float angint = fScored[jg-1] * fDABXBN;
+      for (unsigned int jg=jg1; jg>=jg2; jg--) {
+	//	std::cout << "jg: " << jg << std::endl;
+	en2 = fENGMAX[jg-1];
+	angint = fScored[jg] * fDABXBN;
 	cumul += angint*(en2-en1);
-	std::cout << en1 << " " << en2 << " " << fScored[jg-1] << " " << angint << " " << cumul << std::endl;
+	std::cout << jg << "\t" << en1 << "\t" << en2 << "\t\t" << fScored[jg] << "\t" << angint << "\t" << cumul << std::endl;
+	ig--;
+	en1 = en2;
       }
+      // find lower limit of first bin above or straddling the
+      // n-group limit. Nhigh: counts the high energy bins
+      nhigh = 0;
+      // for the time being, set energy boundary at n-group limit
+      elimit = en1;
+      en1 = fEBXHGH;
+      for (int ie = 1; ie<=fNEBXBN; ie++) {
+	if (fITUSBX>0)  // type of the binning
+	  en2 = en1 - fDEBXBN;
+	else
+	  en2 = en1/fDEBXBN;
+	en1 = en2;
+	nhigh++;
+	if (en2<=elimit) break;
+      }
+    } else {
+      en1 = fEBXLOW;
+      nhigh = fNEBXBN;
     }
+    //     first bin above or straddling the n-group limit
+    if (fITUSBX>0)
+      en2 = en1 + fDEBXBN;
+    else
+      en2 = en1 * fDEBXBN;
+    float diff = fScored[ia*(fNEBXBN-nhigh+1)-1];
+    angint = diff*fDABXBN;
+    cumul += angint*(en2-elimit);
+    std::cout << "\t" << elimit << "\t" << en2 << "\t\t" << diff << "\t" << angint << "\t" << cumul << std::endl;
+    en1 = en2;
+    //     -------- loop on energies above the n-group limit ----------
+    // line 205
+
   }
   delete [] mychar; mychar = 0; // is it ok? !!!
   return true;
