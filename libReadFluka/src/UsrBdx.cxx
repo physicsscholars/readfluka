@@ -167,7 +167,7 @@ bool UsrBdx::Read()
       // for the time being, set energy boundary at n-group limit
       elimit = en1;
       en1 = fEBXHGH;
-      for (int ie = 1; ie<=fNEBXBN; ie++) {
+      for (unsigned int ie = 1; ie<=fNEBXBN; ie++) {
 	if (fITUSBX>0)  // type of the binning
 	  en2 = en1 - fDEBXBN;
 	else
@@ -190,8 +190,24 @@ bool UsrBdx::Read()
     cumul += angint*(en2-elimit);
     std::cout << "\t" << elimit << "\t" << en2 << "\t\t" << diff << "\t" << angint << "\t" << cumul << std::endl;
     en1 = en2;
+
     //     -------- loop on energies above the n-group limit ----------
-    // line 205
+    // line 205 !!! this section have not yet been checked !!!
+    std::cout << " nhigh: " << nhigh << std::endl;
+    for (int ie=2; ie<=nhigh; ie++) {
+      if (fITUSBX > 0) // binning is linear
+	en2 = en1 + fDEBXBN;
+      else
+	en2 = en1 * fDEBXBN;
+      diff = fScored[ ia*(fNEBXBN-nhigh+ie) - 1 ];
+      angint = diff * fDABXBN;
+      cumul += angint*(en2-en1);
+      std::cout << "here" << std::endl;
+      std::cout << en1 << " " << en2 << " " << diff << " " << angint << " " << cumul << std::endl;
+      en1 = en2;
+    }
+
+
 
   }
   delete [] mychar; mychar = 0; // is it ok? !!!
