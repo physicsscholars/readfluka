@@ -141,7 +141,7 @@ bool UsrBdx::Read()
     
     float elimit = fEBXLOW;
     float en1,en2, angint;
-    int nhigh;
+    unsigned int nhigh;
     if (fLLNUSX) { // low energy neutrons - data are stored backwards
       int ig = fIGMUSX;// std::cout << "fIGMUSX: " << fIGMUSX << std::endl;
       en1 = fENGMAX[ig+1-1]; // +1-1 - it's a FORTRAN/C issue
@@ -194,7 +194,7 @@ bool UsrBdx::Read()
     //     -------- loop on energies above the n-group limit ----------
     // line 205 !!! this section have not yet been checked !!!
     std::cout << " nhigh: " << nhigh << std::endl;
-    for (int ie=2; ie<=nhigh; ie++) {
+    for (unsigned int ie=2; ie<=nhigh; ie++) {
       if (fITUSBX > 0) // binning is linear
 	en2 = en1 + fDEBXBN;
       else
@@ -207,7 +207,24 @@ bool UsrBdx::Read()
       en1 = en2;
     }
 
-
+    //     Case of generalized particles .ne. 8 but including neutrons
+    // !!! this section have not been checked yet !!!
+    float cumule = 0.0; // used but not defined in rdbdx.f
+    float cumula = 0.0; // used but not defined in rdbdx.f
+    if (fLLNUSX && fIDUSBX != 8 && fNEBXBN > nhigh) {
+      std::cout << "Particles other than neutrons below E=" << elimit << std::endl;
+      en1 = fEBXLOW;
+      for (unsigned int ie = 1; ie<=(fNEBXBN-nhigh); ie++) {
+	if (fITUSBX>0)
+	  en2 = en1 + fDEBXBN;
+	else
+	  en2 = en1 * fDEBXBN;
+	diff = fScored[ (ia-1)*(fNEBXBN+fIGMUSX) + ie - 1 ];
+	angint = diff * fDABXBN;
+	cumul += angint * (en2-en1);
+	std::cout << en1 << " " << en2 << " " << diff << " " << cumule << " " << cumula << std::endl;
+      }
+    }
 
   }
   delete [] mychar; mychar = 0; // is it ok? !!!
