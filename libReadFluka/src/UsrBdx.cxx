@@ -119,6 +119,125 @@ bool UsrBdx::Read()
 
   CheckFormat(); // std::cerr << "+++ OK in the end of UsrBdx::Read +++" << std::endl;
 
+
+  delete [] mychar; mychar = 0; // is it ok? !!!
+  return true;
+}
+
+float UsrBdx::GetScored(unsigned int ie, unsigned int ia) const
+{
+  /*
+    Return the scored value in the ie-ja-cell.
+    ie - energy bin
+    ia - angular bin
+    The cell indises must be >= 1 (FLUKA-Fortran style)
+  */
+
+  unsigned int e = ie-1;
+  unsigned int a = ia-1;
+  
+  if (e>fNEBXBN) {
+    std::cerr << "GetScored():\t" << e << " > " << fNEBXBN << std::endl;
+    exit(FATAL_ERROR);
+  }
+
+  if (a>fNABXBN) {
+    std::cerr << "GetScored():\t" << a << " > " << fNABXBN << std::endl;
+    exit(FATAL_ERROR);
+  }
+  
+  return fScored[e + a*fNEBXBN];
+}
+
+std::string UsrBdx::GetBinTitle() const
+{
+  std::ostringstream tmp;
+  if (IsFluence()) tmp << "Fluence of ";
+  else tmp << "Current of ";
+  
+  tmp << Code2Name(GetID()) << " (reg. " << GetRegFrom();
+
+  if (IsOneWay()) tmp << " -> ";
+  else tmp << " <-> ";
+  tmp << GetRegTo();
+  tmp << ", ";
+
+  tmp << "S = ";
+  tmp << GetArea();
+  tmp << " cm^{2})";
+
+  return tmp.str();
+}
+
+const char* UsrBdx::GetXtitle() const
+{
+  if (GetType()>0) return "E_{kin} [GeV]";
+  else return "lg(E_{kin}/1 GeV)";
+}
+
+const char* UsrBdx::GetYtitle() const
+{
+  if (abs(GetType())<=1) return "#Omega [sr]";
+  else return "lg(#Omega/1 sr)";
+}
+
+/*bool UsrBdx::IsLogA() const
+{
+  int i= int(std::abs(float(GetType())));
+  std::cout << "nint: " << i << std::endl;
+  if (i<=1) std::cout << "nint says: logA" << std::endl;
+
+  return (i<=1);
+  }*/
+
+void UsrBdx::Print() const
+{
+  std::cout << "Bdrx n. " << GetCardNumber() << " \"" << GetBinName() << "\"" <<  std::flush;
+  std::cout << ", generalized particle n. " << GetID() << std::flush;
+  std::cout << ", from region n. " << GetRegFrom() << " to region n. " << GetRegTo() << std::endl;
+  std::cout << "\tdetector area: " << GetArea() <<  " cm**2" << std::endl;
+  if (IsReadNeutrons()) {
+    std::cout << "\tlow energy neutrons scored from group 1" << " to group " << GetMaxNeutronGroup() << std::endl;
+  }
+  if (IsOneWay() == true) 
+    std::cout << "\tthis is a one way only estimator" << std::endl; 
+  else
+    std::cout << "\tthis is a two ways estimator" << std::endl;
+  
+  if (IsFluence() == true) 
+    std::cout << "\tthis is a fluence like estimator" << std::endl;
+  else
+    std::cout << "\tthis is a current-like estimator" << std::endl;
+
+  std::cout.precision(4);
+
+  if (!IsLogE()) {
+    std::cout << "\tlinear energy binning from " << GetEmin() << " to " << GetEmax()  << " GeV,\t" << std::flush;
+    std::cout << GetNbinsE() << " bins ("  << GetEWidth() <<  " GeV wide)" << std::endl;
+  } else {
+    std::cout << "\tlogar. energy binning from " << GetEmin() << " to " << GetEmax() << " GeV,\t" << std::flush;
+    std::cout << GetNbinsE() << " bins (ratio: " << GetEWidth() << ")" << std::endl;
+  }
+  
+  if (!IsLogA()) {
+    std::cout << "\tlinear angular binning from "<<GetAmin()<<" to "<< GetAmax() << " sr,\t"<< std::flush;
+    std::cout <<  GetNbinsA() << " bins (" << GetAwidth() << " sr wide)"  << std::endl;
+  } else {
+    std::cout << "\tlogar. angular binning from "<<GetAmin()<<" to "<< GetAmax() << " sr,\t"<< std::flush;
+    std::cout <<  GetNbinsA() << " bins (ratio: " << GetAwidth() << ")"  << std::endl;
+  }
+  
+  std::cout << "\tData follow in a matrix A(ie,ia), format (1(5x,1p,10(1x,e11.4)))" << std::endl;
+  int n = GetNScored();
+  n = GetNbinsE()*GetNbinsA();
+  std::cout << std::endl << "\t";
+  for (unsigned int i=1; i<=GetNbinsA(); i++) {
+    for (unsigned int j=1; j<=GetNbinsE(); j++)
+      std::cout << GetScored(j, i) << " ";
+    std::cout << std::endl << "\t";
+  }
+  std::cout << std::endl;
+
   // loop on angles
   double cumul = 0.0;
   for (unsigned int ia=1; ia<=fNABXBN; ia++) { // angular intervals
@@ -227,124 +346,9 @@ bool UsrBdx::Read()
     }
 
   }
-  delete [] mychar; mychar = 0; // is it ok? !!!
-  return true;
-}
-
-float UsrBdx::GetScored(unsigned int ie, unsigned int ia) const
-{
-  /*
-    Return the scored value in the ie-ja-cell.
-    ie - energy bin
-    ia - angular bin
-    The cell indises must be >= 1 (FLUKA-Fortran style)
-  */
-
-  unsigned int e = ie-1;
-  unsigned int a = ia-1;
-  
-  if (e>fNEBXBN) {
-    std::cerr << "GetScored():\t" << e << " > " << fNEBXBN << std::endl;
-    exit(FATAL_ERROR);
-  }
-
-  if (a>fNABXBN) {
-    std::cerr << "GetScored():\t" << a << " > " << fNABXBN << std::endl;
-    exit(FATAL_ERROR);
-  }
-  
-  return fScored[e + a*fNEBXBN];
-}
-
-std::string UsrBdx::GetBinTitle() const
-{
-  std::ostringstream tmp;
-  if (IsFluence()) tmp << "Fluence of ";
-  else tmp << "Current of ";
-  
-  tmp << Code2Name(GetID()) << " (reg. " << GetRegFrom();
-
-  if (IsOneWay()) tmp << " -> ";
-  else tmp << " <-> ";
-  tmp << GetRegTo();
-  tmp << ", ";
-
-  tmp << "S = ";
-  tmp << GetArea();
-  tmp << " cm^{2})";
-
-  return tmp.str();
-}
-
-const char* UsrBdx::GetXtitle() const
-{
-  if (GetType()>0) return "E_{kin} [GeV]";
-  else return "lg(E_{kin}/1 GeV)";
-}
-
-const char* UsrBdx::GetYtitle() const
-{
-  if (abs(GetType())<=1) return "#Omega [sr]";
-  else return "lg(#Omega/1 sr)";
-}
-
-/*bool UsrBdx::IsLogA() const
-{
-  int i= int(std::abs(float(GetType())));
-  std::cout << "nint: " << i << std::endl;
-  if (i<=1) std::cout << "nint says: logA" << std::endl;
-
-  return (i<=1);
-  }*/
-
-void UsrBdx::Print() const
-{
-  std::cout << "Bdrx n. " << GetCardNumber() << " \"" << GetBinName() << "\"" <<  std::flush;
-  std::cout << ", generalized particle n. " << GetID() << std::flush;
-  std::cout << ", from region n. " << GetRegFrom() << " to region n. " << GetRegTo() << std::endl;
-  std::cout << "\tdetector area: " << GetArea() <<  " cm**2" << std::endl;
-  if (IsReadNeutrons()) {
-    std::cout << "\tlow energy neutrons scored from group 1" << " to group " << GetMaxNeutronGroup() << std::endl;
-  }
-  if (IsOneWay() == true) 
-    std::cout << "\tthis is a two ways estimator" << std::endl; 
-  else
-    std::cout << "\tthis is a one way only estimator" << std::endl;
-  
-  if (IsFluence() == true) 
-    std::cout << "\tthis is a fluence like estimator" << std::endl;
-  else
-    std::cout << "\tthis is a current like estimator" << std::endl;
-  
-  if (!IsLogE()) {
-    std::cout << "\tlinear energy binning from " << GetEmin() << " to " << GetEmax()  << " GeV,\t" << std::flush;
-    std::cout << GetNbinsE() << " bins ("  << GetEWidth() <<  " GeV wide)" << std::endl;
-  } else {
-    std::cout << "\tlogar. energy binning from " << GetEmin() << " to " << GetEmax() << " GeV,\t" << std::flush;
-    std::cout << GetNbinsE() << " bins (ratio: " << GetEWidth() << ")" << std::endl;
-  }
-  
-  if (!IsLogA()) {
-    std::cout << "\tlinear angular binning from "<<GetAmin()<<" to "<< GetAmax() << " sr,\t"<< std::flush;
-    std::cout <<  GetNbinsA() << " bins (" << GetAwidth() << " sr wide)"  << std::endl;
-  } else {
-    std::cout << "\tlogar. angular binning from "<<GetAmin()<<" to "<< GetAmax() << " sr,\t"<< std::flush;
-    std::cout <<  GetNbinsA() << " bins (ratio: " << GetAwidth() << ")"  << std::endl;
-  }
-  
-  std::cout << "\tData follow in a matrix A(ie,ia), format (1(5x,1p,10(1x,e11.4)))" << std::endl;
-  int n = GetNScored();
-  n = GetNbinsE()*GetNbinsA();
-  std::cout << std::endl << "\t";
-  for (unsigned int i=1; i<=GetNbinsA(); i++) {
-    for (unsigned int j=1; j<=GetNbinsE(); j++)
-      std::cout << GetScored(j, i) << " ";
-    std::cout << std::endl << "\t";
-  }
-  std::cout << std::endl;
   
   
-  if (IsReadNeutrons()) {
+  /*  if (IsReadNeutrons()) {
     std::cout << "\tLow energy neutron data from group 1 to group " << GetMaxNeutronGroup() <<  " follow in a matrix A(ig,ia), format (1(5x,1p,10(1x,e11.4)))" << std::endl;
     
     
@@ -356,5 +360,5 @@ void UsrBdx::Print() const
     n = GetNScored();
     //      for (int i= GetNbinsE()*GetNbinsA(); i<n; i++)  std::cout << GetScored(i) << " "; 
     std::cout << std::endl << std::endl;
-  }
+    }*/
 }

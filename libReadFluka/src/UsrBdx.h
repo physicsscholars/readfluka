@@ -56,7 +56,7 @@ namespace ReadFluka {
     bool Read();
 
     inline float GetArea() const { return fAUSBDX; }
-    inline float GetCardNumber() const { return fMX; }
+    inline int GetCardNumber() const { return fMX; }
     std::string GetBinName() const {return fTITUSX; }
     std::string GetBinTitle() const;
     inline int GetID() const { return fIDUSBX; }

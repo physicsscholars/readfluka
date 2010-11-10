@@ -11,10 +11,12 @@ int main(int argc, const char **argv)
   cout << "***** " << usrbdx->GetRunTitle() << " *****" << endl;
   cout << usrbdx->GetRunTime() << endl;
   cout << "Total number of particles followed " << usrbdx->GetEntryNumber() << flush;
-  cout << ", for a total weight of " << usrbdx->GetWeight() << endl;
+  cout << ", for a total weight of ";
+  cout.precision(8);
+  cout << scientific << usrbdx->GetWeight() << endl;
   
   while (usrbdx->Read()) {
-    cout << "1" << endl;
+    /* cout << "1" << endl;
     cout << "Bdrx n. " << usrbdx->GetCardNumber() << " \"" << usrbdx->GetBinName() << "\"" <<  flush;
     cout << ", generalized particle n. " << usrbdx->GetID() << flush;
     cout << ", from region n. " << usrbdx->GetRegFrom() << " to region n. " << usrbdx->GetRegTo() << endl;
@@ -75,7 +77,9 @@ int main(int argc, const char **argv)
       //      for (int i= usrbdx->GetNbinsE()*usrbdx->GetNbinsA(); i<n; i++)  cout << usrbdx->GetScored(i) << " "; 
       cout << endl << endl;
     }
-  }
+    */
+    usrbdx->Print();
+}
 
   delete usrbdx;
   
