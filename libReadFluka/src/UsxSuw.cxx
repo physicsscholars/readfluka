@@ -1,5 +1,3 @@
-//     	       	       	NOT YET	IMLEMENTED - just a copy from UsrBdx!!!
-
 #include <iostream>
 #include <sstream>
 #include <cstring>
@@ -100,11 +98,16 @@ bool UsxSuw::Read()
 
   CheckFormat();
 
-  if (fLLNUSX) { // read low energy neutrons
-    fIGMUSX = ReadInt();
+  if (fLLNUSX) { //std::cout << " read low energy neutrons" << std::endl;
+    fIGMUSX = ReadInt(); //std::cout << "igmusx: " << fIGMUSX << std::endl;
+    if (fIGMUSX != 260) {
+      std::cerr << std::endl << "UsxSuw::Read: strange, but number of neutron groups is " << fIGMUSX << " but not 260" << std::endl;
+    }
+    
     fENGMAX = new float[fIGMUSX+1];
-    for (int i=0; i<fIGMUSX+1; i++) fENGMAX[i] = ReadFloat();
-    //    ReadFloat(2); // !!! Why? !!!
+    for (int i=0; i<fIGMUSX+1; i++) {
+      fENGMAX[i] = ReadFloat();
+    }
     CheckFormat(); 
   } else fIGMUSX = 0;
   // + see page 239 for further reading
@@ -115,11 +118,13 @@ bool UsxSuw::Read()
   fNScored = INTERV*fNABXBN;
   fScored = new float[fNScored];
 
-  
+  // read the scoring results as a 1-dimentional array
   for (int i=0; i<fNScored; i++) fScored[i] = ReadFloat();
 
   CheckFormat(); // std::cerr << "+++ OK in the end of UsxSuw::Read +++" << std::endl;
 
+
+  delete [] mychar; mychar = 0; // is it ok? !!!
   return true;
 }
 
@@ -191,6 +196,7 @@ const char* UsxSuw::GetYtitle() const
 
 void UsxSuw::Print() const
 {
+  std::cout << std::endl;
   std::cout << "Bdrx n. " << GetCardNumber() << " \"" << GetBinName() << "\"" <<  std::flush;
   std::cout << ", generalized particle n. " << GetID() << std::flush;
   std::cout << ", from region n. " << GetRegFrom() << " to region n. " << GetRegTo() << std::endl;
@@ -199,15 +205,17 @@ void UsxSuw::Print() const
     std::cout << "\tlow energy neutrons scored from group 1" << " to group " << GetMaxNeutronGroup() << std::endl;
   }
   if (IsOneWay() == true) 
-    std::cout << "\tthis is a two ways estimator" << std::endl; 
+    std::cout << "\tthis is a one way only estimator" << std::endl; 
   else
-    std::cout << "\tthis is a one way only estimator" << std::endl;
+    std::cout << "\tthis is a two ways estimator" << std::endl;
   
   if (IsFluence() == true) 
     std::cout << "\tthis is a fluence like estimator" << std::endl;
   else
-    std::cout << "\tthis is a current like estimator" << std::endl;
-  
+    std::cout << "\tthis is a current-like estimator" << std::endl;
+
+  std::cout.precision(4);
+
   if (!IsLogE()) {
     std::cout << "\tlinear energy binning from " << GetEmin() << " to " << GetEmax()  << " GeV,\t" << std::flush;
     std::cout << GetNbinsE() << " bins ("  << GetEWidth() <<  " GeV wide)" << std::endl;
@@ -224,29 +232,206 @@ void UsxSuw::Print() const
     std::cout <<  GetNbinsA() << " bins (ratio: " << GetAwidth() << ")"  << std::endl;
   }
   
-  std::cout << "\tData follow in a matrix A(ie,ia), format (1(5x,1p,10(1x,e11.4)))" << std::endl;
+  //  std::cout << "\tData follow in a matrix A(ie,ia), format (1(5x,1p,10(1x,e11.4)))" << std::endl;
   int n = GetNScored();
   n = GetNbinsE()*GetNbinsA();
-  std::cout << std::endl << "\t";
-  for (unsigned int i=1; i<=GetNbinsA(); i++) {
-    for (unsigned int j=1; j<=GetNbinsE(); j++)
-      std::cout << GetScored(j, i) << " ";
+  /*
     std::cout << std::endl << "\t";
-  }
+    for (unsigned int i=1; i<=GetNbinsA(); i++) {
+    for (unsigned int j=1; j<=GetNbinsE(); j++)
+    std::cout << GetScored(j, i) << " ";
+    std::cout << std::endl << "\t";
+    }
+  */
   std::cout << std::endl;
   
+  // loop on angles - line 125
+  double cumul = 0.0;
+  for (unsigned int ia=1; ia<=fNABXBN; ia++) { // angular intervals
+    if (abs(fITUSBX)<=1) { // linear in angle
+      std::cout << "\tAngle " << ia << " between " << fABXLOW + (ia-1)*fDABXBN << " and " << fABXLOW + ia*fDABXBN << " sr" << std::endl;
+    } else { // logarithmic in angle
+      if (ia == 1) // fist bin
+	std::cout << "\tAngle 1 between 0 and " << fABXLOW << " sr" << std::endl;
+      else
+	std::cout << "\tAngle " << ia << " between " << fABXLOW*pow(fDABXBN, ia-1) << " and " << fABXLOW*pow(fDABXBN, ia) << " sr" << std::endl;
+    }
+
+    std::cout << std::endl;
+    std::cout << "\t                                Double Differential      Angle-Integrated Cumulative" << std::endl;
+    if (GetLFUSBX()) // fluence
+      std::cout << "\t                              Fluence (dPhi/dE/dOmega)      dPhi/dE        Fluence" << std::endl;                 
+    else // current
+      std::cout << "\t                               Current (dJ/dE/dOmega)        dJ/dE         Current" << std::endl;
+    
+    std::cout << "\tLower energy     Upper energy    cm**-2 GeV**-1 sr-1      cm**2 GeV-1     cm**-2" << std::endl;
+    
+    float elimit = fEBXLOW;
+    float en1,en2, angint;
+    unsigned int nhigh;
+    if (fLLNUSX) { // low energy neutrons - data are stored backwards
+      int ig = fIGMUSX;// 260 - maximum low energy group to be scored
+      en1 = fENGMAX[ig+1-1]; // +1-1 - it's a FORTRAN/C issue
+      unsigned int jg1 = ia*(fNEBXBN+fIGMUSX);
+      // kbat
+      jg1--;
+      unsigned int jg2 = ia*(fNEBXBN+fIGMUSX)-fIGMUSX+1;
+      // kbat
+      jg2--;
+      //std::cout << "jg: " << jg1 << " " << jg2 << std::endl;
+      for (unsigned int jg=jg1; jg>=jg2; jg--) {
+	//	std::cout << "jg: " << jg << std::endl;
+	en2 = fENGMAX[jg-1];
+	angint = fScored[jg] * fDABXBN;
+	cumul += angint*(en2-en1);
+	std::cout  << "\t" << en1 << "\t" << en2 << "\t\t";
+	std::cout.precision(7);
+	std::cout << fScored[jg] << "\t" << angint << "\t" << cumul << std::endl;
+	ig--;
+	en1 = en2;
+      }
+      // find lower limit of first bin above or straddling the
+      // n-group limit. Nhigh: counts the high energy bins
+      nhigh = 0;
+      // for the time being, set energy boundary at n-group limit
+      elimit = en1;
+      en1 = fEBXHGH;
+      for (unsigned int ie = 1; ie<=fNEBXBN; ie++) {
+	if (fITUSBX>0)  // type of the binning
+	  en2 = en1 - fDEBXBN;
+	else
+	  en2 = en1/fDEBXBN;
+	en1 = en2;
+	nhigh++;
+	if (en2<=elimit) break;
+      }
+    } else {
+      en1 = fEBXLOW;
+      nhigh = fNEBXBN;
+    }
+    //     first bin above or straddling the n-group limit
+    if (fITUSBX>0)
+      en2 = en1 + fDEBXBN;
+    else
+      en2 = en1 * fDEBXBN;
+    float diff = fScored[ia*(fNEBXBN-nhigh+1)-1];
+    angint = diff*fDABXBN;
+    cumul += angint*(en2-elimit);
+    std::cout << "\t" << elimit << "\t" << en2 << "\t\t";
+    std::cout.precision(7);
+    std::cout << diff << "\t" << angint << "\t" << cumul << std::endl;
+    en1 = en2;
+
+    //     -------- loop on energies above the n-group limit ----------
+    // line 205 !!! this section have not yet been checked !!!
+    //std::cout << " nhigh: " << nhigh << std::endl;
+    for (unsigned int ie=2; ie<=nhigh; ie++) {
+      if (fITUSBX > 0) // binning is linear
+	en2 = en1 + fDEBXBN;
+      else
+	en2 = en1 * fDEBXBN;
+      diff = fScored[ ia*(fNEBXBN-nhigh+ie) - 1 ];
+      angint = diff * fDABXBN;
+      cumul += angint*(en2-en1);
+      std::cout << "here" << std::endl;
+      std::cout << en1 << " " << en2 << " " << diff << " " << angint << " " << cumul << std::endl;
+      en1 = en2;
+    }
+
+    //     Case of generalized particles .ne. 8 but including neutrons
+    // !!! this section have not been checked yet !!!
+    float cumule = 0.0; // used but not defined in rdbdx.f
+    float cumula = 0.0; // used but not defined in rdbdx.f
+    if (fLLNUSX && fIDUSBX != 8 && fNEBXBN > nhigh) {
+      std::cout << "Particles other than neutrons below E=" << elimit << std::endl;
+      en1 = fEBXLOW;
+      for (unsigned int ie = 1; ie<=(fNEBXBN-nhigh); ie++) {
+	if (fITUSBX>0)
+	  en2 = en1 + fDEBXBN;
+	else
+	  en2 = en1 * fDEBXBN;
+	diff = fScored[ (ia-1)*(fNEBXBN+fIGMUSX) + ie - 1 ];
+	angint = diff * fDABXBN;
+	cumul += angint * (en2-en1);
+	std::cout << en1 << " " << en2 << " " << diff << " " << cumule << " " << cumula << std::endl;
+      }
+    }
+
+  }
   
-  if (IsReadNeutrons()) {
+  
+  /*  if (IsReadNeutrons()) {
     std::cout << "\tLow energy neutron data from group 1 to group " << GetMaxNeutronGroup() <<  " follow in a matrix A(ig,ia), format (1(5x,1p,10(1x,e11.4)))" << std::endl;
     
     
     std::cerr << "!!! check it again !!! WHY ZEROS? why do we need the neutron data?" << std::endl;
     
     
-    //  n = GetMaxNeutronGroup();
-    //  for (int i=0; i<n; i++) std::cout << GetENGMAX(i) << " "; std::cout << std::endl;
+    n = GetMaxNeutronGroup();
+    for (int i=0; i<n; i++) std::cout << GetENGMAX(i) << " "; std::cout << std::endl;
     n = GetNScored();
     //      for (int i= GetNbinsE()*GetNbinsA(); i<n; i++)  std::cout << GetScored(i) << " "; 
     std::cout << std::endl << std::endl;
-  }
+    }*/
 }
+
+/*double *UsxSuw::XbinsE_len(double *values, double *limits) const
+{
+  
+    Fills two arrays:
+    values - an array of low-energy neutron data. Dimention is GetMaxNeutronGroup()+1 = 261
+    limits - an array of low-edges of each low energy neutron energy bin.  This is an array of size GetMaxNeutronGroup()+1+1 = 262
+    Note that it is a user's responsability to delete these arrays.
+   
+
+  if (!IsReadNeutrons()) return 0; // nothing to do if there are no neutron data
+
+  short nlims = fIGMUSX+2; // 261+1=262 std::cout << "nlims: " << nlims << std::endl;
+  double *lims = new double[nlims];
+  
+  // The rest of the code is very similar to UsxSuw::Print and rdbdx.f
+
+  unsigned int ia = 1; // ??? set the 1st angular interval and assume it's the same for all the others - is it correct ??? 
+  unsigned int jg1 = ia*(fNEBXBN+fIGMUSX);
+  unsigned int jg2 = ia*(fNEBXBN+fIGMUSX)-fIGMUSX+1;
+  double en1 = fENGMAX[fIGMUSX];
+  double en2 = 0.0;
+
+  std::cout << "here" << std::endl;
+  for (unsigned int jg = jg1; jg>=jg2-1; jg--) { // here we say jg2-1 but not jg2 as in UsxSuw::Print and rdbdx.f since otherwise we lose the last interval
+    en1 = fENGMAX[jg-1];
+    std::cout << jg << " " << nlims-jg << "\t" << en1 << std::endl;
+    lims[nlims-jg] = en1;
+    //en1 = en2;
+  }
+  
+   // find lower limit of first bin above or straddling the
+  // n-group limit. Nhigh: counts the high energy bins
+  unsigned int nhigh = 0;
+  // for the time being, set energy boundary at n-group limit
+  float elimit = en1;
+  en1 = fEBXHGH;
+  for (unsigned int ie = 1; ie<=fNEBXBN; ie++) {
+    if (fITUSBX>0)  // type of the binning
+      en2 = en1 - fDEBXBN;
+    else
+      en2 = en1/fDEBXBN;
+    en1 = en2;
+    nhigh++;
+    if (en2<=elimit) break;
+  }
+
+  //     first bin above or straddling the n-group limit
+  if (fITUSBX>0)
+    en2 = en1 + fDEBXBN;
+  else
+    en2 = en1 * fDEBXBN;
+  float diff = fScored[ia*(fNEBXBN-nhigh+1)-1];
+  std::cout << en2 << "\t\t";
+  std::cout.precision(7);
+  std::cout << diff << std::endl;
+  en1 = en2;
+  
+  return lims; 
+}
+*/

@@ -1,9 +1,9 @@
 #ifndef UsxSuw_h
 #define UsxSuw_h
-//                      NOT YET IMLEMENTED - just a copy from UsrBdx!!!
+
 ///////////////////////////////////////////////
 //
-// UsxSuw - a class to read the binary output of usxsuw - the FLUKA tool to analyse and combine the
+// UsxSuw - a class to read the
 // USRBDX estimator output.
 //
 ///////////////////////////////////////////////
@@ -56,18 +56,24 @@ namespace ReadFluka {
     bool Read();
 
     inline float GetArea() const { return fAUSBDX; }
-    inline float GetCardNumber() const { return fMX; }
+    inline int GetCardNumber() const { return fMX; }
     std::string GetBinName() const {return fTITUSX; }
     std::string GetBinTitle() const;
     inline int GetID() const { return fIDUSBX; }
     inline int GetRegFrom() const { return fNR1USX; }
     inline int GetRegTo() const { return fNR2USX; }
-    inline bool IsReadNeutrons() const { return fLLNUSX; }
-    inline int GetMaxNeutronGroup() const { return fIGMUSX; }
-    inline float GetENGMAX(int i) const { return fENGMAX[i]; }
-    inline bool IsOneWay() const { return fLWUSBX; }
 
-    inline bool IsFluence() const { return fLFUSBX; }
+    inline bool GetLLNUSX() const { return fLLNUSX; }
+    inline bool IsReadNeutrons() const { return GetLLNUSX(); }
+
+    inline int GetIGMUSX() const { return fIGMUSX; }
+    inline int GetMaxNeutronGroup() const { return GetIGMUSX(); }
+
+    inline float GetENGMAX(int i) const { return fENGMAX[i]; }
+    inline bool IsOneWay() const { return !fLWUSBX; }
+
+    inline bool GetLFUSBX() const { return fLFUSBX; }
+    inline bool IsFluence() const { return GetLFUSBX(); }
     inline bool IsCurrent() const { return !IsFluence(); }
 
     inline int  GetType() const { return fITUSBX; }
@@ -79,7 +85,9 @@ namespace ReadFluka {
 
     inline float GetAmin() const { return fABXLOW; }
     inline float GetAmax() const { return fABXHGH; }
-    inline unsigned int GetNbinsA() const { return fNABXBN; }
+
+    inline unsigned int GetNABXBN() const { return fNABXBN; }
+    inline unsigned int GetNbinsA() const { return GetNABXBN(); }
     inline float GetAwidth() const { return fDABXBN; }
 
     inline int GetNScored() const { return fNScored; }
@@ -91,6 +99,8 @@ namespace ReadFluka {
 
     const char* GetXtitle() const;
     const char* GetYtitle() const;
+
+    // void XbinsE_len() const;
 
     void Print() const;
   };
