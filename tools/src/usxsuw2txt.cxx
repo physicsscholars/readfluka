@@ -14,9 +14,11 @@ int main(int argc, const char **argv)
   cout << ", for a total weight of ";
   cout << usxsuw->GetWeight() << endl;
 
-  while (usxsuw->Read()) {
-    usxsuw->Print();
-  }
+  int i=0;
+  usxsuw->Read();
+  //usxsuw->Print(i);
+  i++;
+  
 
   delete usxsuw;
   

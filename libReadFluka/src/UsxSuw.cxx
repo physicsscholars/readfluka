@@ -9,12 +9,11 @@ using namespace ReadFluka;
 
 UsxSuw::UsxSuw(const char *fname) : Base(fname)
 {
+  Reset();
+
   fIsReadHeader = false;
   fWEIPRI = 0;
   fNCASE  = 0;
-  fENGMAX = 0;
-  fScored = 0;
-  Reset();
 
   ReadHeader();
 }
@@ -26,31 +25,32 @@ UsxSuw::~UsxSuw()
 
 void UsxSuw::Reset()
 {
-  fMX = 0;
-  fTITUSX = "";
-  fITUSBX = fIDUSBX = 0;
-  fNR1USX = fNR2USX = 0;
-  fAUSBDX = 0.0f;
-  //  fLWUSBX = false;
-  //  fLFUSBX = false;
-  fEBXLOW = fEBXHGH = 0.0f;
-  fNEBXBN = 0;
-  fDEBXBN = 0.0f;
-  fABXLOW = fABXHGH = 0.0f;
-  fNABXBN = 0;
-  fDABXBN = 0.0f;
+  fNX = 0;
+  fTITUSX.clear();
+  fITUSBX.clear();
+  fIDUSBX.clear();
+  fNR1USX.clear();
+  fNR2USX.clear();
+  fAUSBDX.clear();
+  fLWUSBX.clear();
+  fLFUSBX.clear();
+  fLLNUSX.clear();
+  fEBXLOW.clear();
+  fEBXHGH.clear();
+  fNEBXBN.clear();
+  fDEBXBN.clear();;
+  fABXLOW.clear();
+  fABXHGH.clear();;
+  fNABXBN.clear();
+  fDABXBN.clear();
 
-  fIGMUSX = 0;
-  if (fENGMAX) {
-    delete [] fENGMAX;
-    fENGMAX = 0;
-  }
+  fIGMUSX.clear();
+  fENGMAX.clear();
 
-  fNScored = 0;
-  if (fScored) {
-    delete [] fScored;
-    fScored = 0;
-  }
+  fNScored.clear();
+  fScored.clear();
+
+  fGDSTOR.clear();
 }
 
 void UsxSuw::ReadHeader()
@@ -73,49 +73,70 @@ bool UsxSuw::Read()
   if (fin->eof()) return false; // exit the while-loop if reached the end of the file
   Reset();
 
-  //  std::cerr << "Read begin" << std::endl;
-  fMX = ReadInt();  //std::cout << "MX: " << fMX << std::endl;
-
-  // line 526 in usxsuw.f
-
-  char *mychar = new char[10];
-  fin->read(mychar, 10); mychar[10]='\0';
-  fTITUSX = Trimmed(std::string(mychar));  //std::cout << fTITUSX << std::endl;
-  fITUSBX = ReadInt();// std::cout << "fITUSBX: " << fITUSBX << std::endl;
-  fIDUSBX = ReadInt();   //std::cout << fIDUSBX << std::endl;
-  fNR1USX = ReadInt();   
-  fNR2USX = ReadInt();   
-  fAUSBDX = ReadFloat();   
-  fLWUSBX = ReadBool();   
-  fLFUSBX = ReadBool();    
-  fLLNUSX = ReadBool();   
-
-  fEBXLOW = ReadFloat(); fEBXHGH = ReadFloat(); fNEBXBN = ReadInt();fDEBXBN = ReadFloat();
-  fABXLOW = ReadFloat(); fABXHGH = ReadFloat(); fNABXBN = ReadInt(); fDABXBN = ReadFloat();
-
-  CheckFormat();
-
-  if (fLLNUSX) { //std::cout << " read low energy neutrons" << std::endl;
-    fIGMUSX = ReadInt(); //std::cout << "igmusx: " << fIGMUSX << std::endl;
-    if (fIGMUSX != 260) {
-      std::cerr << std::endl << "UsxSuw::Read: strange, but number of neutron groups is " << fIGMUSX << " but not 260" << std::endl;
-    }
-    
-    // line 534 in usxsuw.f
-    fENGMAX = new float[fIGMUSX+1];
-    for (int i=0; i<fIGMUSX+1; i++) {
-      fENGMAX[i] = ReadFloat();
-    }
-    CheckFormat(); 
-  } else fIGMUSX = 0;
-  
   int KLAST = 0;
-  int K0 = KLAST + 1;
-  int K1 = fNEBXBN * fNABXBN + K0 - 1; // total number of bins + K0 - 1
-  int K2 = K1 + fIGMUSX*fNABXBN;
-  KLAST = K2;
+  int K0, K1, K2;
+  char *mychar = new char[11];
+  std::vector<float> vtmp;
 
-  // INTERV - total number of enery intervals
+  //  std::cerr << "Read begin" << std::endl;
+  for (int jj=0; jj<10; jj++) {
+    fNX = ReadInt();  std::cout << "NX: " << fNX << std::endl;
+    
+    // line 526 in usxsuw.f
+    
+    fin->read(mychar, 10); mychar[10]='\0';
+    fTITUSX.push_back(Trimmed(std::string(mychar)));
+    fITUSBX.push_back(ReadInt());// std::cout << "fITUSBX: " << fITUSBX << std::endl;
+    fIDUSBX.push_back(ReadInt());   //std::cout << fIDUSBX << std::endl;
+    fNR1USX.push_back(ReadInt());   
+    fNR2USX.push_back(ReadInt());   
+    fAUSBDX.push_back(ReadFloat());   
+    fLWUSBX.push_back(ReadBool());   
+    fLFUSBX.push_back(ReadBool());    
+    fLLNUSX.push_back(ReadBool());   
+    
+    fEBXLOW.push_back(ReadFloat()); fEBXHGH.push_back(ReadFloat()); fNEBXBN.push_back(ReadInt());fDEBXBN.push_back(ReadFloat());
+    fABXLOW.push_back(ReadFloat()); fABXHGH.push_back(ReadFloat()); fNABXBN.push_back(ReadInt()); fDABXBN.push_back(ReadFloat());
+
+    CheckFormat();
+
+    if (fLLNUSX[jj]) { //std::cout << " read low energy neutrons" << std::endl;
+      //  CheckFormat();
+
+      fIGMUSX.push_back(ReadInt()); //std::cout << "igmusx: " << fIGMUSX << std::endl;
+      if (fIGMUSX[jj] != 260) {
+	std::cerr << std::endl << "UsxSuw::Read: strange, but number of neutron groups is " << fIGMUSX[jj] << " but not 260" << std::endl;
+      }
+      
+      // line 534 in usxsuw.f
+      vtmp.clear();
+      for (int i=0; i<fIGMUSX[jj]+1; i++) {
+	vtmp.push_back(ReadFloat());
+      }
+      fENGMAX.push_back(vtmp);
+      
+      CheckFormat();
+    } else fIGMUSX.push_back(0);
+
+    K0 = KLAST + 1;
+    K1 = fNEBXBN[jj] * fNABXBN[jj] + K0 - 1; // total number of bins + K0 - 1
+    K2 = K1 + fIGMUSX[jj]*fNABXBN[jj];
+    KLAST = K2;
+
+    vtmp.clear();
+    for (int j=K0; j<=K2; j++) vtmp.push_back(ReadFloat());
+    fGDSTOR.push_back(vtmp); // line 540 in usxsuw.f
+
+    CheckFormat();
+
+    Print(jj);
+    
+    if (ReadStatFlag(false) == true) {
+      break;
+    } //else for (int iii=0; iii<3; iii++) std::cout << ReadInt(iii) << std::endl;
+  }
+
+  /*  // INTERV - total number of enery intervals
   // (interval above the limit of n-groups+ intervals below)
   int INTERV = fNEBXBN + fIGMUSX;
   fNScored = INTERV*fNABXBN;
@@ -125,20 +146,20 @@ bool UsxSuw::Read()
   for (int i=0; i<fNScored; i++) fScored[i] = ReadFloat();
 
   CheckFormat(); // std::cerr << "+++ OK in the end of UsxSuw::Read +++" << std::endl;
-
+  */
 
   delete [] mychar; mychar = 0; // is it ok? !!!
   return true;
 }
 
-float UsxSuw::GetScored(unsigned int ie, unsigned int ia) const
+/*float UsxSuw::GetScored(unsigned int ie, unsigned int ia) const
 {
-  /*
+  
     Return the scored value in the ie-ja-cell.
     ie - energy bin
     ia - angular bin
     The cell indises must be >= 1 (FLUKA-Fortran style)
-  */
+  
 
   unsigned int e = ie-1;
   unsigned int a = ia-1;
@@ -155,36 +176,37 @@ float UsxSuw::GetScored(unsigned int ie, unsigned int ia) const
   
   return fScored[e + a*fNEBXBN];
 }
+*/
 
-std::string UsxSuw::GetBinTitle() const
+std::string UsxSuw::GetBinTitle(int i) const
 {
   std::ostringstream tmp;
-  if (IsFluence()) tmp << "Fluence of ";
+  if (IsFluence(i)) tmp << "Fluence of ";
   else tmp << "Current of ";
   
-  tmp << Code2Name(GetID()) << " (reg. " << GetRegFrom();
+  tmp << Code2Name(GetID(i)) << " (reg. " << GetRegFrom(i);
 
-  if (IsOneWay()) tmp << " -> ";
+  if (IsOneWay(i)) tmp << " -> ";
   else tmp << " <-> ";
-  tmp << GetRegTo();
+  tmp << GetRegTo(i);
   tmp << ", ";
 
   tmp << "S = ";
-  tmp << GetArea();
+  tmp << GetArea(i);
   tmp << " cm^{2})";
 
   return tmp.str();
 }
 
-const char* UsxSuw::GetXtitle() const
+const char* UsxSuw::GetXtitle(int i) const
 {
-  if (GetType()>0) return "E_{kin} [GeV]";
+  if (GetType(i)>0) return "E_{kin} [GeV]";
   else return "lg(E_{kin}/1 GeV)";
 }
 
-const char* UsxSuw::GetYtitle() const
+const char* UsxSuw::GetYtitle(int i) const
 {
-  if (abs(GetType())<=1) return "#Omega [sr]";
+  if (abs(GetType(i))<=1) return "#Omega [sr]";
   else return "lg(#Omega/1 sr)";
 }
 
@@ -197,22 +219,22 @@ const char* UsxSuw::GetYtitle() const
   return (i<=1);
   }*/
 
-void UsxSuw::Print() const
+void UsxSuw::Print(int i) const
 {
   std::cout << std::endl;
-  std::cout << "Detector n. " << GetCardNumber() << " " << GetBinName() <<  std::endl;
-  std::cout << "\t(Area: " << GetArea() << " cmq," << std::endl;
-  std::cout << "\t distr. scored: " << GetID() << "," << std::endl;
-  std::cout << "\t from reg " << GetRegFrom() << " to " << GetRegTo() << "," << std::endl;
-  if (IsReadNeutrons()) {
-    std::cout << "\t low energy neutrons scored from group 1" << " to group " << GetMaxNeutronGroup() << std::endl;
+  std::cout << "Detector n. " << GetCardNumber() << " " << GetBinName(i) <<  std::endl;
+  std::cout << "\t(Area: " << GetArea(i) << " cmq," << std::endl;
+  std::cout << "\t distr. scored: " << GetID(i) << "," << std::endl;
+  std::cout << "\t from reg " << GetRegFrom(i) << " to " << GetRegTo(i) << "," << std::endl;
+  if (IsReadNeutrons(i)) {
+    std::cout << "\t low energy neutrons scored from group 1" << " to group " << GetMaxNeutronGroup(i) << std::endl;
   }
-  if (IsOneWay() == true) 
+  if (IsOneWay(i) == true) 
     std::cout << "\t one way scoring" << std::endl; 
   else
     std::cout << "\t this is a two ways estimator" << std::endl;
   
-  if (IsFluence() == true) 
+  if (IsFluence(i) == true) 
     std::cout << "\t fluence scoring)" << std::endl;
   else
     std::cout << "\t current scoring)" << std::endl;
@@ -234,11 +256,12 @@ void UsxSuw::Print() const
     std::cout << "\tlogar. angular binning from "<<GetAmin()<<" to "<< GetAmax() << " sr,\t"<< std::flush;
     std::cout <<  GetNbinsA() << " bins (ratio: " << GetAwidth() << ")"  << std::endl;
   }
-  */
+  
   
   //  std::cout << "\tData follow in a matrix A(ie,ia), format (1(5x,1p,10(1x,e11.4)))" << std::endl;
-  int n = GetNScored();
-  n = GetNbinsE()*GetNbinsA();
+  int n = GetNScored(i);
+  n = GetNbinsE(i)*GetNbinsA(i);
+*/
   /*
     std::cout << std::endl << "\t";
     for (unsigned int i=1; i<=GetNbinsA(); i++) {
@@ -247,7 +270,7 @@ void UsxSuw::Print() const
     std::cout << std::endl << "\t";
     }
   */
-  std::cout << std::endl;
+  /*std::cout << std::endl;
   
   // loop on angles 
   double cumul = 0.0;
@@ -362,7 +385,7 @@ void UsxSuw::Print() const
     }
 
   }
-  
+  */
   
   /*  if (IsReadNeutrons()) {
     std::cout << "\tLow energy neutron data from group 1 to group " << GetMaxNeutronGroup() <<  " follow in a matrix A(ig,ia), format (1(5x,1p,10(1x,e11.4)))" << std::endl;

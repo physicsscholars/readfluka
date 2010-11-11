@@ -17,42 +17,44 @@
 namespace ReadFluka {
   class UsxSuw : public Base {
   private:
-    int        fMX;        // USRBDX card number
+    int        fNX;        // USRBDX card number
     float      fWCTOT; // total weight
     int        fNCTOT; // total number of incident particles
     int        fMCTOT;
     int        fMBATCH;
 
-    std::string fTITUSX; // bdrx name
-    int         fITUSBX; // type of the binning (WHAT(1): -1, -2, 1, 2)
-    int         fIDUSBX; // distribution to be scored
-    int         fNR1USX; // 1st region
-    int         fNR2USX; // 2nd region
-    float       fAUSBDX; // area of the detector
-    bool        fLWUSBX; // one way if false, two ways if true
-    bool        fLFUSBX; // current if false, fluence if true
-    bool        fLLNUSX; // no low energy neutron scoring if false, yes if true
+    std::vector<std::string> fTITUSX; // bdrx name
+    std::vector<int> fITUSBX; // type of the binning (WHAT(1): -1, -2, 1, 2)
+    std::vector<int> fIDUSBX; // distribution to be scored
+    std::vector<int> fNR1USX; // 1st region
+    std::vector<int> fNR2USX; // 2nd region
+    std::vector<float> fAUSBDX; // area of the detector
+    std::vector<bool> fLWUSBX; // one way if false, two ways if true
+    std::vector<bool> fLFUSBX; // current if false, fluence if true
+    std::vector<bool> fLLNUSX; // no low energy neutron scoring if false, yes if true
 
-    float       fEBXLOW; // min energy
-    float       fEBXHGH; // max energy
+    std::vector<float> fEBXLOW; // min energy
+    std::vector<float> fEBXHGH; // max energy
 
-    unsigned int         fNEBXBN; // number of energy intervals
-    float       fDEBXBN; // energy bin width
+    std::vector<unsigned int> fNEBXBN; // number of energy intervals
+    std::vector<float> fDEBXBN; // energy bin width
 
-    float       fABXLOW; // min angle
-    float       fABXHGH; // min angle
-    unsigned int         fNABXBN; // number of angular intervals
-    float       fDABXBN; // angular (steradian) bin width 
+    std::vector<float> fABXLOW; // min angle
+    std::vector<float> fABXHGH; // min angle
+    std::vector<unsigned int> fNABXBN; // number of angular intervals
+    std::vector<float> fDABXBN; // angular (steradian) bin width 
 
-    int         fIGMUSX; // maximum low energy neutron group to be scored
-    float      *fENGMAX; // array of the low energy neutron data
+    std::vector<int> fIGMUSX; // maximum low energy neutron group to be scored
+    std::vector< std::vector<float> > fENGMAX; // array of the low energy neutron data
 
-    int         fNScored; // number of scored values (INTERV*fNABXBN)
-    float      *fScored;  // array with scored data
+    std::vector<int> fNScored; // number of scored values (INTERV*fNABXBN)
+    std::vector< std::vector<float> > fScored;  // array with scored data
+    std::vector< std::vector<float> > fGDSTOR;
 
     bool       fIsReadHeader;
     void       ReadHeader();
     void       Reset();
+
   public:
     UsxSuw(const char *fname);
     virtual ~UsxSuw();
@@ -62,54 +64,54 @@ namespace ReadFluka {
     inline int GetEntryNumber() const { return fNCTOT; }
     inline float GetWeight() const { return fWCTOT; }
 
-    inline float GetArea() const { return fAUSBDX; }
-    inline int GetCardNumber() const { return fMX; }
-    std::string GetBinName() const {return fTITUSX; }
-    std::string GetBinTitle() const;
-    inline int GetID() const { return fIDUSBX; }
-    inline int GetRegFrom() const { return fNR1USX; }
-    inline int GetRegTo() const { return fNR2USX; }
+    inline float GetArea(int i) const { return fAUSBDX[i]; }
+    inline int GetCardNumber() const { return fNX; }
+    std::string GetBinName(int i) const {return fTITUSX[i]; }
+    std::string GetBinTitle(int i) const;
+    inline int GetID(int i) const { return fIDUSBX[i]; }
+    inline int GetRegFrom(int i) const { return fNR1USX[i]; }
+    inline int GetRegTo(int i) const { return fNR2USX[i]; }
 
-    inline bool GetLLNUSX() const { return fLLNUSX; }
-    inline bool IsReadNeutrons() const { return GetLLNUSX(); }
+    inline bool GetLLNUSX(int i) const { return fLLNUSX[i]; }
+    inline bool IsReadNeutrons(int i) const { return GetLLNUSX(i); }
 
-    inline int GetIGMUSX() const { return fIGMUSX; }
-    inline int GetMaxNeutronGroup() const { return GetIGMUSX(); }
+    inline int GetIGMUSX(int i) const { return fIGMUSX[i]; }
+    inline int GetMaxNeutronGroup(int i) const { return GetIGMUSX(i); }
 
-    inline float GetENGMAX(int i) const { return fENGMAX[i]; }
-    inline bool IsOneWay() const { return !fLWUSBX; }
+    //    inline float GetENGMAX(int i) const { return fENGMAX[i]; }
+    inline bool IsOneWay(int i) const { return !fLWUSBX[i]; }
 
-    inline bool GetLFUSBX() const { return fLFUSBX; }
-    inline bool IsFluence() const { return GetLFUSBX(); }
-    inline bool IsCurrent() const { return !IsFluence(); }
+    inline bool GetLFUSBX(int i) const { return fLFUSBX[i]; }
+    inline bool IsFluence(int i) const { return GetLFUSBX(i); }
+    inline bool IsCurrent(int i) const { return !IsFluence(i); }
 
-    inline int  GetType() const { return fITUSBX; }
+    inline int  GetType(int i) const { return fITUSBX[i]; }
 
-    inline float GetEmin() const { return fEBXLOW; }
-    inline float GetEmax() const { return fEBXHGH; }
-    inline unsigned int GetNbinsE() const { return fNEBXBN; }
-    inline float GetEWidth() const { return fDEBXBN; }
+    inline float GetEmin(int i) const { return fEBXLOW[i]; }
+    inline float GetEmax(int i) const { return fEBXHGH[i]; }
+    inline unsigned int GetNbinsE(int i) const { return fNEBXBN[i]; }
+    inline float GetEWidth(int i) const { return fDEBXBN[i]; }
 
-    inline float GetAmin() const { return fABXLOW; }
-    inline float GetAmax() const { return fABXHGH; }
+    inline float GetAmin(int i) const { return fABXLOW[i]; }
+    inline float GetAmax(int i) const { return fABXHGH[i]; }
 
-    inline unsigned int GetNABXBN() const { return fNABXBN; }
-    inline unsigned int GetNbinsA() const { return GetNABXBN(); }
-    inline float GetAwidth() const { return fDABXBN; }
+    inline unsigned int GetNABXBN(int i) const { return fNABXBN[i]; }
+    inline unsigned int GetNbinsA(int i) const { return GetNABXBN(i); }
+    inline float GetAwidth(int i) const { return fDABXBN[i]; }
 
-    inline int GetNScored() const { return fNScored; }
-    inline float *GetScored() const { return fScored; }
+    inline int GetNScored(int i) const { return fNScored[i]; }
+    //    inline float *GetScored() const { return fScored; }
     float GetScored(unsigned int ie, unsigned int ia) const;
 
-    inline bool IsLogE() const {return !(GetType()>0); }
-    inline bool IsLogA() const { return !(int(std::abs(float(GetType())))<=1); }
+    inline bool IsLogE(int i) const {return !(GetType(i)>0); }
+    inline bool IsLogA(int i) const { return !(int(std::abs(float(GetType(i))))<=1); }
 
-    const char* GetXtitle() const;
-    const char* GetYtitle() const;
+    const char* GetXtitle(int i) const;
+    const char* GetYtitle(int i) const;
 
     // void XbinsE_len() const;
 
-    void Print() const;
+    void Print(int i) const;
   };
 }
 
