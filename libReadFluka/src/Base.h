@@ -17,6 +17,7 @@
 //////////////////////////////////////////////////////////////
 
 #include <fstream>
+#include <iostream>
 
 namespace ReadFluka {
   enum EVerboseLevel {kPRINT_NOTHING, kPRINT_TITLE, kPRINT_HEADER, kPRINT_MISC, kPRINT_SCORED};
@@ -69,6 +70,7 @@ namespace ReadFluka {
     bool CheckFormat(bool doExit=true);
 
     bool ReadStatFlag(bool doExit=true);
+    void Warning(const char *msg) const;
     
     std::string                 Trimmed(std::string const& str, char const* sepSet=" ");
     std::ifstream              *GetFile() const {return fin;}

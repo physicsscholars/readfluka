@@ -3,7 +3,7 @@
 #include <cstring>
 #include <cstdlib> // for exit()
 
-#include "UsxSuw.h"
+#include "UsxSuw.h" ///////                                !!! NOT YET FINISHED !!!
 
 using namespace ReadFluka;
 
@@ -60,15 +60,11 @@ void UsxSuw::ReadHeader()
   fIsReadHeader = true;
   ReadRunTitle();
   ReadRunTime();
-  fWEIPRI = ReadFloat();
-  fNCASE  = ReadInt();
+  fWCTOT = ReadFloat();
+  fNCTOT  = ReadInt();
+  fMCTOT = ReadInt();
+  fMBATCH = ReadInt();
 
-  if (gVerbose>=kPRINT_SCORED) {
-        std::clog << "WEIPRI: " << fWEIPRI << std::endl;
-    std::clog << "NCASE: "  << fNCASE << std::endl;
-  }
-
-  ReadInt(2); // !!! What is this? !!!
   CheckFormat();
 }
 
@@ -79,6 +75,8 @@ bool UsxSuw::Read()
 
   //  std::cerr << "Read begin" << std::endl;
   fMX = ReadInt();  //std::cout << "MX: " << fMX << std::endl;
+
+  // line 526 in usxsuw.f
 
   char *mychar = new char[10];
   fin->read(mychar, 10); mychar[10]='\0';
@@ -95,7 +93,6 @@ bool UsxSuw::Read()
   fEBXLOW = ReadFloat(); fEBXHGH = ReadFloat(); fNEBXBN = ReadInt();fDEBXBN = ReadFloat();
   fABXLOW = ReadFloat(); fABXHGH = ReadFloat(); fNABXBN = ReadInt(); fDABXBN = ReadFloat();
 
-
   CheckFormat();
 
   if (fLLNUSX) { //std::cout << " read low energy neutrons" << std::endl;
@@ -104,13 +101,19 @@ bool UsxSuw::Read()
       std::cerr << std::endl << "UsxSuw::Read: strange, but number of neutron groups is " << fIGMUSX << " but not 260" << std::endl;
     }
     
+    // line 534 in usxsuw.f
     fENGMAX = new float[fIGMUSX+1];
     for (int i=0; i<fIGMUSX+1; i++) {
       fENGMAX[i] = ReadFloat();
     }
     CheckFormat(); 
   } else fIGMUSX = 0;
-  // + see page 239 for further reading
+  
+  int KLAST = 0;
+  int K0 = KLAST + 1;
+  int K1 = fNEBXBN * fNABXBN + K0 - 1; // total number of bins + K0 - 1
+  int K2 = K1 + fIGMUSX*fNABXBN;
+  KLAST = K2;
 
   // INTERV - total number of enery intervals
   // (interval above the limit of n-groups+ intervals below)
@@ -197,24 +200,24 @@ const char* UsxSuw::GetYtitle() const
 void UsxSuw::Print() const
 {
   std::cout << std::endl;
-  std::cout << "Bdrx n. " << GetCardNumber() << " \"" << GetBinName() << "\"" <<  std::flush;
-  std::cout << ", generalized particle n. " << GetID() << std::flush;
-  std::cout << ", from region n. " << GetRegFrom() << " to region n. " << GetRegTo() << std::endl;
-  std::cout << "\tdetector area: " << GetArea() <<  " cm**2" << std::endl;
+  std::cout << "Detector n. " << GetCardNumber() << " " << GetBinName() <<  std::endl;
+  std::cout << "\t(Area: " << GetArea() << " cmq," << std::endl;
+  std::cout << "\t distr. scored: " << GetID() << "," << std::endl;
+  std::cout << "\t from reg " << GetRegFrom() << " to " << GetRegTo() << "," << std::endl;
   if (IsReadNeutrons()) {
-    std::cout << "\tlow energy neutrons scored from group 1" << " to group " << GetMaxNeutronGroup() << std::endl;
+    std::cout << "\t low energy neutrons scored from group 1" << " to group " << GetMaxNeutronGroup() << std::endl;
   }
   if (IsOneWay() == true) 
-    std::cout << "\tthis is a one way only estimator" << std::endl; 
+    std::cout << "\t one way scoring" << std::endl; 
   else
-    std::cout << "\tthis is a two ways estimator" << std::endl;
+    std::cout << "\t this is a two ways estimator" << std::endl;
   
   if (IsFluence() == true) 
-    std::cout << "\tthis is a fluence like estimator" << std::endl;
+    std::cout << "\t fluence scoring)" << std::endl;
   else
-    std::cout << "\tthis is a current-like estimator" << std::endl;
+    std::cout << "\t current scoring)" << std::endl;
 
-  std::cout.precision(4);
+  /* std::cout.precision(4);
 
   if (!IsLogE()) {
     std::cout << "\tlinear energy binning from " << GetEmin() << " to " << GetEmax()  << " GeV,\t" << std::flush;
@@ -231,6 +234,7 @@ void UsxSuw::Print() const
     std::cout << "\tlogar. angular binning from "<<GetAmin()<<" to "<< GetAmax() << " sr,\t"<< std::flush;
     std::cout <<  GetNbinsA() << " bins (ratio: " << GetAwidth() << ")"  << std::endl;
   }
+  */
   
   //  std::cout << "\tData follow in a matrix A(ie,ia), format (1(5x,1p,10(1x,e11.4)))" << std::endl;
   int n = GetNScored();
@@ -245,7 +249,7 @@ void UsxSuw::Print() const
   */
   std::cout << std::endl;
   
-  // loop on angles - line 125
+  // loop on angles 
   double cumul = 0.0;
   for (unsigned int ia=1; ia<=fNABXBN; ia++) { // angular intervals
     if (abs(fITUSBX)<=1) { // linear in angle
@@ -323,7 +327,7 @@ void UsxSuw::Print() const
     en1 = en2;
 
     //     -------- loop on energies above the n-group limit ----------
-    // line 205 !!! this section have not yet been checked !!!
+    Warning("UsxSuw::Read: Loop on energies above the n-group limit has not yet been checked !!!")
     //std::cout << " nhigh: " << nhigh << std::endl;
     for (unsigned int ie=2; ie<=nhigh; ie++) {
       if (fITUSBX > 0) // binning is linear

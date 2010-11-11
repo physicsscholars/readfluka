@@ -1,5 +1,4 @@
 #include "Base.h"
-#include <iostream>
 #include <iomanip>
 #include <cstdlib>
 #include <cstring>
@@ -299,4 +298,10 @@ std::string Base::Trimmed(std::string const& str, char const* sepSet)
 
 	std::string::size_type const first = str.find_first_not_of(sepSet);
   return ( first==std::string::npos )  ? std::string() : str.substr(first, str.find_last_not_of(sepSet)-first+1);
+}
+
+void Base::Warning(const char *msg) const
+{
+  std::cerr << "WARNING: " << std::flush;
+  std::cerr << msg << std::endl;
 }

@@ -4,7 +4,7 @@
 ///////////////////////////////////////////////
 //
 // UsxSuw - a class to read the
-// USRBDX estimator output.
+// $FLUTIL/usxsuw estimator output                       !!! NOT YET FINISHED !!!
 //
 ///////////////////////////////////////////////
 
@@ -18,6 +18,10 @@ namespace ReadFluka {
   class UsxSuw : public Base {
   private:
     int        fMX;        // USRBDX card number
+    float      fWCTOT; // total weight
+    int        fNCTOT; // total number of incident particles
+    int        fMCTOT;
+    int        fMBATCH;
 
     std::string fTITUSX; // bdrx name
     int         fITUSBX; // type of the binning (WHAT(1): -1, -2, 1, 2)
@@ -54,6 +58,9 @@ namespace ReadFluka {
     virtual ~UsxSuw();
 
     bool Read();
+
+    inline int GetEntryNumber() const { return fNCTOT; }
+    inline float GetWeight() const { return fWCTOT; }
 
     inline float GetArea() const { return fAUSBDX; }
     inline int GetCardNumber() const { return fMX; }
