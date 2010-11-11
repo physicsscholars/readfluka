@@ -100,6 +100,10 @@ bool UsrBdx::Read()
 
   if (fLLNUSX) { //std::cout << " read low energy neutrons" << std::endl;
     fIGMUSX = ReadInt(); //std::cout << "igmusx: " << fIGMUSX << std::endl;
+    if (fIGMUSX != 260) {
+      std::cerr << std::endl << "UsrBdx::Read: strange, but number of neutron groups is " << fIGMUSX << " but not 260" << std::endl;
+    }
+    
     fENGMAX = new float[fIGMUSX+1];
     for (int i=0; i<fIGMUSX+1; i++) {
       fENGMAX[i] = ReadFloat();
@@ -266,7 +270,7 @@ void UsrBdx::Print() const
     float en1,en2, angint;
     unsigned int nhigh;
     if (fLLNUSX) { // low energy neutrons - data are stored backwards
-      int ig = fIGMUSX;// std::cout << "fIGMUSX: " << fIGMUSX << std::endl;
+      int ig = fIGMUSX;// 260 - maximum low energy group to be scored
       en1 = fENGMAX[ig+1-1]; // +1-1 - it's a FORTRAN/C issue
       unsigned int jg1 = ia*(fNEBXBN+fIGMUSX);
       // kbat
@@ -370,3 +374,64 @@ void UsrBdx::Print() const
     std::cout << std::endl << std::endl;
     }*/
 }
+
+/*double *UsrBdx::XbinsE_len(double *values, double *limits) const
+{
+  
+    Fills two arrays:
+    values - an array of low-energy neutron data. Dimention is GetMaxNeutronGroup()+1 = 261
+    limits - an array of low-edges of each low energy neutron energy bin.  This is an array of size GetMaxNeutronGroup()+1+1 = 262
+    Note that it is a user's responsability to delete these arrays.
+   
+
+  if (!IsReadNeutrons()) return 0; // nothing to do if there are no neutron data
+
+  short nlims = fIGMUSX+2; // 261+1=262 std::cout << "nlims: " << nlims << std::endl;
+  double *lims = new double[nlims];
+  
+  // The rest of the code is very similar to UsrBdx::Print and rdbdx.f
+
+  unsigned int ia = 1; // ??? set the 1st angular interval and assume it's the same for all the others - is it correct ??? 
+  unsigned int jg1 = ia*(fNEBXBN+fIGMUSX);
+  unsigned int jg2 = ia*(fNEBXBN+fIGMUSX)-fIGMUSX+1;
+  double en1 = fENGMAX[fIGMUSX];
+  double en2 = 0.0;
+
+  std::cout << "here" << std::endl;
+  for (unsigned int jg = jg1; jg>=jg2-1; jg--) { // here we say jg2-1 but not jg2 as in UsrBdx::Print and rdbdx.f since otherwise we lose the last interval
+    en1 = fENGMAX[jg-1];
+    std::cout << jg << " " << nlims-jg << "\t" << en1 << std::endl;
+    lims[nlims-jg] = en1;
+    //en1 = en2;
+  }
+  
+   // find lower limit of first bin above or straddling the
+  // n-group limit. Nhigh: counts the high energy bins
+  unsigned int nhigh = 0;
+  // for the time being, set energy boundary at n-group limit
+  float elimit = en1;
+  en1 = fEBXHGH;
+  for (unsigned int ie = 1; ie<=fNEBXBN; ie++) {
+    if (fITUSBX>0)  // type of the binning
+      en2 = en1 - fDEBXBN;
+    else
+      en2 = en1/fDEBXBN;
+    en1 = en2;
+    nhigh++;
+    if (en2<=elimit) break;
+  }
+
+  //     first bin above or straddling the n-group limit
+  if (fITUSBX>0)
+    en2 = en1 + fDEBXBN;
+  else
+    en2 = en1 * fDEBXBN;
+  float diff = fScored[ia*(fNEBXBN-nhigh+1)-1];
+  std::cout << en2 << "\t\t";
+  std::cout.precision(7);
+  std::cout << diff << std::endl;
+  en1 = en2;
+  
+  return lims; 
+}
+*/

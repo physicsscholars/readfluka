@@ -19,6 +19,7 @@ namespace ReadFluka {
 
     TString GetBinTitle() const;
     TH2F *Histogram() const; // note that this is a 3D histogram
+    TH2F *Histogram_len() const; // low energy neutrons
   };
 }
 #endif

@@ -34,9 +34,12 @@ int main(int argc, const char **argv)
 
   TFile *file = TFile::Open(fname_out.Data(), "recreate");
 
+  TH2F *hlen = 0;
   while (usrbdx->Read()) {
     usrbdx->Histogram()->Write();
     clog << usrbdx->GetBinName() << "  " << flush;
+    hlen = usrbdx->Histogram_len();
+    if (hlen) hlen->Write();
   }
   clog << endl;
 

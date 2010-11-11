@@ -36,12 +36,31 @@ TH2F *ROOT_UsrBdx::Histogram() const
   TH2F *h = new TH2F(GetBinName().data(), ROOT_UsrBdx::GetBinTitle().Data(), 
   		     GetNbinsE(), emin, emax,
   		     GetNbinsA(), amin, amax);
-
+  
   for (unsigned int i=1; i<=GetNbinsE(); i++)
     for (unsigned int j=1; j<=GetNbinsA(); j++)
       h->SetBinContent(i, j, GetScored(i, j));
-
+  
   h->SetEntries(GetEntryNumber());
+  
+  return h;
+}
+
+TH2F *ROOT_UsrBdx::Histogram_len() const
+{
+  /*
+    Make a low energy neutron histogram (if any)
+   */
+  
+  TH2F *h = 0;
+
+  double values[262];
+  double limits[262];
+  //XbinsE_len(values, limits);
+
+  if (IsReadNeutrons()) {
+    h = new TH2F("h", "", GetMaxNeutronGroup(), 2, 4, GetNbinsA(), GetAmin(), GetAmax());
+  }
 
   return h;
 }

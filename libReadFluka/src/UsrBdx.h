@@ -62,8 +62,13 @@ namespace ReadFluka {
     inline int GetID() const { return fIDUSBX; }
     inline int GetRegFrom() const { return fNR1USX; }
     inline int GetRegTo() const { return fNR2USX; }
-    inline bool IsReadNeutrons() const { return fLLNUSX; }
-    inline int GetMaxNeutronGroup() const { return fIGMUSX; }
+
+    inline bool GetLLNUSX() const { return fLLNUSX; }
+    inline bool IsReadNeutrons() const { return GetLLNUSX(); }
+
+    inline int GetIGMUSX() const { return fIGMUSX; }
+    inline int GetMaxNeutronGroup() const { return GetIGMUSX(); }
+
     inline float GetENGMAX(int i) const { return fENGMAX[i]; }
     inline bool IsOneWay() const { return !fLWUSBX; }
 
@@ -80,7 +85,9 @@ namespace ReadFluka {
 
     inline float GetAmin() const { return fABXLOW; }
     inline float GetAmax() const { return fABXHGH; }
-    inline unsigned int GetNbinsA() const { return fNABXBN; }
+
+    inline unsigned int GetNABXBN() const { return fNABXBN; }
+    inline unsigned int GetNbinsA() const { return GetNABXBN(); }
     inline float GetAwidth() const { return fDABXBN; }
 
     inline int GetNScored() const { return fNScored; }
@@ -92,6 +99,8 @@ namespace ReadFluka {
 
     const char* GetXtitle() const;
     const char* GetYtitle() const;
+
+    // void XbinsE_len() const;
 
     void Print() const;
   };
