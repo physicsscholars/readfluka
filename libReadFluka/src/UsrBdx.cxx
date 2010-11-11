@@ -192,6 +192,7 @@ const char* UsrBdx::GetYtitle() const
 
 void UsrBdx::Print() const
 {
+  std::cout << std::endl;
   std::cout << "Bdrx n. " << GetCardNumber() << " \"" << GetBinName() << "\"" <<  std::flush;
   std::cout << ", generalized particle n. " << GetID() << std::flush;
   std::cout << ", from region n. " << GetRegFrom() << " to region n. " << GetRegTo() << std::endl;
@@ -227,36 +228,39 @@ void UsrBdx::Print() const
     std::cout <<  GetNbinsA() << " bins (ratio: " << GetAwidth() << ")"  << std::endl;
   }
   
-  std::cout << "\tData follow in a matrix A(ie,ia), format (1(5x,1p,10(1x,e11.4)))" << std::endl;
+  //  std::cout << "\tData follow in a matrix A(ie,ia), format (1(5x,1p,10(1x,e11.4)))" << std::endl;
   int n = GetNScored();
   n = GetNbinsE()*GetNbinsA();
-  std::cout << std::endl << "\t";
-  for (unsigned int i=1; i<=GetNbinsA(); i++) {
-    for (unsigned int j=1; j<=GetNbinsE(); j++)
-      std::cout << GetScored(j, i) << " ";
+  /*
     std::cout << std::endl << "\t";
-  }
+    for (unsigned int i=1; i<=GetNbinsA(); i++) {
+    for (unsigned int j=1; j<=GetNbinsE(); j++)
+    std::cout << GetScored(j, i) << " ";
+    std::cout << std::endl << "\t";
+    }
+  */
   std::cout << std::endl;
-
-  // loop on angles
+  
+  // loop on angles - line 125
   double cumul = 0.0;
   for (unsigned int ia=1; ia<=fNABXBN; ia++) { // angular intervals
-    if (abs(fITUSBX)<1) { // linear in angle
-      std::cout << "UsrBdx::Read() - linear in angle" << std::endl;
+    if (abs(fITUSBX)<=1) { // linear in angle
+      std::cout << "\tAngle " << ia << " between " << fABXLOW + (ia-1)*fDABXBN << " and " << fABXLOW + ia*fDABXBN << " sr" << std::endl;
     } else { // logarithmic in angle
       if (ia == 1) // fist bin
-	std::cout << "Angle 1 between 0 and " << fABXLOW << " sr" << std::endl;
+	std::cout << "\tAngle 1 between 0 and " << fABXLOW << " sr" << std::endl;
       else
-	std::cout << "Angle " << ia << " between " << fABXLOW*pow(fDABXBN, ia-1) << " and " << fABXLOW*pow(fDABXBN, ia) << " sr" << std::endl;
+	std::cout << "\tAngle " << ia << " between " << fABXLOW*pow(fDABXBN, ia-1) << " and " << fABXLOW*pow(fDABXBN, ia) << " sr" << std::endl;
     }
-    
-    std::cout << "                                Double Differential      Angle-Integrated Cumulative" << std::endl;
-    if (!GetLFUSBX()) // fluence
-      std::cout << "                              Fluence (dPhi/dE/dOmega)      dPhi/dE      Fluence" << std::endl;                 
+
+    std::cout << std::endl;
+    std::cout << "\t                                Double Differential      Angle-Integrated Cumulative" << std::endl;
+    if (GetLFUSBX()) // fluence
+      std::cout << "\t                              Fluence (dPhi/dE/dOmega)      dPhi/dE        Fluence" << std::endl;                 
     else // current
-      std::cout << "                               Current (dJ/dE/dOmega)        dJ/dE        Current" << std::endl;
+      std::cout << "\t                               Current (dJ/dE/dOmega)        dJ/dE         Current" << std::endl;
     
-    std::cout << "Lower energy     Upper energy    cm**-2 GeV**-1 sr-1      cm**2 GeV-1     cm**-2" << std::endl;
+    std::cout << "\tLower energy     Upper energy    cm**-2 GeV**-1 sr-1      cm**2 GeV-1     cm**-2" << std::endl;
     
     float elimit = fEBXLOW;
     float en1,en2, angint;
@@ -270,13 +274,15 @@ void UsrBdx::Print() const
       unsigned int jg2 = ia*(fNEBXBN+fIGMUSX)-fIGMUSX+1;
       // kbat
       jg2--;
-      std::cout << "jg: " << jg1 << " " << jg2 << std::endl;
+      //std::cout << "jg: " << jg1 << " " << jg2 << std::endl;
       for (unsigned int jg=jg1; jg>=jg2; jg--) {
 	//	std::cout << "jg: " << jg << std::endl;
 	en2 = fENGMAX[jg-1];
 	angint = fScored[jg] * fDABXBN;
 	cumul += angint*(en2-en1);
-	std::cout << jg << "\t" << en1 << "\t" << en2 << "\t\t" << fScored[jg] << "\t" << angint << "\t" << cumul << std::endl;
+	std::cout  << "\t" << en1 << "\t" << en2 << "\t\t";
+	std::cout.precision(7);
+	std::cout << fScored[jg] << "\t" << angint << "\t" << cumul << std::endl;
 	ig--;
 	en1 = en2;
       }
@@ -307,12 +313,14 @@ void UsrBdx::Print() const
     float diff = fScored[ia*(fNEBXBN-nhigh+1)-1];
     angint = diff*fDABXBN;
     cumul += angint*(en2-elimit);
-    std::cout << "\t" << elimit << "\t" << en2 << "\t\t" << diff << "\t" << angint << "\t" << cumul << std::endl;
+    std::cout << "\t" << elimit << "\t" << en2 << "\t\t";
+    std::cout.precision(7);
+    std::cout << diff << "\t" << angint << "\t" << cumul << std::endl;
     en1 = en2;
 
     //     -------- loop on energies above the n-group limit ----------
     // line 205 !!! this section have not yet been checked !!!
-    std::cout << " nhigh: " << nhigh << std::endl;
+    //std::cout << " nhigh: " << nhigh << std::endl;
     for (unsigned int ie=2; ie<=nhigh; ie++) {
       if (fITUSBX > 0) // binning is linear
 	en2 = en1 + fDEBXBN;
