@@ -79,7 +79,8 @@ bool UsxSuw::Read()
   std::vector<float> vtmp;
 
   //  std::cerr << "Read begin" << std::endl;
-  for (int jj=0; jj<10; jj++) {
+  int jj=0;
+  for (;;) {
     fNX = ReadInt();  std::cout << "NX: " << fNX << std::endl;
     
     // line 526 in usxsuw.f
@@ -134,6 +135,7 @@ bool UsxSuw::Read()
     if (ReadStatFlag(false) == true) {
       break;
     } //else for (int iii=0; iii<3; iii++) std::cout << ReadInt(iii) << std::endl;
+    jj++;
   }
 
   /*  // INTERV - total number of enery intervals
