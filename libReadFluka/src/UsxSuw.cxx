@@ -2,6 +2,8 @@
 #include <sstream>
 #include <cstring>
 #include <cstdlib> // for exit()
+#include <algorithm>
+#include <numeric>
 
 #include "UsxSuw.h" ///////                                !!! NOT YET FINISHED !!!
 
@@ -25,7 +27,7 @@ UsxSuw::~UsxSuw()
 
 void UsxSuw::Reset()
 {
-  fNX = 0;
+  // fNX = 0;
   fTITUSX.clear();
   fITUSBX.clear();
   fIDUSBX.clear();
@@ -46,11 +48,14 @@ void UsxSuw::Reset()
 
   fIGMUSX.clear();
   fENGMAX.clear();
-
+  fEPGMAX.clear();
   fNScored.clear();
   fScored.clear();
 
   fGDSTOR.clear();
+  
+  fTOTTOT.clear();
+  
 }
 
 void UsxSuw::ReadHeader()
@@ -73,15 +78,18 @@ bool UsxSuw::Read()
   if (fin->eof()) return false; // exit the while-loop if reached the end of the file
   Reset();
 
+  int NX;
   int KLAST = 0;
   int K0, K1, K2;
   char *mychar = new char[11];
   std::vector<float> vtmp;
+  double totresp, dtmp;
 
   //  std::cerr << "Read begin" << std::endl;
-  int jj=0;
+  int record=0;
   for (;;) {
-    fNX = ReadInt();  std::cout << "NX: " << fNX << std::endl;
+    totresp = 0.0;
+    NX = ReadInt();  std::cout << "NX: " << NX << std::endl;
     
     // line 526 in usxsuw.f
     
@@ -101,42 +109,64 @@ bool UsxSuw::Read()
 
     CheckFormat();
 
-    if (fLLNUSX[jj]) { //std::cout << " read low energy neutrons" << std::endl;
-      //  CheckFormat();
+    if (fLLNUSX[record]) {  // low energy neutrons
+      // std::cout << " read low energy neutrons" << std::endl;
 
       fIGMUSX.push_back(ReadInt()); //std::cout << "igmusx: " << fIGMUSX << std::endl;
-      if (fIGMUSX[jj] != 260) {
-	std::cerr << std::endl << "UsxSuw::Read: strange, but number of neutron groups is " << fIGMUSX[jj] << " but not 260" << std::endl;
+      if (fIGMUSX[record] != 260) {
+	std::cerr << std::endl << "UsxSuw::Read: strange, but number of neutron groups is " << fIGMUSX[record] << " but not 260" << std::endl;
       }
       
       // line 534 in usxsuw.f
       vtmp.clear();
-      for (int i=0; i<fIGMUSX[jj]+1; i++) {
-	vtmp.push_back(ReadFloat());
+      for (int j=0; j<fIGMUSX[record]+1; j++) { // loop over all low energy groups (260) plus one bin
+	dtmp = ReadFloat();
+	vtmp.push_back(dtmp);
       }
+      totresp +=  std::accumulate(vtmp.begin(), vtmp.end(), 0.0f);
       fENGMAX.push_back(vtmp);
-      
+
       CheckFormat();
     } else fIGMUSX.push_back(0);
 
     K0 = KLAST + 1;
-    K1 = fNEBXBN[jj] * fNABXBN[jj] + K0 - 1; // total number of bins + K0 - 1
-    K2 = K1 + fIGMUSX[jj]*fNABXBN[jj];
+    K1 = fNEBXBN[record] * fNABXBN[record] + K0 - 1; // total number of bins + K0 - 1
+    K2 = K1 + fIGMUSX[record]*fNABXBN[record];
     KLAST = K2;
 
     vtmp.clear();
-    for (int j=K0; j<=K2; j++) vtmp.push_back(ReadFloat());
+    for (int j=K0; j<=K2; j++) {
+      dtmp = ReadFloat(); 
+      vtmp.push_back(dtmp);
+    }
+    totresp += std::accumulate(vtmp.begin(), vtmp.end(), 0.0f);
     fGDSTOR.push_back(vtmp); // line 540 in usxsuw.f
+
+    std::cout << "totresp: " << totresp << std::endl;
+    fTOTTOT.push_back(totresp);
 
     CheckFormat();
 
-    Print(jj);
+    Print(record);
     
     if (ReadStatFlag(false) == true) {
       break;
     } //else for (int iii=0; iii<3; iii++) std::cout << ReadInt(iii) << std::endl;
-    jj++;
+    record++;
   }
+
+  const int Nrecords = record;
+  for (record=0; record<=Nrecords; record++) {
+    NX = record;
+    //  MX = 0; //!!! check this !!! - total number of detectors?
+  }
+
+  // Read Statistics
+
+  KLAST = 0;
+
+  //  for (int j=0; j<10; j++) std::cout << ReadFloat() << std::endl;
+
 
   /*  // INTERV - total number of enery intervals
   // (interval above the limit of n-groups+ intervals below)
@@ -223,8 +253,9 @@ const char* UsxSuw::GetYtitle(int i) const
 
 void UsxSuw::Print(int i) const
 {
+  std::cout << "UsxSuw::Print" << std::endl;
   std::cout << std::endl;
-  std::cout << "Detector n. " << GetCardNumber() << " " << GetBinName(i) <<  std::endl;
+  std::cout << "Detector n. " << i+1 << " " << GetBinName(i) <<  std::endl;
   std::cout << "\t(Area: " << GetArea(i) << " cmq," << std::endl;
   std::cout << "\t distr. scored: " << GetID(i) << "," << std::endl;
   std::cout << "\t from reg " << GetRegFrom(i) << " to " << GetRegTo(i) << "," << std::endl;
@@ -240,6 +271,20 @@ void UsxSuw::Print(int i) const
     std::cout << "\t fluence scoring)" << std::endl;
   else
     std::cout << "\t current scoring)" << std::endl;
+
+  std::cout << std::endl << "\t Tot. resp. (Part/cmq/pr) " << fTOTTOT[i] << std::endl;
+
+  std::cout << "\t**** Different. Fluxes as a function of energy ****" << std::endl;
+  std::cout << "\t****      (integrated over solid angle)        ****" << std::endl;
+  
+  std::cout << "\t Energy boundaries (GeV):" << std::endl;
+
+  GetALowEdge(i);
+  for (int ii=0; ii<GetNbinsA(i); ii++)
+    std::cout << "width: " << GetAwidthRAD(i, ii)  << " rad"<< std::endl;
+  
+  //  for (int j=1; j<fNEBXBN(i); j++)
+  //  std::cout <<  << std::endl;
 
   /* std::cout.precision(4);
 
@@ -464,3 +509,52 @@ void UsxSuw::Print(int i) const
   return lims; 
 }
 */
+
+
+std::vector<float> UsxSuw::GetALowEdge(unsigned int i) const
+{
+  /*
+    Return low edges for angular bins. The array size is bin+1 (since we want to know the high edge for the last bin)
+   */
+
+  std::vector<float> vec;
+  float val;
+
+  //  std::cout << "angular intervals: " << fNABXBN[i] << " between " << fABXLOW[i] << " and " << fABXHGH[i] << " rad" << std::endl;
+  for (int ia=1; ia<=fNABXBN[i]+1; ia++) {
+    if (abs(fITUSBX[i])<=1) { // linear in angle
+      val = fABXLOW[i] + (ia-1)*fDABXBN[i];
+      vec.push_back(val);
+    } else { // logarithmic in angle
+      if (ia == 1) {// fist bin
+	vec.push_back(0.0f); // see note 2 for USRBDX on page 237
+	val = fABXLOW[i]; //std::cout << "first bin log val: " << val << std::endl;
+        vec.push_back(val);
+      } else {
+	if (ia!=fNABXBN[i]+1) {
+	  val = fABXLOW[i]*pow(fDABXBN[i], ia-1); //std::cout << "log val: " << val << std::endl;
+	  vec.push_back(val);
+	}
+      }
+    }
+  }
+  /*  std::cout << "size: " << vec.size() << std::endl;
+  for (int ia=0; ia<vec.size(); ia++) 
+  std::cout << "bin" << ia << " "  << vec[ia] << " " << std::endl;*/
+
+  return vec;
+}
+
+float UsxSuw::GetAwidthRAD(unsigned int i, unsigned int bin) const
+{
+  /*
+    Return the width of 'bin'th bin in the 'i'th distribution. The result is always in Radians even if log binning has been requested.
+   */
+
+  std::vector<float> edges = GetALowEdge(i);
+  if (bin>edges.size()) {
+    std::cerr << "WARNING: UsxSuw::GetAwidthRAD: bin = " << bin << " > " << edges.size() << std::endl;
+    return 0;
+  }
+  return edges[bin+1]-edges[bin];
+}

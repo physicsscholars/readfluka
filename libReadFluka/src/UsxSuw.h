@@ -17,7 +17,7 @@
 namespace ReadFluka {
   class UsxSuw : public Base {
   private:
-    int        fNX;        // USRBDX card number
+    //int        fNX;        // USRBDX card number
     float      fWCTOT; // total weight
     int        fNCTOT; // total number of incident particles
     int        fMCTOT;
@@ -31,7 +31,7 @@ namespace ReadFluka {
     std::vector<float> fAUSBDX; // area of the detector
     std::vector<bool> fLWUSBX; // one way if false, two ways if true
     std::vector<bool> fLFUSBX; // current if false, fluence if true
-    std::vector<bool> fLLNUSX; // no low energy neutron scoring if false, yes if true
+    std::vector<bool> fLLNUSX; // low energy neutron scoring if true
 
     std::vector<float> fEBXLOW; // min energy
     std::vector<float> fEBXHGH; // max energy
@@ -46,10 +46,14 @@ namespace ReadFluka {
 
     std::vector<int> fIGMUSX; // maximum low energy neutron group to be scored
     std::vector< std::vector<float> > fENGMAX; // array of the low energy neutron data
+    std::vector< std::vector<float> > fEPGMAX; // energy boundaries for each distribution
+
 
     std::vector<int> fNScored; // number of scored values (INTERV*fNABXBN)
     std::vector< std::vector<float> > fScored;  // array with scored data
     std::vector< std::vector<float> > fGDSTOR;
+
+    std::vector<double> fTOTTOT; // total responce
 
     bool       fIsReadHeader;
     void       ReadHeader();
@@ -65,7 +69,7 @@ namespace ReadFluka {
     inline float GetWeight() const { return fWCTOT; }
 
     inline float GetArea(int i) const { return fAUSBDX[i]; }
-    inline int GetCardNumber() const { return fNX; }
+    //    inline int GetCardNumber() const { return fNX; }
     std::string GetBinName(int i) const {return fTITUSX[i]; }
     std::string GetBinTitle(int i) const;
     inline int GetID(int i) const { return fIDUSBX[i]; }
@@ -108,6 +112,9 @@ namespace ReadFluka {
 
     const char* GetXtitle(int i) const;
     const char* GetYtitle(int i) const;
+
+    std::vector<float> GetALowEdge(unsigned int i) const;
+    float GetAwidthRAD(unsigned int i, unsigned int bin) const;
 
     // void XbinsE_len() const;
 
