@@ -279,9 +279,9 @@ void UsxSuw::Print(int i) const
   
   std::cout << "\t Energy boundaries (GeV):" << std::endl;
 
-  GetALowEdge(i);
-  for (int ii=0; ii<GetNbinsA(i); ii++)
-    std::cout << "width: " << GetAwidthRAD(i, ii)  << " rad"<< std::endl;
+  GetELowEdge(i);
+  for (unsigned int ii=0; ii<GetNbinsA(i); ii++)
+    std::cout << "awidth: " << GetAwidthRAD(i, ii)  << " rad"<< std::endl;
   
   //  for (int j=1; j<fNEBXBN(i); j++)
   //  std::cout <<  << std::endl;
@@ -521,7 +521,7 @@ std::vector<float> UsxSuw::GetALowEdge(unsigned int i) const
   float val;
 
   //  std::cout << "angular intervals: " << fNABXBN[i] << " between " << fABXLOW[i] << " and " << fABXHGH[i] << " rad" << std::endl;
-  for (int ia=1; ia<=fNABXBN[i]+1; ia++) {
+  for (unsigned int ia=1; ia<=fNABXBN[i]+1; ia++) {
     if (abs(fITUSBX[i])<=1) { // linear in angle
       val = fABXLOW[i] + (ia-1)*fDABXBN[i];
       vec.push_back(val);
@@ -557,4 +557,33 @@ float UsxSuw::GetAwidthRAD(unsigned int i, unsigned int bin) const
     return 0;
   }
   return edges[bin+1]-edges[bin];
+}
+
+std::vector<float> UsxSuw::GetELowEdge(unsigned int i) const
+{
+  /*
+    Return low edges for energy bins. ???The array size is bin+1 (since we want to know the high edge for the last bin)???
+   */
+
+  std::cerr << "UsxSuw::ELowEdge: NOT YET IMPLEMENTED" << std::endl;
+
+  std::vector<float> vec;
+  float val;
+  unsigned int nint = fNEBXBN[i]; // number of energy intervals without low energy neutrons
+
+  std::cout << "energy intervals: " << nint << " between " << fEBXLOW[i] << " and " << fEBXHGH[i] << " GeV" << std::endl;
+  for (unsigned int ie=1; ie<=nint+1; ie++) {
+    if (fITUSBX[i]>0) { // linear in energy
+      val = fEBXLOW[i] + (ie-1)*fDEBXBN[i];
+      vec.push_back(val);
+    } else { // logarithmic in energy
+      val = fEBXLOW[i]*pow(fDEBXBN[i], ie-1); //std::cout << "log val: " << val << std::endl;
+      vec.push_back(val);
+    }
+  }
+  std::cout << "esize: " << vec.size() << std::endl;
+  for (int ie=0; ie<vec.size(); ie++) 
+  std::cout << "ebin" << ie << " "  << vec[ie] << " " << std::endl;
+
+  return vec;
 }
