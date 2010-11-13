@@ -49,13 +49,20 @@ void UsxSuw::Reset()
   fIGMUSX.clear();
   fENGMAX.clear();
   fEPGMAX.clear();
-  fNScored.clear();
-  fScored.clear();
 
+  fGBSTOR.clear();
   fGDSTOR.clear();
   
   fTOTTOT.clear();
-  
+  fTOTERR.clear();
+
+  fTotResp.clear();
+  fTotRespErr.clear();
+
+  fFlux.clear();
+  fFluxErr.clear();
+  fCumulFlux.clear();
+  fCumulFluxErr.clear();
 }
 
 void UsxSuw::ReadHeader()
@@ -85,11 +92,11 @@ bool UsxSuw::Read()
   std::vector<float> vtmp;
   double totresp, dtmp;
 
-  //  std::cerr << "Read begin" << std::endl;
+  //std::cerr << "Read begin" << std::endl;
   int record=0;
   for (;;) {
     totresp = 0.0;
-    NX = ReadInt();  std::cout << "NX: " << NX << std::endl;
+    NX = ReadInt();  //std::cout << "NX: " << NX << std::endl;
     
     // line 526 in usxsuw.f
     
@@ -142,12 +149,12 @@ bool UsxSuw::Read()
     totresp += std::accumulate(vtmp.begin(), vtmp.end(), 0.0f);
     fGDSTOR.push_back(vtmp); // line 540 in usxsuw.f
 
-    std::cout << "totresp: " << totresp << std::endl;
+    //std::cout << "totresp: " << totresp << std::endl;
     fTOTTOT.push_back(totresp); // !!! the same numbers can be read from file - see below
 
     CheckFormat();
 
-    Print(record);
+    //    Print(record);
     
     if (ReadStatFlag(false) == true) {
       break;
@@ -161,26 +168,61 @@ bool UsxSuw::Read()
     //  MX = 0; //!!! check this !!! - total number of detectors?
     CheckFormat();
     //    fTOTTOT.push_back(ReadFloat());
-    float t1 = ReadFloat();
-    float t2 = ReadFloat();
-    std::cout << "Total responce read from file: " << t1 << " +- " << t2 << std::endl;
+    //    float t1 = ReadFloat();
+    //float t2 = ReadFloat();
+    fTotResp.push_back(ReadFloat());
+    fTotRespErr.push_back(ReadFloat());
+    //std::cout << "Total responce read from file: " << t1 << " +- " << t2 << std::endl;
+    //fTOTERR.push_back(t2);
     CheckFormat();
 
-    PrintInt(2);
-    PrintFloat(4);
-    CheckFormat();
+    
+    int nebxbn = ReadInt(); // line 654
+    int igmusx = ReadInt();
 
-    PrintFloat(2);
-    CheckFormat();
+    //std::cout << "ebxlow: old=" << fEBXLOW[record] << std::endl;
+    PrintFloat(1);
 
-    PrintFloat(2);
+    //std::cout << "epgmax (energy boundaries):" << std::endl;
+    for (int ii=0; ii<nebxbn+igmusx+1; ii++) {
+      std::cerr << ii << " " << ReadFloat() << std::endl;
+    }
+    
     CheckFormat();
     
+    vtmp.clear();
+    for (int ii=0; ii<GetNbinsTotal(record); ii++) { // flux
+      vtmp.push_back(ReadFloat());
+    }
+    // FLUKA writes the array in a reverse way, so we reverse it again:
+    //std::reverse(vtmp.begin(), vtmp.end());
+    fFlux.push_back(vtmp); 
+
+    CheckFormat();
+
+    vtmp.clear();
+    for (int ii=0; ii<GetNbinsTotal(record); ii++) { // flux error
+      vtmp.push_back(ReadFloat());
+    }
+    //std::reverse(vtmp.begin(), vtmp.end());
+    fFluxErr.push_back(vtmp);
+    CheckFormat();
+
+    vtmp.clear();
+    for (int ii=0; ii<GetNbinsTotal(record); ii++) { // cumulative flux
+      vtmp.push_back(ReadFloat());
+    }
+    fCumulFlux.push_back(vtmp);
+    CheckFormat();
+
+    vtmp.clear();
+    for (int ii=0; ii<GetNbinsTotal(record); ii++) { // cumulative flux error
+      vtmp.push_back(ReadFloat());
+    }
+    fCumulFluxErr.push_back(vtmp);
+    CheckFormat();
   }
 
-  // Read Statistics
-
-  KLAST = 0;
 
   //  for (int j=0; j<10; j++) std::cout << ReadFloat() << std::endl;
 
@@ -198,6 +240,9 @@ bool UsxSuw::Read()
   */
 
   delete [] mychar; mychar = 0; // is it ok? !!!
+
+  Print(0);
+
   return true;
 }
 
@@ -270,17 +315,17 @@ const char* UsxSuw::GetYtitle(int i) const
 
 void UsxSuw::Print(int i) const
 {
-  std::cout << "UsxSuw::Print" << std::endl;
+  std::cerr << "UsxSuw::Print" << std::endl;
   std::cout << std::endl;
-  std::cout << "Detector n. " << i+1 << " (" << i+1 << ") " << GetBinName(i) <<  std::endl;
+  std::cout << "Detector n: " << i+1 << " (" << i+1 << ") " << GetBinName(i) <<  std::endl;
   std::cout << "\t(Area: " << GetArea(i) << " cmq," << std::endl;
   std::cout << "\t distr. scored: " << GetID(i) << "," << std::endl;
-  std::cout << "\t from reg " << GetRegFrom(i) << " to " << GetRegTo(i) << "," << std::endl;
+  std::cout << "\t from reg. " << GetRegFrom(i) << " to " << GetRegTo(i) << "," << std::endl;
   if (IsReadNeutrons(i)) {
     std::cout << "\t low energy neutrons scored from group 1" << " to group " << GetMaxNeutronGroup(i) << std::endl;
   }
   if (IsOneWay(i) == true) 
-    std::cout << "\t one way scoring" << std::endl; 
+    std::cout << "\t one way scoring," << std::endl; 
   else
     std::cout << "\t this is a two ways estimator" << std::endl;
   
@@ -290,8 +335,10 @@ void UsxSuw::Print(int i) const
     std::cout << "\t current scoring)" << std::endl;
 
   std::cout << std::endl;
-  std::cout << "\tTot. resp. (Part/cmq/pr) " << AsFortran( GetTotalResponce(i) , 6 ) << std::endl;
-  std::cout << "\t( -->      (Part/pr)     " << AsFortran( GetTotalResponce(i)/fAUSBDX[i], 6 ) << std::endl;
+  std::cout << "\tTot. resp. (Part/cmq/pr) " << AsFortran( fTotResp[i] , 6 )
+	    << " +/- " << AsFortran( 100.0*fTotRespErr[i], 5) << " %" << std::endl;
+  std::cout << "\t( -->      (Part/pr)     " <<AsFortran( fTotResp[i]/fAUSBDX[i], 6 )
+	    << " +/- " << AsFortran( 100.0*fTotRespErr[i]/fAUSBDX[i], 5) << " % )" << std::endl;
 
   std::cout << std::endl;
   std::cout << "\t**** Different. Fluxes as a function of energy ****" << std::endl;
@@ -301,9 +348,8 @@ void UsxSuw::Print(int i) const
 
   std::vector<float> elowedges = GetELowEdge(i);
   std::cout << "\t  ";
-  std::cout.precision(7);
   for (unsigned int ii=elowedges.size()-1; ii>0; ii--) { // do not print the lowest boundary here (ii>0) instead of (ii>=0)
-    std::cout << elowedges[ii] << " ";
+    std::cout << AsFortran(elowedges[ii], 6) << " ";
   }
   std::cout << std::endl;
   std::cout << "\t Lowest boundary (GeV): " << AsFortran(elowedges[0], 6) << std::endl;
@@ -312,13 +358,39 @@ void UsxSuw::Print(int i) const
   std::cout << "\t Flux (Part/GeV/cmq/pr):" << std::endl;
   std::cout << "\t  ";
 
-  for (int ii=fGDSTOR[i].size()-1; ii>=0; ii--) {
-    std::cout << AsFortran(fGDSTOR[i][ii]*(fABXHGH[i]-fABXLOW[i]), 6) << " ";
+  for (int ii=0; ii<fGDSTOR[i].size(); ii++) {
+    /*
+      This line is actually the same as the uncommented one (fFlux):
+      std::cout << AsFortran(fGDSTOR[i][ii]*(fABXHGH[i]-fABXLOW[i]), 6) << " ";
+    */
+    std::cout << AsFortran( fFlux[i][ii], 6 ) << " +/- " << AsFortran( 100.0*fFluxErr[i][ii], 5 ) << " %\t";
+  }
+  std::cout << std::endl << std::endl;
+
+  std::cout << "\t**** Cumulative Fluxes as a function of energy ****" << std::endl
+	    << "\t****      (integrated over solid angle)        ****" << std::endl;
+
+  std::cout << "\t Energy boundaries (GeV):" << std::endl;
+
+  //  std::vector<float> elowedges = GetELowEdge(i);
+  std::cout << "\t  ";
+  for (unsigned int ii=elowedges.size()-1; ii>0; ii--) { // do not print the lowest boundary here (ii>0) instead of (ii>=0)
+    std::cout << AsFortran(elowedges[ii], 6) << " ";
+  }
+  std::cout << std::endl;
+  std::cout << "\t Lowest boundary (GeV): " << AsFortran(elowedges[0], 6) << std::endl;
+
+  std::cout << "\t Cumul. Flux (Part/cmq/pr):" << std::endl;
+  std::cout << "\t  ";
+  for (unsigned int ii=0; ii<elowedges.size()-1; ii++) {
+    std:: cout << AsFortran(fCumulFlux[i][ii], 6) << " +/- "
+	       << AsFortran(100*fCumulFluxErr[i][ii], 5) << " %\t";
   }
   std::cout << std::endl;
 
-  for (unsigned int ii=0; ii<GetNbinsA(i); ii++)
-    std::cout << "awidth: " << GetAwidthRAD(i, ii)  << " rad"<< std::endl;
+
+  //  for (unsigned int ii=0; ii<GetNbinsA(i); ii++)
+  //  std::cout << "awidth: " << GetAwidthRAD(i, ii)  << " rad"<< std::endl;
   
   //  for (int j=1; j<fNEBXBN(i); j++)
   //  std::cout <<  << std::endl;
@@ -602,7 +674,7 @@ std::vector<float> UsxSuw::GetELowEdge(unsigned int i) const
     Return low edges for energy bins. ???The array size is bin+1 (since we want to know the high edge for the last bin)???
    */
 
-  std::cerr << "UsxSuw::ELowEdge: NOT YET IMPLEMENTED" << std::endl;
+  //  std::cerr << "UsxSuw::ELowEdge: NOT YET IMPLEMENTED" << std::endl;
 
   std::vector<float> vec;
   float val;
@@ -629,6 +701,7 @@ std::vector<float> UsxSuw::GetELowEdge(unsigned int i) const
 float UsxSuw::GetTotalResponce(unsigned int i) const
 {
   /*
+    --- The same as fTotResp[i] ---
     Return the total responce of the i-th detector [Part/GeV/cmq/primary]
     Note that in *_sum.lis produced by usxsuw it's somewhat written [Part/cmq/primary] - without GeV. WHY???
    */

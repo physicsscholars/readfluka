@@ -325,9 +325,9 @@ void Base::PrintInt(unsigned int n) const
   /*
     Read and print n integers. Usefull for guessing the format of undocumented FLUKA files.
    */
-  std::cout << "int:\t";
-  for (unsigned int i=0; i<n; i++) std::cout << ReadInt() << " ";
-  std::cout << std::endl;
+  std::cerr << "int:\t";
+  for (unsigned int i=0; i<n; i++) std::cerr << ReadInt() << " ";
+  std::cerr << std::endl;
 }
 
 void Base::PrintFloat(unsigned int n) const
@@ -335,7 +335,7 @@ void Base::PrintFloat(unsigned int n) const
   /*
     Read and print n float. Usefull for guessing the format of undocumented FLUKA files.
    */
-  std::cout << "float:\t";
-  for (unsigned int i=0; i<n; i++) std::cout << ReadFloat() << " ";
-  std::cout << std::endl;
+  std::cerr << "float:\t";
+  for (unsigned int i=0; i<n; i++) std::cerr << ReadFloat() << " ";
+  std::cerr << std::endl;
 }

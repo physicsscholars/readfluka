@@ -48,11 +48,21 @@ namespace ReadFluka {
     std::vector< std::vector<float> > fENGMAX; // array of the low energy neutron data
     std::vector< std::vector<float> > fEPGMAX; // energy boundaries for each distribution
 
-    std::vector<int> fNScored; // number of scored values (INTERV*fNABXBN)
-    std::vector< std::vector<float> > fScored;  // array with scored data
-    std::vector< std::vector<float> > fGDSTOR;
+    //    std::vector<int> fNScored; // number of scored values (INTERV*fNABXBN)
+    std::vector< std::vector<float> > fGDSTOR; // array with flux (Part/GeV/cmq/pr)
+    std::vector< std::vector<float> > fGBSTOR; // arrary with flux errors
 
     std::vector<float> fTOTTOT; // total responce not normalized by GeV and sr. See also UsxSuw::GetTotalResponce(unsigned int) const
+    std::vector<float> fTOTERR; // relative error of the total responce
+
+    std::vector<float> fTotResp; // what is the difference with fTOTTOT???
+    std::vector<float> fTotRespErr; // difference with fTOTERR?
+
+    // our own vectors for flux in order not putting it in GDSTOR:
+    std::vector< std::vector<float> > fFlux;
+    std::vector< std::vector<float> > fFluxErr;
+    std::vector< std::vector<float> > fCumulFlux;
+    std::vector< std::vector<float> > fCumulFluxErr;
 
     bool       fIsReadHeader;
     void       ReadHeader();
@@ -102,7 +112,8 @@ namespace ReadFluka {
     inline unsigned int GetNbinsA(int i) const { return GetNABXBN(i); }
     inline float GetAwidth(int i) const { return fDABXBN[i]; }
 
-    inline int GetNScored(int i) const { return fNScored[i]; }
+    inline unsigned int GetNbinsTotal(int i) const { return GetNbinsE(i)*GetNbinsA(i); }
+    //    inline int GetNScored(int i) const { return fNScored[i]; }
     //    inline float *GetScored() const { return fScored; }
     float GetScored(unsigned int ie, unsigned int ia) const;
 
