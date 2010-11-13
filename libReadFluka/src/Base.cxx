@@ -265,7 +265,7 @@ bool Base::ReadStatFlag(bool doExit)
   //CheckFormat(doExit);
   //int position0 = fin->tellg();
   //  std::cout << "position: " << position0 << " " << position << std::endl;
-  char *value = "STATISTICS";
+  const char *value = "STATISTICS";
   const unsigned short n = strlen(value);
   char flag[n];
   fin->read(flag, n);
@@ -296,7 +296,7 @@ std::string Base::Trimmed(std::string const& str, char const* sepSet)
 		 sepSet - C string with characters to be dropped
 	*/
 
-	std::string::size_type const first = str.find_first_not_of(sepSet);
+  std::string::size_type const first = str.find_first_not_of(sepSet);
   return ( first==std::string::npos )  ? std::string() : str.substr(first, str.find_last_not_of(sepSet)-first+1);
 }
 
@@ -304,4 +304,38 @@ void Base::Warning(const char *msg) const
 {
   std::cerr << "WARNING: " << std::flush;
   std::cerr << msg << std::endl;
+}
+
+std::string Base::AsFortran(double val, int precision, std::ios_base::fmtflags flags) const
+{
+  /*
+    This method is to be used to print 'val' with a given precision, so we can diff it with the Fortran output.
+   */
+  //  std::ios_base::fmtflags flags=std::ios::fixed;
+  std::ostringstream str;
+  str.precision(precision);
+  str.setf(flags);
+  str << val;
+
+  return str.str();
+}
+
+void Base::PrintInt(unsigned int n) const
+{
+  /*
+    Read and print n integers. Usefull for guessing the format of undocumented FLUKA files.
+   */
+  std::cout << "int:\t";
+  for (unsigned int i=0; i<n; i++) std::cout << ReadInt() << " ";
+  std::cout << std::endl;
+}
+
+void Base::PrintFloat(unsigned int n) const
+{
+  /*
+    Read and print n float. Usefull for guessing the format of undocumented FLUKA files.
+   */
+  std::cout << "float:\t";
+  for (unsigned int i=0; i<n; i++) std::cout << ReadFloat() << " ";
+  std::cout << std::endl;
 }

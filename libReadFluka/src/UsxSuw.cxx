@@ -142,8 +142,8 @@ bool UsxSuw::Read()
     totresp += std::accumulate(vtmp.begin(), vtmp.end(), 0.0f);
     fGDSTOR.push_back(vtmp); // line 540 in usxsuw.f
 
-    // std::cout << "totresp: " << totresp << std::endl;
-    fTOTTOT.push_back(totresp);
+    std::cout << "totresp: " << totresp << std::endl;
+    fTOTTOT.push_back(totresp); // !!! the same numbers can be read from file - see below
 
     CheckFormat();
 
@@ -159,6 +159,23 @@ bool UsxSuw::Read()
   for (record=0; record<=Nrecords; record++) {
     NX = record;
     //  MX = 0; //!!! check this !!! - total number of detectors?
+    CheckFormat();
+    //    fTOTTOT.push_back(ReadFloat());
+    float t1 = ReadFloat();
+    float t2 = ReadFloat();
+    std::cout << "Total responce read from file: " << t1 << " +- " << t2 << std::endl;
+    CheckFormat();
+
+    PrintInt(2);
+    PrintFloat(4);
+    CheckFormat();
+
+    PrintFloat(2);
+    CheckFormat();
+
+    PrintFloat(2);
+    CheckFormat();
+    
   }
 
   // Read Statistics
@@ -273,8 +290,8 @@ void UsxSuw::Print(int i) const
     std::cout << "\t current scoring)" << std::endl;
 
   std::cout << std::endl;
-  std::cout << "\tTot. resp. (Part/cmq/pr) " << GetTotalResponce(i) << std::endl;
-  std::cout << "\t( -->      (Part/pr)     " << GetTotalResponce(i)/fAUSBDX[i] << std::endl;
+  std::cout << "\tTot. resp. (Part/cmq/pr) " << AsFortran( GetTotalResponce(i) , 6 ) << std::endl;
+  std::cout << "\t( -->      (Part/pr)     " << AsFortran( GetTotalResponce(i)/fAUSBDX[i], 6 ) << std::endl;
 
   std::cout << std::endl;
   std::cout << "\t**** Different. Fluxes as a function of energy ****" << std::endl;
@@ -289,14 +306,16 @@ void UsxSuw::Print(int i) const
     std::cout << elowedges[ii] << " ";
   }
   std::cout << std::endl;
-  std::cout << "\t Lowest boundary (GeV): " << elowedges[0] << std::endl;
+  std::cout << "\t Lowest boundary (GeV): " << AsFortran(elowedges[0], 6) << std::endl;
 
   std::cout << std::endl;
   std::cout << "\t Flux (Part/GeV/cmq/pr):" << std::endl;
   std::cout << "\t  ";
-  for (unsigned int ii=0; ii<fGDSTOR[i].size(); ii++) {
-    std::cout << fGDSTOR[i][ii]*(fABXHGH[i]-fABXLOW[i]) << " " << std::endl;
+
+  for (int ii=fGDSTOR[i].size()-1; ii>=0; ii--) {
+    std::cout << AsFortran(fGDSTOR[i][ii]*(fABXHGH[i]-fABXLOW[i]), 6) << " ";
   }
+  std::cout << std::endl;
 
   for (unsigned int ii=0; ii<GetNbinsA(i); ii++)
     std::cout << "awidth: " << GetAwidthRAD(i, ii)  << " rad"<< std::endl;
@@ -613,5 +632,7 @@ float UsxSuw::GetTotalResponce(unsigned int i) const
     Return the total responce of the i-th detector [Part/GeV/cmq/primary]
     Note that in *_sum.lis produced by usxsuw it's somewhat written [Part/cmq/primary] - without GeV. WHY???
    */
-  return fTOTTOT[i]*(fEBXHGH[i]-fEBXLOW[i])*(fABXHGH[i]-fABXLOW[i]);
+  
+  // why divide by fNEBXBN[i]
+  return fTOTTOT[i]*(fEBXHGH[i]-fEBXLOW[i])*(fABXHGH[i]-fABXLOW[i])/fNEBXBN[i];
 }

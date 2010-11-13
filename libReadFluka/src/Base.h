@@ -71,6 +71,9 @@ namespace ReadFluka {
 
     bool ReadStatFlag(bool doExit=true);
     void Warning(const char *msg) const;
+    std::string AsFortran(double val, int precision, std::ios_base::fmtflags flags=std::ios::fixed) const;
+    void PrintInt(unsigned int n) const;
+    void PrintFloat(unsigned int n) const;
     
     std::string                 Trimmed(std::string const& str, char const* sepSet=" ");
     std::ifstream              *GetFile() const {return fin;}
