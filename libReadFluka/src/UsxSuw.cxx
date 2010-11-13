@@ -142,7 +142,7 @@ bool UsxSuw::Read()
     totresp += std::accumulate(vtmp.begin(), vtmp.end(), 0.0f);
     fGDSTOR.push_back(vtmp); // line 540 in usxsuw.f
 
-    std::cout << "totresp: " << totresp << std::endl;
+    // std::cout << "totresp: " << totresp << std::endl;
     fTOTTOT.push_back(totresp);
 
     CheckFormat();
@@ -255,7 +255,7 @@ void UsxSuw::Print(int i) const
 {
   std::cout << "UsxSuw::Print" << std::endl;
   std::cout << std::endl;
-  std::cout << "Detector n. " << i+1 << " " << GetBinName(i) <<  std::endl;
+  std::cout << "Detector n. " << i+1 << " (" << i+1 << ") " << GetBinName(i) <<  std::endl;
   std::cout << "\t(Area: " << GetArea(i) << " cmq," << std::endl;
   std::cout << "\t distr. scored: " << GetID(i) << "," << std::endl;
   std::cout << "\t from reg " << GetRegFrom(i) << " to " << GetRegTo(i) << "," << std::endl;
@@ -272,14 +272,32 @@ void UsxSuw::Print(int i) const
   else
     std::cout << "\t current scoring)" << std::endl;
 
-  std::cout << std::endl << "\t Tot. resp. (Part/cmq/pr) " << fTOTTOT[i] << std::endl;
+  std::cout << std::endl;
+  std::cout << "\tTot. resp. (Part/cmq/pr) " << GetTotalResponce(i) << std::endl;
+  std::cout << "\t( -->      (Part/pr)     " << GetTotalResponce(i)/fAUSBDX[i] << std::endl;
 
+  std::cout << std::endl;
   std::cout << "\t**** Different. Fluxes as a function of energy ****" << std::endl;
   std::cout << "\t****      (integrated over solid angle)        ****" << std::endl;
   
   std::cout << "\t Energy boundaries (GeV):" << std::endl;
 
-  GetELowEdge(i);
+  std::vector<float> elowedges = GetELowEdge(i);
+  std::cout << "\t  ";
+  std::cout.precision(7);
+  for (unsigned int ii=elowedges.size()-1; ii>0; ii--) { // do not print the lowest boundary here (ii>0) instead of (ii>=0)
+    std::cout << elowedges[ii] << " ";
+  }
+  std::cout << std::endl;
+  std::cout << "\t Lowest boundary (GeV): " << elowedges[0] << std::endl;
+
+  std::cout << std::endl;
+  std::cout << "\t Flux (Part/GeV/cmq/pr):" << std::endl;
+  std::cout << "\t  ";
+  for (unsigned int ii=0; ii<fGDSTOR[i].size(); ii++) {
+    std::cout << fGDSTOR[i][ii]*(fABXHGH[i]-fABXLOW[i]) << " " << std::endl;
+  }
+
   for (unsigned int ii=0; ii<GetNbinsA(i); ii++)
     std::cout << "awidth: " << GetAwidthRAD(i, ii)  << " rad"<< std::endl;
   
@@ -571,7 +589,7 @@ std::vector<float> UsxSuw::GetELowEdge(unsigned int i) const
   float val;
   unsigned int nint = fNEBXBN[i]; // number of energy intervals without low energy neutrons
 
-  std::cout << "energy intervals: " << nint << " between " << fEBXLOW[i] << " and " << fEBXHGH[i] << " GeV" << std::endl;
+  //  std::cout << "energy intervals: " << nint << " between " << fEBXLOW[i] << " and " << fEBXHGH[i] << " GeV" << std::endl;
   for (unsigned int ie=1; ie<=nint+1; ie++) {
     if (fITUSBX[i]>0) { // linear in energy
       val = fEBXLOW[i] + (ie-1)*fDEBXBN[i];
@@ -581,9 +599,19 @@ std::vector<float> UsxSuw::GetELowEdge(unsigned int i) const
       vec.push_back(val);
     }
   }
-  std::cout << "esize: " << vec.size() << std::endl;
-  for (int ie=0; ie<vec.size(); ie++) 
-  std::cout << "ebin" << ie << " "  << vec[ie] << " " << std::endl;
+  //std::cout << "esize: " << vec.size() << std::endl;
+  //for (unsigned int ie=0; ie<vec.size(); ie++) 
+  //std::cout << "ebin" << ie << " "  << vec[ie] << " " << std::endl;
 
   return vec;
+}
+
+
+float UsxSuw::GetTotalResponce(unsigned int i) const
+{
+  /*
+    Return the total responce of the i-th detector [Part/GeV/cmq/primary]
+    Note that in *_sum.lis produced by usxsuw it's somewhat written [Part/cmq/primary] - without GeV. WHY???
+   */
+  return fTOTTOT[i]*(fEBXHGH[i]-fEBXLOW[i])*(fABXHGH[i]-fABXLOW[i]);
 }

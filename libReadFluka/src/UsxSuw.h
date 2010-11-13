@@ -40,20 +40,19 @@ namespace ReadFluka {
     std::vector<float> fDEBXBN; // energy bin width
 
     std::vector<float> fABXLOW; // min angle
-    std::vector<float> fABXHGH; // min angle
+    std::vector<float> fABXHGH; // max angle
     std::vector<unsigned int> fNABXBN; // number of angular intervals
     std::vector<float> fDABXBN; // angular (steradian) bin width 
 
-    std::vector<int> fIGMUSX; // maximum low energy neutron group to be scored
+    std::vector<int> fIGMUSX; // maximum low energy neutron group to be scored (normally 260)
     std::vector< std::vector<float> > fENGMAX; // array of the low energy neutron data
     std::vector< std::vector<float> > fEPGMAX; // energy boundaries for each distribution
-
 
     std::vector<int> fNScored; // number of scored values (INTERV*fNABXBN)
     std::vector< std::vector<float> > fScored;  // array with scored data
     std::vector< std::vector<float> > fGDSTOR;
 
-    std::vector<double> fTOTTOT; // total responce
+    std::vector<float> fTOTTOT; // total responce not normalized by GeV and sr. See also UsxSuw::GetTotalResponce(unsigned int) const
 
     bool       fIsReadHeader;
     void       ReadHeader();
@@ -117,6 +116,8 @@ namespace ReadFluka {
     float GetAwidthRAD(unsigned int i, unsigned int bin) const;
 
     std::vector<float> GetELowEdge(unsigned int i) const;
+
+    float GetTotalResponce(unsigned int i) const;
 
     // void XbinsE_len() const;
 
