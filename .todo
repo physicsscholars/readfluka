@@ -7,6 +7,9 @@
             <note priority="medium" time="1289649655">
                 Why in *_sum.lis the total responce is reported in Part/cmq/pr but not in Part/cmq/GeV/pr? When I calculate myself, it turned out that it is also normalized by GeV.
             </note>
+            <note priority="medium" time="1289740516">
+                UsxSuw::GetALowEdge - why the conversion from RAD to DEG is so strange? - see "Angular upper boundaries" in _sum.lis
+            </note>
         </note>
     </note>
 </todo>

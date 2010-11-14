@@ -123,10 +123,8 @@ namespace ReadFluka {
     const char* GetXtitle(int i) const;
     const char* GetYtitle(int i) const;
 
-    std::vector<float> GetALowEdge(unsigned int i) const;
+    std::vector<float> GetALowEdge(unsigned int i, EUnit unit=kRAD) const;
     float GetAwidthRAD(unsigned int i, unsigned int bin) const;
-    std::vector<float> GetALowEdgeDEG(unsigned int i) const;
-
     std::vector<float> GetELowEdge(unsigned int i) const;
 
     float GetTotalResponce(unsigned int i) const;

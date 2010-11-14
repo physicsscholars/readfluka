@@ -193,7 +193,7 @@ bool UsxSuw::Read()
     
 
     vtmp.clear();
-    for (int ii=0; ii<GetNbinsE(record); ii++) { // flux
+    for (unsigned int ii=0; ii<GetNbinsE(record); ii++) { // flux
       vtmp.push_back(ReadFloat());
     }
     // FLUKA writes the array in a reverse way, so we reverse it again:
@@ -203,7 +203,7 @@ bool UsxSuw::Read()
     CheckFormat();
 
     vtmp.clear();
-    for (int ii=0; ii<GetNbinsE(record); ii++) { // flux error
+    for (unsigned int ii=0; ii<GetNbinsE(record); ii++) { // flux error
       vtmp.push_back(ReadFloat());
     }
     //std::reverse(vtmp.begin(), vtmp.end());
@@ -213,14 +213,14 @@ bool UsxSuw::Read()
     CheckFormat();
 
     vtmp.clear();
-    for (int ii=0; ii<GetNbinsE(record); ii++) { // cumulative flux
+    for (unsigned int ii=0; ii<GetNbinsE(record); ii++) { // cumulative flux
       vtmp.push_back(ReadFloat());
     }
     fCumulFlux.push_back(vtmp);
     CheckFormat();
 
     vtmp.clear();
-    for (int ii=0; ii<GetNbinsE(record); ii++) { // cumulative flux error
+    for (unsigned int ii=0; ii<GetNbinsE(record); ii++) { // cumulative flux error
       vtmp.push_back(ReadFloat());
     }
     fCumulFluxErr.push_back(vtmp);
@@ -401,7 +401,7 @@ void UsxSuw::Print(int i) const
   if (fNABXBN[i]>1) {
     std::cout << std::endl;
     std::cout << "\t**** Double diff. Fluxes as a function of energy ****" << std::endl;
-    std::vector<float> alowedges = GetALowEdge(i);
+    std::vector<float> alowedges = GetALowEdge(i, kRAD);
     
     std::cout << "\t Solid angle minimum value (sr): " << AsFortran(alowedges[0], 6) << std::endl;
     std::cout << "\t Solid angle upper boundaries (sr):" << std::endl;
@@ -410,7 +410,7 @@ void UsxSuw::Print(int i) const
       std::cout << AsFortran(alowedges[ii], 6) << " ";
     std::cout << std::endl;
 
-    std::vector<float> alowedgesdeg = GetALowEdgeDEG(i);
+    std::vector<float> alowedgesdeg = GetALowEdge(i, kDEG);
     std::cout << "\t Angular minimum value (deg.): " << AsFortran( alowedgesdeg[0], 6) << std::endl;
     std::cout << "\t Angular upper boundaries (deg.):" << std::endl;
     std::cout << "\t  ";
@@ -660,11 +660,13 @@ void UsxSuw::Print(int i) const
 */
 
 
-std::vector<float> UsxSuw::GetALowEdge(unsigned int i) const
+std::vector<float> UsxSuw::GetALowEdge(unsigned int i, EUnit unit) const
 {
   /*
     Return low edges for angular bins. The array size is bin+1 (since we want to know the high edge for the last bin)
-    It seems the returned array is the same as OMGMAX in usxsuw.f
+    ---- It seems the returned array is the same as OMGMAX in usxsuw.f ---
+    If 'unit' is kRAD the angles (solid) are in radians, 
+    if unit==kDEG - in degrees (I still don't understand this strange conversion - see below.)
    */
 
   std::vector<float> vec;
@@ -688,25 +690,15 @@ std::vector<float> UsxSuw::GetALowEdge(unsigned int i) const
       }
     }
   }
-  /*  std::cout << "size: " << vec.size() << std::endl;
-  for (int ia=0; ia<vec.size(); ia++) 
-  std::cout << "bin" << ia << " "  << vec[ia] << " " << std::endl;*/
-
-  return vec;
-}
-
-std::vector<float> UsxSuw::GetALowEdgeDEG(unsigned int i) const
-{
-  /*
-    usxsuw.f:876
-   */
-  std::vector<float> vec = GetALowEdge(i);
-  double val;
-  for (unsigned int i=0; i<vec.size(); i++) {
-    val = vec[i];
-    val = std::acos(std::max(1.0-val/M_PI/2.0, -1.0)) * 180.0/M_PI;
-    vec[i] = (float)val;
+  if (unit == kDEG) {
+    double val;
+    for (unsigned int i=0; i<vec.size(); i++) {
+      val = vec[i];
+      val = std::acos(std::max(1.0-val/M_PI/2.0, -1.0)) * 180.0/M_PI;
+      vec[i] = (float)val;
+    }
   }
+
   return vec;
 }
 
