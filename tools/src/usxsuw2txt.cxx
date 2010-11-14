@@ -10,9 +10,8 @@ int main(int argc, const char **argv)
   
   cout << usxsuw->GetRunTitle() << endl;
   cout << usxsuw->GetRunTime() << endl;
-  cout << "Total number of particles followed " << usxsuw->GetEntryNumber() << flush;
-  cout << ", for a total weight of ";
-  cout << usxsuw->GetWeight() << endl;
+  cout << "Total primaries run:\t" << usxsuw->GetEntryNumber() << endl;
+  cout << "Total weight of the primaries run:\t" << usxsuw->GetWeight() << endl;
 
   int i=0;
   usxsuw->Read();

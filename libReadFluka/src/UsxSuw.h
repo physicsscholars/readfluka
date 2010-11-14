@@ -129,6 +129,8 @@ namespace ReadFluka {
 
     float GetTotalResponce(unsigned int i) const;
 
+    float GetData(unsigned int i, unsigned int ie, unsigned int ia) const;
+
     // void XbinsE_len() const;
 
     void Print(int i) const;

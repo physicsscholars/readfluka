@@ -103,16 +103,18 @@ bool UsxSuw::Read()
     
     fin->read(mychar, 10); mychar[10]='\0';
     fTITUSX.push_back(Trimmed(std::string(mychar)));
-    fITUSBX.push_back(ReadInt());// std::cout << "fITUSBX: " << fITUSBX << std::endl;
-    fIDUSBX.push_back(ReadInt());   //std::cout << fIDUSBX << std::endl;
-    fNR1USX.push_back(ReadInt());   
-    fNR2USX.push_back(ReadInt());   
-    fAUSBDX.push_back(ReadFloat());   
-    fLWUSBX.push_back(ReadBool());   
-    fLFUSBX.push_back(ReadBool());    
-    fLLNUSX.push_back(ReadBool());   
+    fITUSBX.push_back(ReadInt()); // type of the binning
+    fIDUSBX.push_back(ReadInt()); // distr to be scored
+    fNR1USX.push_back(ReadInt()); // 1st region
+    fNR2USX.push_back(ReadInt()); // 2nd region
+    fAUSBDX.push_back(ReadFloat());    // area
+    fLWUSBX.push_back(ReadBool());   // one/two ways
+    fLFUSBX.push_back(ReadBool());   // current/fluence
+    fLLNUSX.push_back(ReadBool());   // low energy neutrons
     
+    // energy binning:
     fEBXLOW.push_back(ReadFloat()); fEBXHGH.push_back(ReadFloat()); fNEBXBN.push_back(ReadInt());fDEBXBN.push_back(ReadFloat());
+    // angular binning:
     fABXLOW.push_back(ReadFloat()); fABXHGH.push_back(ReadFloat()); fNABXBN.push_back(ReadInt()); fDABXBN.push_back(ReadFloat());
 
     CheckFormat();
@@ -143,10 +145,12 @@ bool UsxSuw::Read()
     KLAST = K2;
 
     vtmp.clear();
+    std::cerr << "data1: ";
     for (int j=K0; j<=K2; j++) {
-      dtmp = ReadFloat(); 
+      dtmp = ReadFloat(); std::cout << j-K0 << " " << dtmp << "\t";
       vtmp.push_back(dtmp);
-    }
+    } 
+    std::cout << std::endl;
     totresp += std::accumulate(vtmp.begin(), vtmp.end(), 0.0f);
     fGDSTOR.push_back(vtmp); // line 540 in usxsuw.f
 
@@ -159,7 +163,7 @@ bool UsxSuw::Read()
     
     if (ReadStatFlag(false) == true) {
       break;
-    } //else for (int iii=0; iii<3; iii++) std::cout << ReadInt(iii) << std::endl;
+    }
     record++;
   }
   
@@ -176,7 +180,6 @@ bool UsxSuw::Read()
     //std::cout << "Total responce read from file: " << t1 << " +- " << t2 << std::endl;
     //fTOTERR.push_back(t2);
     CheckFormat();
-
     
     int nebxbn = ReadInt(); // line 654
     int igmusx = ReadInt();
@@ -190,7 +193,6 @@ bool UsxSuw::Read()
     }
     
     CheckFormat();
-    
 
     vtmp.clear();
     for (unsigned int ii=0; ii<GetNbinsE(record); ii++) { // flux
@@ -217,6 +219,7 @@ bool UsxSuw::Read()
       vtmp.push_back(ReadFloat());
     }
     fCumulFlux.push_back(vtmp);
+
     CheckFormat();
 
     vtmp.clear();
@@ -227,6 +230,7 @@ bool UsxSuw::Read()
 
     CheckFormat();
 
+    std::cout << "angles: " << std::endl;
     if (fNABXBN[record]>1) { // more than one angular interval
       PrintFloat(4);
       CheckFormat();
@@ -419,11 +423,22 @@ void UsxSuw::Print(int i) const
     std::cout << std::endl;
 
     for (unsigned int ie=elowedges.size()-1; ie>0; ie--) {
-      std::cout << "\tEnergy interval (GeV): "
+      std::cout << "\t Energy interval (GeV): "
 		<< AsFortran(elowedges[ie], 6) << " "
 		<< AsFortran(elowedges[ie-1], 6) << std::endl;
-      for (unsigned int ia=alowedges.size()-1; ia>0; ia--) {
-	std::cout << "\t Flux (Part/sr/GeV/cmq/pr):" << std::endl;
+      for (int icase=0; icase<2; icase++) {
+	if (icase==0) {
+	  std::cout << "\t  Flux (Part/sr/GeV/cmq/pr):" << std::endl << "\t   ";
+	  for (unsigned int ia=alowedges.size()-1; ia>0; ia--) {
+	    std::cout << ie-1 << "," << ia-1 << ": " << GetData(i, ie-1, ia-1) << "\t";
+	  }
+	} else if (icase==1) {
+	  std::cout << "\t  Flux (Part/deg/GeV/cmq/pr):" << std::endl << "\t   ";
+	  for (unsigned int ia=alowedges.size()-1; ia>0; ia--) {
+	    std::cout << "here" << " ";
+	  }
+	}
+	std::cout << std::endl;
       }
     }
   }
@@ -756,4 +771,13 @@ float UsxSuw::GetTotalResponce(unsigned int i) const
   
   // why divide by fNEBXBN[i]
   return fTOTTOT[i]*(fEBXHGH[i]-fEBXLOW[i])*(fABXHGH[i]-fABXLOW[i])/fNEBXBN[i];
+}
+
+float UsxSuw::GetData(unsigned int i, unsigned int ie, unsigned int ia) const
+{
+  /*
+    Return data (above low energy neutrons) in energy bin 'ie' and angular bin 'ia'
+   */
+
+  return fGDSTOR[i][ie+ia];
 }
