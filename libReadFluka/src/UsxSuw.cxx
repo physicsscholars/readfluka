@@ -4,6 +4,7 @@
 #include <cstdlib> // for exit()
 #include <algorithm>
 #include <numeric>
+//#include <cmath>
 
 #include "UsxSuw.h" ///////                                !!! NOT YET FINISHED !!!
 
@@ -150,7 +151,7 @@ bool UsxSuw::Read()
     fGDSTOR.push_back(vtmp); // line 540 in usxsuw.f
 
     //std::cout << "totresp: " << totresp << std::endl;
-    fTOTTOT.push_back(totresp); // !!! the same numbers can be read from file - see below
+    fTOTTOT.push_back(totresp); // !!! the same numbers can be read from file - see below fTotResp
 
     CheckFormat();
 
@@ -161,7 +162,7 @@ bool UsxSuw::Read()
     } //else for (int iii=0; iii<3; iii++) std::cout << ReadInt(iii) << std::endl;
     record++;
   }
-
+  
   const int Nrecords = record;
   for (record=0; record<=Nrecords; record++) {
     NX = record;
@@ -180,18 +181,19 @@ bool UsxSuw::Read()
     int nebxbn = ReadInt(); // line 654
     int igmusx = ReadInt();
 
-    //std::cout << "ebxlow: old=" << fEBXLOW[record] << std::endl;
+    std::cout << "ebxlow: old=" << fEBXLOW[record] << std::endl;
     PrintFloat(1);
 
-    //std::cout << "epgmax (energy boundaries):" << std::endl;
+    std::cout << "epgmax (energy boundaries):" << std::endl;
     for (int ii=0; ii<nebxbn+igmusx+1; ii++) {
       std::cerr << ii << " " << ReadFloat() << std::endl;
     }
     
     CheckFormat();
     
+
     vtmp.clear();
-    for (int ii=0; ii<GetNbinsTotal(record); ii++) { // flux
+    for (int ii=0; ii<GetNbinsE(record); ii++) { // flux
       vtmp.push_back(ReadFloat());
     }
     // FLUKA writes the array in a reverse way, so we reverse it again:
@@ -201,26 +203,34 @@ bool UsxSuw::Read()
     CheckFormat();
 
     vtmp.clear();
-    for (int ii=0; ii<GetNbinsTotal(record); ii++) { // flux error
+    for (int ii=0; ii<GetNbinsE(record); ii++) { // flux error
       vtmp.push_back(ReadFloat());
     }
     //std::reverse(vtmp.begin(), vtmp.end());
     fFluxErr.push_back(vtmp);
+
+
     CheckFormat();
 
     vtmp.clear();
-    for (int ii=0; ii<GetNbinsTotal(record); ii++) { // cumulative flux
+    for (int ii=0; ii<GetNbinsE(record); ii++) { // cumulative flux
       vtmp.push_back(ReadFloat());
     }
     fCumulFlux.push_back(vtmp);
     CheckFormat();
 
     vtmp.clear();
-    for (int ii=0; ii<GetNbinsTotal(record); ii++) { // cumulative flux error
+    for (int ii=0; ii<GetNbinsE(record); ii++) { // cumulative flux error
       vtmp.push_back(ReadFloat());
     }
     fCumulFluxErr.push_back(vtmp);
+
     CheckFormat();
+
+    if (fNABXBN[record]>1) { // more than one angular interval
+      PrintFloat(4);
+      CheckFormat();
+    }
   }
 
 
@@ -358,7 +368,7 @@ void UsxSuw::Print(int i) const
   std::cout << "\t Flux (Part/GeV/cmq/pr):" << std::endl;
   std::cout << "\t  ";
 
-  for (int ii=0; ii<fGDSTOR[i].size(); ii++) {
+  for (unsigned int ii=0; ii<fFlux[i].size(); ii++) {
     /*
       This line is actually the same as the uncommented one (fFlux):
       std::cout << AsFortran(fGDSTOR[i][ii]*(fABXHGH[i]-fABXLOW[i]), 6) << " ";
@@ -387,6 +397,36 @@ void UsxSuw::Print(int i) const
 	       << AsFortran(100*fCumulFluxErr[i][ii], 5) << " %\t";
   }
   std::cout << std::endl;
+
+  if (fNABXBN[i]>1) {
+    std::cout << std::endl;
+    std::cout << "\t**** Double diff. Fluxes as a function of energy ****" << std::endl;
+    std::vector<float> alowedges = GetALowEdge(i);
+    
+    std::cout << "\t Solid angle minimum value (sr): " << AsFortran(alowedges[0], 6) << std::endl;
+    std::cout << "\t Solid angle upper boundaries (sr):" << std::endl;
+    std::cout << "\t  ";
+    for (unsigned int ii=1; ii<alowedges.size(); ii++)
+      std::cout << AsFortran(alowedges[ii], 6) << " ";
+    std::cout << std::endl;
+
+    std::vector<float> alowedgesdeg = GetALowEdgeDEG(i);
+    std::cout << "\t Angular minimum value (deg.): " << AsFortran( alowedgesdeg[0], 6) << std::endl;
+    std::cout << "\t Angular upper boundaries (deg.):" << std::endl;
+    std::cout << "\t  ";
+    for (unsigned int ii=1; ii<alowedgesdeg.size(); ii++)
+      std::cout << AsFortran(alowedgesdeg[ii], 6) << " ";
+    std::cout << std::endl;
+
+    for (unsigned int ie=elowedges.size()-1; ie>0; ie--) {
+      std::cout << "\tEnergy interval (GeV): "
+		<< AsFortran(elowedges[ie], 6) << " "
+		<< AsFortran(elowedges[ie-1], 6) << std::endl;
+      for (unsigned int ia=alowedges.size()-1; ia>0; ia--) {
+	std::cout << "\t Flux (Part/sr/GeV/cmq/pr):" << std::endl;
+      }
+    }
+  }
 
 
   //  for (unsigned int ii=0; ii<GetNbinsA(i); ii++)
@@ -624,6 +664,7 @@ std::vector<float> UsxSuw::GetALowEdge(unsigned int i) const
 {
   /*
     Return low edges for angular bins. The array size is bin+1 (since we want to know the high edge for the last bin)
+    It seems the returned array is the same as OMGMAX in usxsuw.f
    */
 
   std::vector<float> vec;
@@ -651,6 +692,21 @@ std::vector<float> UsxSuw::GetALowEdge(unsigned int i) const
   for (int ia=0; ia<vec.size(); ia++) 
   std::cout << "bin" << ia << " "  << vec[ia] << " " << std::endl;*/
 
+  return vec;
+}
+
+std::vector<float> UsxSuw::GetALowEdgeDEG(unsigned int i) const
+{
+  /*
+    usxsuw.f:876
+   */
+  std::vector<float> vec = GetALowEdge(i);
+  double val;
+  for (unsigned int i=0; i<vec.size(); i++) {
+    val = vec[i];
+    val = std::acos(std::max(1.0-val/M_PI/2.0, -1.0)) * 180.0/M_PI;
+    vec[i] = (float)val;
+  }
   return vec;
 }
 

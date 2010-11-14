@@ -125,6 +125,7 @@ namespace ReadFluka {
 
     std::vector<float> GetALowEdge(unsigned int i) const;
     float GetAwidthRAD(unsigned int i, unsigned int bin) const;
+    std::vector<float> GetALowEdgeDEG(unsigned int i) const;
 
     std::vector<float> GetELowEdge(unsigned int i) const;
 
