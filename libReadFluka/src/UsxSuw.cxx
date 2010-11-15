@@ -29,6 +29,7 @@ UsxSuw::~UsxSuw()
 void UsxSuw::Reset()
 {
   // fNX = 0;
+  fNRecords = 0;
   fTITUSX.clear();
   fITUSBX.clear();
   fIDUSBX.clear();
@@ -53,7 +54,7 @@ void UsxSuw::Reset()
 
   fGBSTOR.clear();
   fGDSTOR.clear();
-  
+
   fTOTTOT.clear();
   fTOTERR.clear();
 
@@ -87,8 +88,6 @@ bool UsxSuw::Read()
   Reset();
 
   int NX;
-  int KLAST = 0;
-  int K0, K1, K2;
   char *mychar = new char[11];
   std::vector<float> vtmp;
   double totresp, dtmp;
@@ -97,12 +96,12 @@ bool UsxSuw::Read()
   int record=0;
   for (;;) {
     totresp = 0.0;
-    NX = ReadInt();  //std::cout << "NX: " << NX << std::endl;
-    
+    NX = ReadInt();  std::cout << "NX: " << NX << std::endl;
+
     // line 526 in usxsuw.f
-    
+
     fin->read(mychar, 10); mychar[10]='\0';
-    fTITUSX.push_back(Trimmed(std::string(mychar)));
+    fTITUSX.push_back(Trimmed(std::string(mychar)));         std::cout << mychar << std::endl;
     fITUSBX.push_back(ReadInt()); // type of the binning
     fIDUSBX.push_back(ReadInt()); // distr to be scored
     fNR1USX.push_back(ReadInt()); // 1st region
@@ -111,7 +110,7 @@ bool UsxSuw::Read()
     fLWUSBX.push_back(ReadBool());   // one/two ways
     fLFUSBX.push_back(ReadBool());   // current/fluence
     fLLNUSX.push_back(ReadBool());   // low energy neutrons
-    
+
     // energy binning:
     fEBXLOW.push_back(ReadFloat()); fEBXHGH.push_back(ReadFloat()); fNEBXBN.push_back(ReadInt());fDEBXBN.push_back(ReadFloat());
     // angular binning:
@@ -126,7 +125,7 @@ bool UsxSuw::Read()
       if (fIGMUSX[record] != 260) {
 	std::cerr << std::endl << "UsxSuw::Read: strange, but number of neutron groups is " << fIGMUSX[record] << " but not 260" << std::endl;
       }
-      
+
       // line 534 in usxsuw.f
       vtmp.clear();
       for (int j=0; j<fIGMUSX[record]+1; j++) { // loop over all low energy groups (260) plus one bin
@@ -139,17 +138,16 @@ bool UsxSuw::Read()
       CheckFormat();
     } else fIGMUSX.push_back(0);
 
-    K0 = KLAST + 1;
-    K1 = fNEBXBN[record] * fNABXBN[record] + K0 - 1; // total number of bins + K0 - 1
-    K2 = K1 + fIGMUSX[record]*fNABXBN[record];
-    KLAST = K2;
+    //    K0 = KLAST + 1;
+    //K1 = fNEBXBN[record] * fNABXBN[record] + K0 - 1; // total number of bins + K0 - 1
+    //K2 = K1 + fIGMUSX[record]*fNABXBN[record];
+    //KLAST = K2;
 
     vtmp.clear();
-    std::cerr << "data1: ";
-    for (int j=K0; j<=K2; j++) {
-      dtmp = ReadFloat(); std::cout << j-K0 << " " << dtmp << "\t";
+    for (int j=0; j<GetNbinsTotal(record); j++) {
+      dtmp = ReadFloat(); //std::cout << j-K0 << " " << dtmp << "\t";
       vtmp.push_back(dtmp);
-    } 
+    }
     std::cout << std::endl;
     totresp += std::accumulate(vtmp.begin(), vtmp.end(), 0.0f);
     fGDSTOR.push_back(vtmp); // line 540 in usxsuw.f
@@ -160,38 +158,52 @@ bool UsxSuw::Read()
     CheckFormat();
 
     //    Print(record);
-    
+
     if (ReadStatFlag(false) == true) {
       break;
     }
     record++;
   }
-  
-  const int Nrecords = record;
-  for (record=0; record<=Nrecords; record++) {
-    NX = record;
+
+  CheckFormat();
+
+  fNRecords = record;
+  std::cout << "->STAT FLAG READ, " << fNRecords+1 << " records found" << std::endl;
+
+  for (record=0; record<=fNRecords; record++) {
+    //NX = record;
     //  MX = 0; //!!! check this !!! - total number of detectors?
-    CheckFormat();
+    //    CheckFormat();
     //    fTOTTOT.push_back(ReadFloat());
     //    float t1 = ReadFloat();
     //float t2 = ReadFloat();
-    fTotResp.push_back(ReadFloat());
-    fTotRespErr.push_back(ReadFloat());
+    if (record>0) {
+      std::cerr << "strange numbers if record>0:" << std::endl;
+      PrintFloat(2);
+      CheckFormat();
+    }
+
+    fTotResp.push_back(ReadFloat()); std::cout << "total responce: " << fTotResp[record] << std::endl;
+    fTotRespErr.push_back(ReadFloat()); std::cout << "total responce error: " << fTotRespErr[record] << std::endl;
     //std::cout << "Total responce read from file: " << t1 << " +- " << t2 << std::endl;
     //fTOTERR.push_back(t2);
     CheckFormat();
-    
+
     int nebxbn = ReadInt(); // line 654
     int igmusx = ReadInt();
+
+    std::cout << "nebxbn: " << nebxbn << "\tigmusx: " << igmusx << std::endl;
 
     std::cout << "ebxlow: old=" << fEBXLOW[record] << std::endl;
     PrintFloat(1);
 
-    std::cout << "epgmax (energy boundaries):" << std::endl;
+    std::cout << "epgmax (energy boundaries):\t";
     for (int ii=0; ii<nebxbn+igmusx+1; ii++) {
-      std::cerr << ii << " " << ReadFloat() << std::endl;
+      std::cerr << ReadFloat() << " ";
+      if ((ii+2) % 10 == 0) std::cout << std::endl;
     }
-    
+    std::cout << std::endl;
+
     CheckFormat();
 
     vtmp.clear();
@@ -200,7 +212,7 @@ bool UsxSuw::Read()
     }
     // FLUKA writes the array in a reverse way, so we reverse it again:
     //std::reverse(vtmp.begin(), vtmp.end());
-    fFlux.push_back(vtmp); 
+    fFlux.push_back(vtmp);
 
     CheckFormat();
 
@@ -258,23 +270,24 @@ bool UsxSuw::Read()
 
   delete [] mychar; mychar = 0; // is it ok? !!!
 
-  Print(0);
+  std::cout << "number of records:" << fNRecords << std::endl;
+  for (int ii=0; ii<=fNRecords ; ii++) Print(ii);
 
   return true;
 }
 
 /*float UsxSuw::GetScored(unsigned int ie, unsigned int ia) const
 {
-  
+
     Return the scored value in the ie-ja-cell.
     ie - energy bin
     ia - angular bin
     The cell indises must be >= 1 (FLUKA-Fortran style)
-  
+
 
   unsigned int e = ie-1;
   unsigned int a = ia-1;
-  
+
   if (e>fNEBXBN) {
     std::cerr << "GetScored():\t" << e << " > " << fNEBXBN << std::endl;
     exit(FATAL_ERROR);
@@ -284,7 +297,7 @@ bool UsxSuw::Read()
     std::cerr << "GetScored():\t" << a << " > " << fNABXBN << std::endl;
     exit(FATAL_ERROR);
   }
-  
+
   return fScored[e + a*fNEBXBN];
 }
 */
@@ -294,7 +307,7 @@ std::string UsxSuw::GetBinTitle(int i) const
   std::ostringstream tmp;
   if (IsFluence(i)) tmp << "Fluence of ";
   else tmp << "Current of ";
-  
+
   tmp << Code2Name(GetID(i)) << " (reg. " << GetRegFrom(i);
 
   if (IsOneWay(i)) tmp << " -> ";
@@ -341,12 +354,12 @@ void UsxSuw::Print(int i) const
   if (IsReadNeutrons(i)) {
     std::cout << "\t low energy neutrons scored from group 1" << " to group " << GetMaxNeutronGroup(i) << std::endl;
   }
-  if (IsOneWay(i) == true) 
-    std::cout << "\t one way scoring," << std::endl; 
+  if (IsOneWay(i) == true)
+    std::cout << "\t one way scoring," << std::endl;
   else
     std::cout << "\t this is a two ways estimator" << std::endl;
-  
-  if (IsFluence(i) == true) 
+
+  if (IsFluence(i) == true)
     std::cout << "\t fluence scoring)" << std::endl;
   else
     std::cout << "\t current scoring)" << std::endl;
@@ -360,7 +373,7 @@ void UsxSuw::Print(int i) const
   std::cout << std::endl;
   std::cout << "\t**** Different. Fluxes as a function of energy ****" << std::endl;
   std::cout << "\t****      (integrated over solid angle)        ****" << std::endl;
-  
+
   std::cout << "\t Energy boundaries (GeV):" << std::endl;
 
   std::vector<float> elowedges = GetELowEdge(i);
@@ -409,7 +422,7 @@ void UsxSuw::Print(int i) const
     std::cout << std::endl;
     std::cout << "\t**** Double diff. Fluxes as a function of energy ****" << std::endl;
     std::vector<float> alowedges = GetALowEdge(i, kRAD);
-    
+
     std::cout << "\t Solid angle minimum value (sr): " << AsFortran(alowedges[0], 6) << std::endl;
     std::cout << "\t Solid angle upper boundaries (sr):" << std::endl;
     std::cout << "\t  ";
@@ -449,7 +462,7 @@ void UsxSuw::Print(int i) const
 
   //  for (unsigned int ii=0; ii<GetNbinsA(i); ii++)
   //  std::cout << "awidth: " << GetAwidthRAD(i, ii)  << " rad"<< std::endl;
-  
+
   //  for (int j=1; j<fNEBXBN(i); j++)
   //  std::cout <<  << std::endl;
 
@@ -462,7 +475,7 @@ void UsxSuw::Print(int i) const
     std::cout << "\tlogar. energy binning from " << GetEmin() << " to " << GetEmax() << " GeV,\t" << std::flush;
     std::cout << GetNbinsE() << " bins (ratio: " << GetEWidth() << ")" << std::endl;
   }
-  
+
   if (!IsLogA()) {
     std::cout << "\tlinear angular binning from "<<GetAmin()<<" to "<< GetAmax() << " sr,\t"<< std::flush;
     std::cout <<  GetNbinsA() << " bins (" << GetAwidth() << " sr wide)"  << std::endl;
@@ -470,8 +483,8 @@ void UsxSuw::Print(int i) const
     std::cout << "\tlogar. angular binning from "<<GetAmin()<<" to "<< GetAmax() << " sr,\t"<< std::flush;
     std::cout <<  GetNbinsA() << " bins (ratio: " << GetAwidth() << ")"  << std::endl;
   }
-  
-  
+
+
   //  std::cout << "\tData follow in a matrix A(ie,ia), format (1(5x,1p,10(1x,e11.4)))" << std::endl;
   int n = GetNScored(i);
   n = GetNbinsE(i)*GetNbinsA(i);
@@ -485,8 +498,8 @@ void UsxSuw::Print(int i) const
     }
   */
   /*std::cout << std::endl;
-  
-  // loop on angles 
+
+  // loop on angles
   double cumul = 0.0;
   for (unsigned int ia=1; ia<=fNABXBN; ia++) { // angular intervals
     if (abs(fITUSBX)<=1) { // linear in angle
@@ -501,12 +514,12 @@ void UsxSuw::Print(int i) const
     std::cout << std::endl;
     std::cout << "\t                                Double Differential      Angle-Integrated Cumulative" << std::endl;
     if (GetLFUSBX()) // fluence
-      std::cout << "\t                              Fluence (dPhi/dE/dOmega)      dPhi/dE        Fluence" << std::endl;                 
+      std::cout << "\t                              Fluence (dPhi/dE/dOmega)      dPhi/dE        Fluence" << std::endl;
     else // current
       std::cout << "\t                               Current (dJ/dE/dOmega)        dJ/dE         Current" << std::endl;
-    
+
     std::cout << "\tLower energy     Upper energy    cm**-2 GeV**-1 sr-1      cm**2 GeV-1     cm**-2" << std::endl;
-    
+
     float elimit = fEBXLOW;
     float en1,en2, angint;
     unsigned int nhigh;
@@ -600,39 +613,39 @@ void UsxSuw::Print(int i) const
 
   }
   */
-  
+
   /*  if (IsReadNeutrons()) {
     std::cout << "\tLow energy neutron data from group 1 to group " << GetMaxNeutronGroup() <<  " follow in a matrix A(ig,ia), format (1(5x,1p,10(1x,e11.4)))" << std::endl;
-    
-    
+
+
     std::cerr << "!!! check it again !!! WHY ZEROS? why do we need the neutron data?" << std::endl;
-    
-    
+
+
     n = GetMaxNeutronGroup();
     for (int i=0; i<n; i++) std::cout << GetENGMAX(i) << " "; std::cout << std::endl;
     n = GetNScored();
-    //      for (int i= GetNbinsE()*GetNbinsA(); i<n; i++)  std::cout << GetScored(i) << " "; 
+    //      for (int i= GetNbinsE()*GetNbinsA(); i<n; i++)  std::cout << GetScored(i) << " ";
     std::cout << std::endl << std::endl;
     }*/
 }
 
 /*double *UsxSuw::XbinsE_len(double *values, double *limits) const
 {
-  
+
     Fills two arrays:
     values - an array of low-energy neutron data. Dimention is GetMaxNeutronGroup()+1 = 261
     limits - an array of low-edges of each low energy neutron energy bin.  This is an array of size GetMaxNeutronGroup()+1+1 = 262
     Note that it is a user's responsability to delete these arrays.
-   
+
 
   if (!IsReadNeutrons()) return 0; // nothing to do if there are no neutron data
 
   short nlims = fIGMUSX+2; // 261+1=262 std::cout << "nlims: " << nlims << std::endl;
   double *lims = new double[nlims];
-  
+
   // The rest of the code is very similar to UsxSuw::Print and rdbdx.f
 
-  unsigned int ia = 1; // ??? set the 1st angular interval and assume it's the same for all the others - is it correct ??? 
+  unsigned int ia = 1; // ??? set the 1st angular interval and assume it's the same for all the others - is it correct ???
   unsigned int jg1 = ia*(fNEBXBN+fIGMUSX);
   unsigned int jg2 = ia*(fNEBXBN+fIGMUSX)-fIGMUSX+1;
   double en1 = fENGMAX[fIGMUSX];
@@ -645,7 +658,7 @@ void UsxSuw::Print(int i) const
     lims[nlims-jg] = en1;
     //en1 = en2;
   }
-  
+
    // find lower limit of first bin above or straddling the
   // n-group limit. Nhigh: counts the high energy bins
   unsigned int nhigh = 0;
@@ -672,8 +685,8 @@ void UsxSuw::Print(int i) const
   std::cout.precision(7);
   std::cout << diff << std::endl;
   en1 = en2;
-  
-  return lims; 
+
+  return lims;
 }
 */
 
@@ -683,7 +696,7 @@ std::vector<float> UsxSuw::GetALowEdge(unsigned int i, EUnit unit) const
   /*
     Return low edges for angular bins. The array size is bin+1 (since we want to know the high edge for the last bin)
     ---- It seems the returned array is the same as OMGMAX in usxsuw.f ---
-    If 'unit' is kRAD the angles (solid) are in radians, 
+    If 'unit' is kRAD the angles (solid) are in radians,
     if unit==kDEG - in degrees (I still don't understand this strange conversion - see below.)
    */
 
@@ -757,7 +770,7 @@ std::vector<float> UsxSuw::GetELowEdge(unsigned int i) const
     }
   }
   //std::cout << "esize: " << vec.size() << std::endl;
-  //for (unsigned int ie=0; ie<vec.size(); ie++) 
+  //for (unsigned int ie=0; ie<vec.size(); ie++)
   //std::cout << "ebin" << ie << " "  << vec[ie] << " " << std::endl;
 
   return vec;
@@ -771,7 +784,7 @@ float UsxSuw::GetTotalResponce(unsigned int i) const
     Return the total responce of the i-th detector [Part/GeV/cmq/primary]
     Note that in *_sum.lis produced by usxsuw it's somewhat written [Part/cmq/primary] - without GeV. WHY???
    */
-  
+
   // why divide by fNEBXBN[i]
   return fTOTTOT[i]*(fEBXHGH[i]-fEBXLOW[i])*(fABXHGH[i]-fABXLOW[i])/fNEBXBN[i];
 }
@@ -785,16 +798,16 @@ float UsxSuw::GetData(unsigned int i, unsigned int ie, unsigned int ia, EUnit un
    */
 
 
-  /* 
-     ACOS ( 
+  /*
+     ACOS (
             MAX ( 1.D+00 - OMGMAX(IA) / TWOPIP, - 1.D+00 )
           ) * 180.D+00 / PIPIPI -
-     ACOS ( 
-            MAX ( 1.D+00 - OMGMAX(IA-1) / TWOPIP, - 1.D+00 ) 
-          ) * 180.D+00 / PIPIPI 
+     ACOS (
+            MAX ( 1.D+00 - OMGMAX(IA-1) / TWOPIP, - 1.D+00 )
+          ) * 180.D+00 / PIPIPI
   */
 
-  double val = fGDSTOR[i][ie+ia*fNEBXBN[i]]; 
+  double val = fGDSTOR[i][ie+ia*fNEBXBN[i]];
 
   switch (unit) {
   case kSR:
@@ -804,7 +817,7 @@ float UsxSuw::GetData(unsigned int i, unsigned int ie, unsigned int ia, EUnit un
     return val * ( vec[ia+1]-vec[ia] ) / (SR2DEG(vec[ia+1]) - SR2DEG(vec[ia]) );
   }
   default:
-    std::cerr << "WARNING: UsxSuw::GetData: unit " << unit << " is not supported -> return 0" << std::endl; 
+    std::cerr << "WARNING: UsxSuw::GetData: unit " << unit << " is not supported -> return 0" << std::endl;
     return 0.0;
   }
 }

@@ -17,6 +17,7 @@
 namespace ReadFluka {
   class UsxSuw : public Base {
   private:
+    unsigned int fNRecords; // number of USRBDX cards
     //int        fNX;        // USRBDX card number
     float      fWCTOT; // total weight
     int        fNCTOT; // total number of incident particles
