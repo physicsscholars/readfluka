@@ -21,7 +21,8 @@
 
 namespace ReadFluka {
   enum EVerboseLevel {kPRINT_NOTHING, kPRINT_TITLE, kPRINT_HEADER, kPRINT_MISC, kPRINT_SCORED};
-  enum EUnit {kDEG, kRAD};
+  //                      steradian
+  enum EUnit {kDEG, kRAD,    kSR       };
   
   class Base {
   private:

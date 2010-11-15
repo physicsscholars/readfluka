@@ -68,6 +68,8 @@ namespace ReadFluka {
     void       ReadHeader();
     void       Reset();
 
+    inline double SR2DEG(double val) const { return std::acos(std::max(1.0-val/M_PI/2.0, -1.0)) * 180.0/M_PI; } // strange function used in usxsuw.f
+
   public:
     UsxSuw(const char *fname);
     virtual ~UsxSuw();
@@ -129,7 +131,8 @@ namespace ReadFluka {
 
     float GetTotalResponce(unsigned int i) const;
 
-    float GetData(unsigned int i, unsigned int ie, unsigned int ia) const;
+    float    GetData(unsigned int i, unsigned int ie, unsigned int ia, EUnit unit) const;
+    float GetDataErr(unsigned int i, unsigned int ie, unsigned int ia, EUnit unit) const;
 
     // void XbinsE_len() const;
 

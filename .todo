@@ -10,6 +10,12 @@
             <note priority="medium" time="1289740516">
                 UsxSuw::GetALowEdge - why the conversion from RAD to DEG is so strange? - see "Angular upper boundaries" in _sum.lis
             </note>
+            <note priority="medium" time="1289825379">
+                UsxSuw::GetDataErr and _sum.lis: why in case of DEG the relative error does not change with respect to SR?
+            </note>
+            <note priority="medium" time="1289826077">
+                understand UsxSuw::SR2DEG
+            </note>
         </note>
     </note>
 </todo>

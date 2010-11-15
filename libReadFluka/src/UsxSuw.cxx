@@ -230,9 +230,12 @@ bool UsxSuw::Read()
 
     CheckFormat();
 
-    std::cout << "angles: " << std::endl;
     if (fNABXBN[record]>1) { // more than one angular interval
-      PrintFloat(4);
+      std::cout << "angles: " << std::endl;
+      vtmp.clear();
+      for (unsigned int ii=0; ii<GetNbinsTotal(record); ii++)
+	vtmp.push_back(ReadFloat());
+      fGBSTOR.push_back(vtmp);
       CheckFormat();
     }
   }
@@ -429,13 +432,13 @@ void UsxSuw::Print(int i) const
       for (int icase=0; icase<2; icase++) {
 	if (icase==0) {
 	  std::cout << "\t  Flux (Part/sr/GeV/cmq/pr):" << std::endl << "\t   ";
-	  for (unsigned int ia=alowedges.size()-1; ia>0; ia--) {
-	    std::cout << ie-1 << "," << ia-1 << ": " << GetData(i, ie-1, ia-1) << "\t";
+	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
+	    std::cout << AsFortran( GetData(i, ie-1, ia, kSR), 7) << " +/- " << AsFortran(100.0*GetDataErr(i, ie-1, ia, kSR), 5) << " %\t";
 	  }
 	} else if (icase==1) {
 	  std::cout << "\t  Flux (Part/deg/GeV/cmq/pr):" << std::endl << "\t   ";
-	  for (unsigned int ia=alowedges.size()-1; ia>0; ia--) {
-	    std::cout << "here" << " ";
+	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
+	    std::cout << AsFortran( GetData(i, ie-1, ia, kDEG), 7, std::ios::scientific) << " +/- " << AsFortran(100.0*GetDataErr(i, ie-1, ia, kDEG), 5) << " %\t";
 	  }
 	}
 	std::cout << std::endl;
@@ -708,8 +711,8 @@ std::vector<float> UsxSuw::GetALowEdge(unsigned int i, EUnit unit) const
   if (unit == kDEG) {
     double val;
     for (unsigned int i=0; i<vec.size(); i++) {
-      val = vec[i];
-      val = std::acos(std::max(1.0-val/M_PI/2.0, -1.0)) * 180.0/M_PI;
+      val = vec[i]; //std::cout << "lowedge: " << val << std::endl;
+      val = SR2DEG(val);
       vec[i] = (float)val;
     }
   }
@@ -773,11 +776,44 @@ float UsxSuw::GetTotalResponce(unsigned int i) const
   return fTOTTOT[i]*(fEBXHGH[i]-fEBXLOW[i])*(fABXHGH[i]-fABXLOW[i])/fNEBXBN[i];
 }
 
-float UsxSuw::GetData(unsigned int i, unsigned int ie, unsigned int ia) const
+float UsxSuw::GetData(unsigned int i, unsigned int ie, unsigned int ia, EUnit unit) const
 {
   /*
     Return data (above low energy neutrons) in energy bin 'ie' and angular bin 'ia'
+    unit == kSR:  [Part/sr/GeV/cmq/pr]
+    unit == kDEG: [Part/deg/GeV/cmq/pr]
    */
 
-  return fGDSTOR[i][ie+ia];
+
+  /* 
+     ACOS ( 
+            MAX ( 1.D+00 - OMGMAX(IA) / TWOPIP, - 1.D+00 )
+          ) * 180.D+00 / PIPIPI -
+     ACOS ( 
+            MAX ( 1.D+00 - OMGMAX(IA-1) / TWOPIP, - 1.D+00 ) 
+          ) * 180.D+00 / PIPIPI 
+  */
+
+  double val = fGDSTOR[i][ie+ia*fNEBXBN[i]]; 
+
+  switch (unit) {
+  case kSR:
+    return val;
+  case kDEG: {
+    std::vector<float> vec = GetALowEdge(i, kRAD);
+    return val * ( vec[ia+1]-vec[ia] ) / (SR2DEG(vec[ia+1]) - SR2DEG(vec[ia]) );
+  }
+  default:
+    std::cerr << "WARNING: UsxSuw::GetData: unit " << unit << " is not supported -> return 0" << std::endl; 
+    return 0.0;
+  }
+}
+
+float UsxSuw::GetDataErr(unsigned int i, unsigned int ie, unsigned int ia, EUnit unit) const
+{
+  /*
+    Return relative error of the data (above low energy neutrons) in energy bin 'ie' and angular bin 'ia'
+   */
+
+  return fGBSTOR[i][ie+ia*fNEBXBN[i]];
 }
