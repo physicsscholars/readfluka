@@ -367,8 +367,8 @@ void UsxSuw::Print(int i) const
   std::cout << std::endl;
   std::cout << "\tTot. resp. (Part/cmq/pr) " << AsFortran( fTotResp[i] , 6 )
 	    << " +/- " << AsFortran( 100.0*fTotRespErr[i], 5) << " %" << std::endl;
-  std::cout << "\t( -->      (Part/pr)     " <<AsFortran( fTotResp[i]/fAUSBDX[i], 6 )
-	    << " +/- " << AsFortran( 100.0*fTotRespErr[i]/fAUSBDX[i], 5) << " % )" << std::endl;
+  std::cout << "\t( -->      (Part/pr)     " <<AsFortran( fTotResp[i]*fAUSBDX[i], 6 )
+	    << " +/- " << AsFortran( 100.0*fTotRespErr[i] << " % )" << std::endl; // !!! why the error does not change ???
 
   std::cout << std::endl;
   std::cout << "\t**** Different. Fluxes as a function of energy ****" << std::endl;
