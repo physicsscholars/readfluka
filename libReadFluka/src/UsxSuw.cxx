@@ -360,7 +360,7 @@ void UsxSuw::Print(int i) const
     std::cout << "\t this is a two ways estimator" << std::endl;
 
   if (IsFluence(i) == true)
-    std::cout << "\t fluence scoring)" << std::endl;
+    std::cout << "\t fluence scoring scoring)" << std::endl;
   else
     std::cout << "\t current scoring)" << std::endl;
 
