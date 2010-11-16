@@ -395,6 +395,7 @@ void UsxSuw::Print(int i) const
       std::cout << AsFortran(fGDSTOR[i][ii]*(fABXHGH[i]-fABXLOW[i]), 6) << " ";
     */
     std::cout << fFlux[i][ii] << " +/- " << 100.0*fFluxErr[i][ii] << " %\t";
+    if ((ii+1) % 2 == 0) std::cout << std::endl << "\t  ";
   }
   std::cout << std::endl << std::endl;
 
@@ -407,6 +408,7 @@ void UsxSuw::Print(int i) const
   std::cout << "\t  ";
   for (unsigned int ii=elowedges.size()-1; ii>0; ii--) { // do not print the lowest boundary here (ii>0) instead of (ii>=0)
     std::cout << elowedges[ii] << " ";
+    if ((ii+4) % 5 == 0) std::cout << std::endl << "\t  ";
   }
   std::cout << std::endl;
   std::cout << "\t Lowest boundary (GeV): " << elowedges[0] << std::endl;
@@ -414,8 +416,9 @@ void UsxSuw::Print(int i) const
   std::cout << "\t Cumul. Flux (Part/cmq/pr):" << std::endl;
   std::cout << "\t  ";
   for (unsigned int ii=0; ii<elowedges.size()-1; ii++) {
-    std:: cout << fCumulFlux[i][ii] << " +/- "
+    std::cout << fCumulFlux[i][ii] << " +/- "
 	       << 100*fCumulFluxErr[i][ii] << " %\t";
+    if ((ii+1) % 2 == 0) std::cout << std::endl << "\t  ";
   }
   std::cout << std::endl;
 
