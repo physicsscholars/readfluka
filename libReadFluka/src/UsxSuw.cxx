@@ -447,12 +447,13 @@ void UsxSuw::Print(int i) const
 	  std::cout << "\t  Flux (Part/sr/GeV/cmq/pr):" << std::endl << "\t   ";
 	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
 	    std::cout  << GetData(i, ie-1, ia, kSR) << " +/- " << 100.0*GetDataErr(i, ie-1, ia, kSR) << " %\t";
-	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t";
+	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t   ";
 	  }
 	} else if (icase==1) {
 	  std::cout << "\t  Flux (Part/deg/GeV/cmq/pr):" << std::endl << "\t   ";
 	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
 	    std::cout << GetData(i, ie-1, ia, kDEG) << " +/- " << 100.0*GetDataErr(i, ie-1, ia, kDEG) << " %\t";
+	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t   ";
 	  }
 	}
 	std::cout << std::endl;
