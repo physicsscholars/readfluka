@@ -380,6 +380,7 @@ void UsxSuw::Print(int i) const
   std::cout << "\t  ";
   for (unsigned int ii=elowedges.size()-1; ii>0; ii--) { // do not print the lowest boundary here (ii>0) instead of (ii>=0)
     std::cout << elowedges[ii] << " ";
+    if (ii%5==0) std::cout << std::endl << "\t  ";
   }
   std::cout << std::endl;
   std::cout << "\t Lowest boundary (GeV): " << elowedges[0] << std::endl;
