@@ -16,6 +16,9 @@
             <note priority="medium" time="1289826077">
                 understand UsxSuw::SR2DEG
             </note>
+            <note priority="medium" time="1289904161">
+                Why in Tot. Resp the relative error does not scale when multiplied by area?
+            </note>
         </note>
     </note>
 </todo>
