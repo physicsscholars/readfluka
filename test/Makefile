@@ -3,10 +3,8 @@ DIFF=diff --ignore-all-space --ignore-blank-lines -i
 
 all: test_usrbin
 
-run: test_001_usrbin.bin
-
-test_001_usrbin.bin: $(FLUPRO)/flukahp test_.inp
-	$(FLUTIL)/rfluka -e $(FLUPRO)/flukahp -N0 -M1 `basename test_.inp .inp`
+run:   $(FLUPRO)/flukahp test_.inp
+	$(FLUTIL)/rfluka -e $(FLUPRO)/flukahp -N0 -M5 test_
 
 $(FLUPRO)/flukahp:
 	cd $(FLUPRO) && flutil/lfluka -m fluka
