@@ -45,7 +45,7 @@ usrbdx.txt
 * by diff (run 'make test')
 *
 SCORE        ENERGY   BEAMPART
-EVENTDAT     -503.0                                                   evdat.bin
+EVENTDAT     -104.0                                                   evdat.bin
 *EVENTDAT     +503.0                                                   evdat.txt
 *
 * Energy deposition density

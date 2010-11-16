@@ -1,4 +1,6 @@
 #! /bin/bash
+# A wrapper script to compare 2 text files, ignoring small numeric differences
+# Needs ndiff ( http://www.math.utah.edu/~beebe/software/ndiff )
 
 RELERR=1.0E-5
 ABSERR=1.0E-5
