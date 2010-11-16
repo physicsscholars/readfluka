@@ -3,11 +3,14 @@ DIFF=diff --ignore-all-space --ignore-blank-lines -i
 
 all: test_usrbin
 
-run:   $(FLUPRO)/flukahp test_.inp
+run:   $(FLUPRO)/flukahp test_.inp test_005.err
 	$(FLUTIL)/rfluka -e $(FLUPRO)/flukahp -N0 -M5 test_
 
 $(FLUPRO)/flukahp:
 	cd $(FLUPRO) && flutil/lfluka -m fluka
+
+usxsuw: run
+	./usxsuw.sh
 
 read_usryield: read_usryield.cxx
 	@echo "Compiling $@"
@@ -28,4 +31,4 @@ clean:
 	@rm -fvr obj/* *.so read_usrbin_root read_usrbin read_usryield
 
 cleandata:
-	@rm -fvr *~ fort.* *.{log,out,err,bin,txt} {rantest,fluka_}* *{_geolog,eventdat}
+	@rm -fvr *~ *test_00* fluka_* *.lis *_usxsuw

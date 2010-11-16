@@ -8,7 +8,7 @@ for file in *usrbdx; do echo $file >> $TMP; done
 echo "" >> $TMP
 echo  $OUT >> $TMP
 
-cat $TMP | $FLUTIL/usxsuw 2>/dev/null
+cat $TMP | $FLUTIL/usxsuw > /dev/null
 
 #usxsuw2txt $OUT > a.txt
 
