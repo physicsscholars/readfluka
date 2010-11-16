@@ -365,9 +365,9 @@ void UsxSuw::Print(int i) const
     std::cout << "\t current scoring)" << std::endl;
 
   std::cout << std::endl;
-  std::cout << "\tTot. resp. (Part/cmq/pr) " << AsFortran( fTotResp[i] , 6 )
-	    << " +/- " << AsFortran( 100.0*fTotRespErr[i], 5) << " %" << std::endl;
-  std::cout << "\t( -->      (Part/pr)     " <<AsFortran( fTotResp[i]*fAUSBDX[i], 6 )
+  std::cout << "\tTot. resp. (Part/cmq/pr) " << fTotResp[i] 
+	    << " +/- " << 100.0*fTotRespErr[i] << " %" << std::endl;
+  std::cout << "\t( -->      (Part/pr)     " << fTotResp[i]*fAUSBDX[i]
 	    << " +/- " << 100.0*fTotRespErr[i] << " % )" << std::endl; // !!! why the error does not change ???
 
   std::cout << std::endl;
@@ -379,10 +379,10 @@ void UsxSuw::Print(int i) const
   std::vector<float> elowedges = GetELowEdge(i);
   std::cout << "\t  ";
   for (unsigned int ii=elowedges.size()-1; ii>0; ii--) { // do not print the lowest boundary here (ii>0) instead of (ii>=0)
-    std::cout << AsFortran(elowedges[ii], 6) << " ";
+    std::cout << elowedges[ii] << " ";
   }
   std::cout << std::endl;
-  std::cout << "\t Lowest boundary (GeV): " << AsFortran(elowedges[0], 6) << std::endl;
+  std::cout << "\t Lowest boundary (GeV): " << elowedges[0] << std::endl;
 
   std::cout << std::endl;
   std::cout << "\t Flux (Part/GeV/cmq/pr):" << std::endl;
@@ -393,7 +393,7 @@ void UsxSuw::Print(int i) const
       This line is actually the same as the uncommented one (fFlux):
       std::cout << AsFortran(fGDSTOR[i][ii]*(fABXHGH[i]-fABXLOW[i]), 6) << " ";
     */
-    std::cout << AsFortran( fFlux[i][ii], 6 ) << " +/- " << AsFortran( 100.0*fFluxErr[i][ii], 5 ) << " %\t";
+    std::cout << fFlux[i][ii] << " +/- " << 100.0*fFluxErr[i][ii] << " %\t";
   }
   std::cout << std::endl << std::endl;
 
@@ -405,16 +405,16 @@ void UsxSuw::Print(int i) const
   //  std::vector<float> elowedges = GetELowEdge(i);
   std::cout << "\t  ";
   for (unsigned int ii=elowedges.size()-1; ii>0; ii--) { // do not print the lowest boundary here (ii>0) instead of (ii>=0)
-    std::cout << AsFortran(elowedges[ii], 6) << " ";
+    std::cout << elowedges[ii] << " ";
   }
   std::cout << std::endl;
-  std::cout << "\t Lowest boundary (GeV): " << AsFortran(elowedges[0], 6) << std::endl;
+  std::cout << "\t Lowest boundary (GeV): " << elowedges[0] << std::endl;
 
   std::cout << "\t Cumul. Flux (Part/cmq/pr):" << std::endl;
   std::cout << "\t  ";
   for (unsigned int ii=0; ii<elowedges.size()-1; ii++) {
-    std:: cout << AsFortran(fCumulFlux[i][ii], 6) << " +/- "
-	       << AsFortran(100*fCumulFluxErr[i][ii], 5) << " %\t";
+    std:: cout << fCumulFlux[i][ii] << " +/- "
+	       << 100*fCumulFluxErr[i][ii] << " %\t";
   }
   std::cout << std::endl;
 
@@ -423,35 +423,35 @@ void UsxSuw::Print(int i) const
     std::cout << "\t**** Double diff. Fluxes as a function of energy ****" << std::endl;
     std::vector<float> alowedges = GetALowEdge(i, kRAD);
 
-    std::cout << "\t Solid angle minimum value (sr): " << AsFortran(alowedges[0], 6) << std::endl;
+    std::cout << "\t Solid angle minimum value (sr): " << alowedges[0] << std::endl;
     std::cout << "\t Solid angle upper boundaries (sr):" << std::endl;
     std::cout << "\t  ";
     for (unsigned int ii=1; ii<alowedges.size(); ii++)
-      std::cout << AsFortran(alowedges[ii], 6) << " ";
+      std::cout << alowedges[ii] << " ";
     std::cout << std::endl;
 
     std::vector<float> alowedgesdeg = GetALowEdge(i, kDEG);
-    std::cout << "\t Angular minimum value (deg.): " << AsFortran( alowedgesdeg[0], 6) << std::endl;
+    std::cout << "\t Angular minimum value (deg.): " <<  alowedgesdeg[0] << std::endl;
     std::cout << "\t Angular upper boundaries (deg.):" << std::endl;
     std::cout << "\t  ";
     for (unsigned int ii=1; ii<alowedgesdeg.size(); ii++)
-      std::cout << AsFortran(alowedgesdeg[ii], 6) << " ";
+      std::cout << alowedgesdeg[ii] << " ";
     std::cout << std::endl;
 
     for (unsigned int ie=elowedges.size()-1; ie>0; ie--) {
       std::cout << "\t Energy interval (GeV): "
-		<< AsFortran(elowedges[ie], 6) << " "
-		<< AsFortran(elowedges[ie-1], 6) << std::endl;
+		<< elowedges[ie] << " "
+		<< elowedges[ie-1] << std::endl;
       for (int icase=0; icase<2; icase++) {
 	if (icase==0) {
 	  std::cout << "\t  Flux (Part/sr/GeV/cmq/pr):" << std::endl << "\t   ";
 	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
-	    std::cout << AsFortran( GetData(i, ie-1, ia, kSR), 7) << " +/- " << AsFortran(100.0*GetDataErr(i, ie-1, ia, kSR), 5) << " %\t";
+	    std::cout << GetData(i, ie-1, ia, kSR) << " +/- " << 100.0*GetDataErr(i, ie-1, ia, kSR) << " %\t";
 	  }
 	} else if (icase==1) {
 	  std::cout << "\t  Flux (Part/deg/GeV/cmq/pr):" << std::endl << "\t   ";
 	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
-	    std::cout << AsFortran( GetData(i, ie-1, ia, kDEG), 7, std::ios::scientific) << " +/- " << AsFortran(100.0*GetDataErr(i, ie-1, ia, kDEG), 5) << " %\t";
+	    std::cout << GetData(i, ie-1, ia, kDEG) << " +/- " << 100.0*GetDataErr(i, ie-1, ia, kDEG) << " %\t";
 	  }
 	}
 	std::cout << std::endl;
