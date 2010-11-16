@@ -3,7 +3,7 @@ DIFF=diff --ignore-all-space --ignore-blank-lines -i
 
 all: test_usrbin
 
-run:   $(FLUPRO)/flukahp test_.inp test_005.err
+run:   $(FLUPRO)/flukahp test_.inp
 	$(FLUTIL)/rfluka -e $(FLUPRO)/flukahp -N0 -M5 test_
 
 $(FLUPRO)/flukahp:
