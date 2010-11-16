@@ -96,12 +96,12 @@ bool UsxSuw::Read()
   int record=0;
   for (;;) {
     totresp = 0.0;
-    NX = ReadInt();  std::cout << "NX: " << NX << std::endl;
+    NX = ReadInt(); // std::cout << "NX: " << NX << std::endl;
 
     // line 526 in usxsuw.f
 
     fin->read(mychar, 10); mychar[10]='\0';
-    fTITUSX.push_back(Trimmed(std::string(mychar)));         std::cout << mychar << std::endl;
+    fTITUSX.push_back(Trimmed(std::string(mychar)));         //std::cout << mychar << std::endl;
     fITUSBX.push_back(ReadInt()); // type of the binning
     fIDUSBX.push_back(ReadInt()); // distr to be scored
     fNR1USX.push_back(ReadInt()); // 1st region
@@ -168,7 +168,7 @@ bool UsxSuw::Read()
   CheckFormat();
 
   fNRecords = record;
-  std::cout << "->STAT FLAG READ, " << fNRecords+1 << " records found" << std::endl;
+  std::cerr << "->STAT FLAG READ, " << fNRecords+1 << " records found" << std::endl;
 
   for (record=0; record<=fNRecords; record++) {
     //NX = record;
@@ -183,26 +183,26 @@ bool UsxSuw::Read()
       CheckFormat();
     }
 
-    fTotResp.push_back(ReadFloat()); std::cout << "total responce: " << fTotResp[record] << std::endl;
-    fTotRespErr.push_back(ReadFloat()); std::cout << "total responce error: " << fTotRespErr[record] << std::endl;
-    //std::cout << "Total responce read from file: " << t1 << " +- " << t2 << std::endl;
+    fTotResp.push_back(ReadFloat()); std::cerr << "total responce: " << fTotResp[record] << std::endl;
+    fTotRespErr.push_back(ReadFloat()); std::cerr << "total responce error: " << fTotRespErr[record] << std::endl;
+    //std::cerr << "Total responce read from file: " << t1 << " +- " << t2 << std::endl;
     //fTOTERR.push_back(t2);
     CheckFormat();
 
     int nebxbn = ReadInt(); // line 654
     int igmusx = ReadInt();
 
-    std::cout << "nebxbn: " << nebxbn << "\tigmusx: " << igmusx << std::endl;
+    std::cerr << "nebxbn: " << nebxbn << "\tigmusx: " << igmusx << std::endl;
 
-    std::cout << "ebxlow: old=" << fEBXLOW[record] << std::endl;
+    std::cerr << "ebxlow: old=" << fEBXLOW[record] << std::endl;
     PrintFloat(1);
 
-    std::cout << "epgmax (energy boundaries):\t";
+    std::cerr << "epgmax (energy boundaries):\t";
     for (int ii=0; ii<nebxbn+igmusx+1; ii++) {
       std::cerr << ReadFloat() << " ";
-      if ((ii+2) % 10 == 0) std::cout << std::endl;
+      if ((ii+2) % 10 == 0) std::cerr << std::endl;
     }
-    std::cout << std::endl;
+    std::cerr << std::endl;
 
     CheckFormat();
 
@@ -243,7 +243,7 @@ bool UsxSuw::Read()
     CheckFormat();
 
     if (fNABXBN[record]>1) { // more than one angular interval
-      std::cout << "angles: " << std::endl;
+      std::cerr << "angles: " << std::endl;
       vtmp.clear();
       for (unsigned int ii=0; ii<GetNbinsTotal(record); ii++)
 	vtmp.push_back(ReadFloat());
@@ -253,7 +253,7 @@ bool UsxSuw::Read()
   }
 
 
-  //  for (int j=0; j<10; j++) std::cout << ReadFloat() << std::endl;
+  //  for (int j=0; j<10; j++) std::cerr << ReadFloat() << std::endl;
 
 
   /*  // INTERV - total number of enery intervals
@@ -270,7 +270,7 @@ bool UsxSuw::Read()
 
   delete [] mychar; mychar = 0; // is it ok? !!!
 
-  std::cout << "number of records:" << fNRecords << std::endl;
+  std::cerr << "number of records:" << fNRecords << std::endl;
   for (int ii=0; ii<=fNRecords ; ii++) Print(ii);
 
   return true;
@@ -347,9 +347,9 @@ void UsxSuw::Print(int i) const
 {
   std::cerr << "UsxSuw::Print" << std::endl;
   std::cout << std::endl;
-  std::cout << "Detector n: " << i+1 << " (" << i+1 << ") " << GetBinName(i) <<  std::endl;
+  std::cout << "Detector n: " << i+1 << "( " << i+1 << ") " << GetBinName(i) <<  std::endl;
   std::cout << "\t(Area: " << GetArea(i) << " cmq," << std::endl;
-  std::cout << "\t distr. scored: " << GetID(i) << "," << std::endl;
+  std::cout << "\t distr. scored: " << GetID(i) << " ," << std::endl;
   std::cout << "\t from reg. " << GetRegFrom(i) << " to " << GetRegTo(i) << "," << std::endl;
   if (IsReadNeutrons(i)) {
     std::cout << "\t low energy neutrons scored from group 1" << " to group " << GetMaxNeutronGroup(i) << std::endl;
