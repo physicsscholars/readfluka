@@ -15,12 +15,20 @@ for file in *usrbdx; do echo $file >> $TMP; done
 echo "" >> $TMP
 echo  $OUT >> $TMP
 
-cat $TMP | $USXSUW > /dev/null || ( echo  "usxsuw conversion failed" && exit 2 )
+cat $TMP | $USXSUW > /dev/null || {
+ echo  "usxsuw conversion failed"
+ rm -f $TMP
+ exit 2 
+}
 
-#usxsuw2txt $OUT > a.txt
+TMP1=$(mktemp)
+usxsuw2txt $OUT > $TMP1 || { 
+	echo -e "\033[31m usxsuw2txt conversion failed \033[0m"
+	rm -f $TMP $TMP1
+	exit 3
+}
 
-#bash ndiff.sh a.txt "$OUT"_sum.lis
 
-bash ndiff.sh USXSUW <(usxsuw2txt $OUT) <(cat "$OUT"_sum.lis)
+bash ndiff.sh USXSUW $TMP1 "$OUT"_sum.lis
 
-rm -f $TMP
+rm -fv $TMP $TMP1
