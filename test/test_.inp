@@ -43,7 +43,7 @@ SCORE          208.0     210.0
 *
 * Boundary crossing fluence in the middle of the target (log intervals, one-way) - electrons
 USRBDX          99.0  ELECTRON     -47.0       3.0       4.0     400. eFluenUD
-USRBDX         +50.0                 2.0                 0.0      3.0 &
+USRBDX         +50.0                20.0                 0.0      3.0 &
 *
 * Boundary crossing fluence in the middle of the target (log intervals, one-way)
 *USRBDX          99.0     209.0     -47.0       3.0       4.0     400. piFluenUD
