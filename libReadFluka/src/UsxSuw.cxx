@@ -432,7 +432,7 @@ void UsxSuw::Print(int i) const
     std::cout << "\t  ";
     for (unsigned int ii=1; ii<alowedges.size(); ii++) {
       std::cout << alowedges[ii] << " ";
-      if ( (ii+1)%5 == 0) std::cout << std::endl << "\t  ";
+      if ( (ii%5) == 0) std::cout << std::endl << "\t  ";
     }
     std::cout << std::endl;
 
