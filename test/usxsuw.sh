@@ -29,6 +29,6 @@ usxsuw2txt $OUT > $TMP1 || {
 }
 
 
-bash ndiff.sh USXSUW $TMP1 "$OUT"_sum.lis
+bash $READFLUKA_SYS/../test/ndiff.sh USXSUW $TMP1 "$OUT"_sum.lis
 
 rm -fv $TMP $TMP1
