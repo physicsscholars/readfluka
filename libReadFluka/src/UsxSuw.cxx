@@ -177,22 +177,21 @@ bool UsxSuw::Read()
     //    fTOTTOT.push_back(ReadFloat());
     //    float t1 = ReadFloat();
     //float t2 = ReadFloat();
-   
+    std::cerr << std::endl;
     fTotResp.push_back(ReadFloat()); std::cerr << "total responce: " << fTotResp[record] << std::endl;
     fTotRespErr.push_back(ReadFloat()); std::cerr << "total responce error: " << fTotRespErr[record] << std::endl;
 
+    if (record==2) {
+      PrintFloat(1);
+    }
+
     CheckFormat();
 
-    /*    if (record>0) {
-      std::cerr << "strange numbers if record>0:" << std::endl;
-      PrintInt(1);
+    if (record==2) {
       PrintFloat(2);
-      }*/
-
-    
-    //std::cerr << "Total responce read from file: " << t1 << " +- " << t2 << std::endl;
-    //fTOTERR.push_back(t2);
-    //    CheckFormat();
+      //      PrintInt(2);
+      CheckFormat();
+    }
 
     int nebxbn = ReadInt(); // line 654
     int igmusx = ReadInt();
