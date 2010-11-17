@@ -138,6 +138,7 @@ namespace ReadFluka {
     // void XbinsE_len() const;
 
     void Print(int i) const;
+    inline void Print() const { for (int i=0; i<fNRecords; i++) Print(i); }
   };
 }
 

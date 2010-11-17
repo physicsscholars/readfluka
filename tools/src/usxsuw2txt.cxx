@@ -16,7 +16,7 @@ int main(int argc, const char **argv)
 
   int i=0;
   usxsuw->Read();
-  //usxsuw->Print(i);
+  usxsuw->Print();
   i++;
   
 
