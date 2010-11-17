@@ -430,8 +430,10 @@ void UsxSuw::Print(int i) const
     std::cout << "\t Solid angle minimum value (sr): " << alowedges[0] << std::endl;
     std::cout << "\t Solid angle upper boundaries (sr):" << std::endl;
     std::cout << "\t  ";
-    for (unsigned int ii=1; ii<alowedges.size(); ii++)
+    for (unsigned int ii=1; ii<alowedges.size(); ii++) {
       std::cout << alowedges[ii] << " ";
+      if ( (ii+1)%5 == 0) std::cout << std::endl << "\t  ";
+    }
     std::cout << std::endl;
 
     std::vector<float> alowedgesdeg = GetALowEdge(i, kDEG);
