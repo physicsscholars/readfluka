@@ -167,10 +167,10 @@ bool UsxSuw::Read()
 
   CheckFormat();
 
-  fNRecords = record;
-  std::cerr << "->STAT FLAG READ, " << fNRecords+1 << " records found" << std::endl;
+  fNRecords = record+1;
+  std::cerr << "->STAT FLAG READ, " << fNRecords << " records found" << std::endl;
 
-  for (record=0; record<=fNRecords; record++) {
+  for (record=0; record<fNRecords; record++) {
     //NX = record;
     //  MX = 0; //!!! check this !!! - total number of detectors?
     //    CheckFormat();
@@ -838,6 +838,7 @@ float UsxSuw::GetDataErr(unsigned int i, unsigned int ie, unsigned int ia, EUnit
   /*
     Return relative error of the data (above low energy neutrons) in energy bin 'ie' and angular bin 'ia'
    */
-
-  return fGBSTOR[i][ie+ia*fNEBXBN[i]];
+  unsigned int y = ie+ia*fNEBXBN[i];
+  std::cout << "GetDataErr: " << i << " " << y << std::endl;
+  return fGBSTOR[i][y];
 }
