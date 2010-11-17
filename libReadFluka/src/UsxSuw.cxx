@@ -440,8 +440,10 @@ void UsxSuw::Print(int i) const
     std::cout << "\t Angular minimum value (deg.): " <<  alowedgesdeg[0] << std::endl;
     std::cout << "\t Angular upper boundaries (deg.):" << std::endl;
     std::cout << "\t  ";
-    for (unsigned int ii=1; ii<alowedgesdeg.size(); ii++)
+    for (unsigned int ii=1; ii<alowedgesdeg.size(); ii++) {
       std::cout << alowedgesdeg[ii] << " ";
+      if ( (ii%5) == 0) std::cout << std::endl << "\t  ";
+    }
     std::cout << std::endl;
 
     for (unsigned int ie=elowedges.size()-1; ie>0; ie--) {
