@@ -274,9 +274,6 @@ bool UsxSuw::Read()
 
   delete [] mychar; mychar = 0; // is it ok? !!!
 
-  std::cerr << "number of records:" << fNRecords << std::endl;
-  for (int ii=0; ii<=fNRecords ; ii++) Print(ii);
-
   return true;
 }
 
