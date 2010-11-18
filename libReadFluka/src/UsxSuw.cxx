@@ -346,7 +346,7 @@ const char* UsxSuw::GetYtitle(int i) const
 
 void UsxSuw::Print(int i) const
 {
-  std::cerr << "UsxSuw::Print" << std::endl;
+  //  std::cerr << "UsxSuw::Print" << std::endl;
   std::cout << std::endl;
   std::cout << "Detector n: " << i+1 << "( " << i+1 << ") " << GetBinName(i) <<  std::endl;
   std::cout << "\t(Area: " << GetArea(i) << " cmq," << std::endl;
