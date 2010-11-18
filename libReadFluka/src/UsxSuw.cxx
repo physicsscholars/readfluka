@@ -118,8 +118,6 @@ bool UsxSuw::Read()
 
     CheckFormat();
 
-    PrintInt(20);
-
     if (fLLNUSX[record]) {  // low energy neutrons
       // std::cout << " read low energy neutrons" << std::endl;
 
@@ -146,7 +144,7 @@ bool UsxSuw::Read()
     //KLAST = K2;
 
     vtmp.clear();
-    for (int j=0; j<GetNbinsTotal(record); j++) {
+    for (int j=0; j<GetNbinsTotal(record) + fIGMUSX[record]*GetNbinsA(record); j++) {
       dtmp = ReadFloat(); //std::cout << j-K0 << " " << dtmp << "\t";
       vtmp.push_back(dtmp);
     }
@@ -220,7 +218,9 @@ bool UsxSuw::Read()
     //std::reverse(vtmp.begin(), vtmp.end());
     fFlux.push_back(vtmp);
 
+    std::cout << "here" << std::endl;
     CheckFormat();
+    std::cout << "here" << std::endl;
 
     vtmp.clear();
     for (unsigned int ii=0; ii<GetNbinsE(record); ii++) { // flux error
