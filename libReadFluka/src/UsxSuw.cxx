@@ -181,17 +181,17 @@ bool UsxSuw::Read()
     fTotResp.push_back(ReadFloat()); std::cerr << "total responce: " << fTotResp[record] << std::endl;
     fTotRespErr.push_back(ReadFloat()); std::cerr << "total responce error: " << fTotRespErr[record] << std::endl;
 
-    if (record==2) {
+    /*    if (record==2) {
       PrintFloat(1);
-    }
+      }*/
 
     CheckFormat();
 
-    if (record==2) {
+    /*    if (record==2) {
       PrintFloat(2);
       //      PrintInt(2);
       CheckFormat();
-    }
+      }*/
 
     int nebxbn = ReadInt(); // line 654
     int igmusx = ReadInt();
@@ -253,7 +253,7 @@ bool UsxSuw::Read()
 	vtmp.push_back(ReadFloat());
       CheckFormat();
     }
-    fGBSTOR.push_back(vtmp);
+    fGBSTOR.push_back(vtmp); // in any case we need to push_back even an empty vector in order not to break the addressing
   }
 
 
