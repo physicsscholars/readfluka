@@ -839,6 +839,6 @@ float UsxSuw::GetDataErr(unsigned int i, unsigned int ie, unsigned int ia, EUnit
     Return relative error of the data (above low energy neutrons) in energy bin 'ie' and angular bin 'ia'
    */
   unsigned int y = ie+ia*fNEBXBN[i];
-  std::cout << "GetDataErr: " << i << " " << y << std::endl;
+  //  std::cout << "GetDataErr: " << i << " " << y << std::endl;
   return fGBSTOR[i][y];
 }
