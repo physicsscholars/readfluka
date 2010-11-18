@@ -246,14 +246,14 @@ bool UsxSuw::Read()
 
     CheckFormat();
 
+    vtmp.clear();
     if (fNABXBN[record]>1) { // more than one angular interval
       std::cerr << "angles: " << std::endl;
-      vtmp.clear();
       for (unsigned int ii=0; ii<GetNbinsTotal(record); ii++)
 	vtmp.push_back(ReadFloat());
-      fGBSTOR.push_back(vtmp);
       CheckFormat();
     }
+    fGBSTOR.push_back(vtmp);
   }
 
 
@@ -838,7 +838,7 @@ float UsxSuw::GetDataErr(unsigned int i, unsigned int ie, unsigned int ia, EUnit
   /*
     Return relative error of the data (above low energy neutrons) in energy bin 'ie' and angular bin 'ia'
    */
-  return 0;
+  //  return 0;
   unsigned int y = ie+ia*fNEBXBN[i];
   //  std::cout << "GetDataErr: " << i << " " << y << std::endl;
   return fGBSTOR[i][y];
