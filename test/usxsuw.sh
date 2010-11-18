@@ -2,6 +2,7 @@
 
 TMP=$(mktemp)
 OUT=test_usxsuw
+SUMLIS="$OUT"_sum.lis
 USXSUW=$FLUTIL/usxsuw
 
 if [ ! -f $USXSUW ]; then
@@ -28,7 +29,11 @@ usxsuw2txt $OUT > $TMP1 || {
 	exit 3
 }
 
+if [ $(awk NF $TMP1 | wc -l) -ne $(awk NF $SUMLIS | wc -l) ]; then
+        echo -e "\033[31m Line number test filed\033[0m"
+        exit 4
+fi
 
 bash $READFLUKA_SYS/../test/ndiff.sh USXSUW $TMP1 "$OUT"_sum.lis
 
-rm -fv $TMP $TMP1
+rm -f $TMP $TMP1
