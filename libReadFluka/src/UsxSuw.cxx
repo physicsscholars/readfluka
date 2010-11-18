@@ -455,13 +455,13 @@ void UsxSuw::Print(int i) const
 	if (icase==0) {
 	  std::cout << "\t  Flux (Part/sr/GeV/cmq/pr):" << std::endl << "\t   ";
 	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
-	    std::cout  << GetData(i, ie-1, ia, kSR) << " +/- " ;//<< 100.0*GetDataErr(i, ie-1, ia, kSR) << " %\t";
+	    std::cout  << GetData(i, ie-1, ia, kSR) << " +/- " << 100.0*GetDataErr(i, ie-1, ia, kSR) << " %\t";
 	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t   ";
 	  }
 	} else if (icase==1) {
 	  std::cout << "\t  Flux (Part/deg/GeV/cmq/pr):" << std::endl << "\t   ";
 	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
-	    std::cout << GetData(i, ie-1, ia, kDEG) << " +/- " ;//<< 100.0*GetDataErr(i, ie-1, ia, kDEG) << " %\t";
+	    std::cout << GetData(i, ie-1, ia, kDEG) << " +/- " << 100.0*GetDataErr(i, ie-1, ia, kDEG) << " %\t";
 	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t   ";
 	  }
 	}
@@ -838,6 +838,7 @@ float UsxSuw::GetDataErr(unsigned int i, unsigned int ie, unsigned int ia, EUnit
   /*
     Return relative error of the data (above low energy neutrons) in energy bin 'ie' and angular bin 'ia'
    */
+  return 0;
   unsigned int y = ie+ia*fNEBXBN[i];
   //  std::cout << "GetDataErr: " << i << " " << y << std::endl;
   return fGBSTOR[i][y];
