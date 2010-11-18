@@ -118,6 +118,8 @@ bool UsxSuw::Read()
 
     CheckFormat();
 
+    PrintInt(20);
+
     if (fLLNUSX[record]) {  // low energy neutrons
       // std::cout << " read low energy neutrons" << std::endl;
 
