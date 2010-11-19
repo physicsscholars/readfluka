@@ -411,8 +411,8 @@ void UsxSuw::Print(int i) const
   std::cout << std::endl;
 
   if (IsReadNeutrons(i)) {
-    std::cerr << "Energy boundaries before low energy:" << std::endl;
-    for (unsigned int ii=0; ii<fNEBXBN[i]; ii++) std::cerr << fEPGMAX[i][ii] << std::endl;
+    //    std::cerr << "Energy boundaries before low energy:" << std::endl;
+    //    for (unsigned int ii=0; ii<fNEBXBN[i]; ii++) std::cerr << fEPGMAX[i][ii] << std::endl;
    
     PrintLowEnergyBoundaries(i);
 
@@ -497,7 +497,7 @@ void UsxSuw::Print(int i) const
 	if (icase==0) {
 	  std::cout << "\t  Flux (Part/sr/GeV/cmq/pr):" << std::endl << "\t   ";
 	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
-	    std::cout  << GetData(i, NE-ie, ia, kSR) << " +/- " << 100.0*GetDataErr(i, NE-ie, ia, kSR) << " %\t";
+	    std::cout  << GetData(i, fNEBXBN[i]-ie, ia, kSR) << " +/- " << 100.0*GetDataErr(i, fNEBXBN[i]-ie, ia, kSR) << " %\t";
 	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t   "; 
 	  }
 	} else if (icase==1) {
