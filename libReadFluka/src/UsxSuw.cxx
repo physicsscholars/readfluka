@@ -390,7 +390,7 @@ void UsxSuw::Print(int i) const
   std::cout << "new: ";*/
   for (unsigned int ii=0; ii<fNEBXBN[i]; ii++) {
     std::cout << elowedges[ii] << " ";
-    if (ii+1%5==0) std::cout << std::endl;
+    if ((ii+1)%5==0) std::cout << std::endl << "\t  ";
   }
   std::cout << std::endl;
 
