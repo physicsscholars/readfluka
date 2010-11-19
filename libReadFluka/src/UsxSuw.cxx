@@ -908,6 +908,6 @@ void UsxSuw::PrintLowEnergyBoundaries(unsigned int i) const
     if ((ii-fNEBXBN[i]+1)%5 == 0) std::cout << std::endl << "\t  ";
   }
   std::cout << std::endl;
-  std::cout << "\t  Lowest boundary: " << fEPGMAX[i][fIGMUSX[i]+fNEBXBN[i]]  << std::endl;
+  std::cout << "\t  Lowest boundary (GeV): " << fEPGMAX[i][fIGMUSX[i]+fNEBXBN[i]]  << std::endl;
   std::cout << std::endl;
 }
