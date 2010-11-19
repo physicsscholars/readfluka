@@ -144,7 +144,7 @@ bool UsxSuw::Read()
     //KLAST = K2;
 
     vtmp.clear();
-    for (int j=0; j<GetNbinsTotal(record) + fIGMUSX[record]*GetNbinsA(record); j++) {
+    for (int j=0; j<GetNbinsTotal(record); j++) {
       dtmp = ReadFloat(); //std::cout << j-K0 << " " << dtmp << "\t";
       vtmp.push_back(dtmp);
     }
@@ -210,20 +210,20 @@ bool UsxSuw::Read()
 
     CheckFormat();
 
+
+    std::cout << "NbinsE: " << GetNbinsE(record) << std::endl;
     vtmp.clear();
-    for (unsigned int ii=0; ii<GetNbinsE(record); ii++) { // flux
+    for (unsigned int ii=0; ii<GetNbinsE(record) + fIGMUSX[record]; ii++) { // flux
       vtmp.push_back(ReadFloat());
     }
     // FLUKA writes the array in a reverse way, so we reverse it again:
     //std::reverse(vtmp.begin(), vtmp.end());
     fFlux.push_back(vtmp);
 
-    std::cout << "here" << std::endl;
     CheckFormat();
-    std::cout << "here" << std::endl;
 
     vtmp.clear();
-    for (unsigned int ii=0; ii<GetNbinsE(record); ii++) { // flux error
+    for (unsigned int ii=0; ii<GetNbinsE(record) + fIGMUSX[record]; ii++) { // flux error
       vtmp.push_back(ReadFloat());
     }
     //std::reverse(vtmp.begin(), vtmp.end());
@@ -233,7 +233,7 @@ bool UsxSuw::Read()
     CheckFormat();
 
     vtmp.clear();
-    for (unsigned int ii=0; ii<GetNbinsE(record); ii++) { // cumulative flux
+    for (unsigned int ii=0; ii<GetNbinsE(record) + fIGMUSX[record]; ii++) { // cumulative flux
       vtmp.push_back(ReadFloat());
     }
     fCumulFlux.push_back(vtmp);
@@ -241,7 +241,7 @@ bool UsxSuw::Read()
     CheckFormat();
 
     vtmp.clear();
-    for (unsigned int ii=0; ii<GetNbinsE(record); ii++) { // cumulative flux error
+    for (unsigned int ii=0; ii<GetNbinsE(record) + fIGMUSX[record]; ii++) { // cumulative flux error
       vtmp.push_back(ReadFloat());
     }
     fCumulFluxErr.push_back(vtmp);
@@ -253,7 +253,9 @@ bool UsxSuw::Read()
       std::cerr << "angles: " << std::endl;
       for (unsigned int ii=0; ii<GetNbinsTotal(record); ii++)
 	vtmp.push_back(ReadFloat());
+    std::cout << "here" << std::endl;
       CheckFormat();
+    std::cout << "here" << std::endl;
     }
     fGBSTOR.push_back(vtmp); // in any case we need to push_back even an empty vector in order not to break the addressing
   }
