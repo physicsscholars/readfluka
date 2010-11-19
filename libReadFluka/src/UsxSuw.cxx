@@ -440,7 +440,7 @@ void UsxSuw::Print(int i) const
 
   std::cout << "\t Cumul. Flux (Part/cmq/pr):" << std::endl;
   std::cout << "\t  ";
-  for (unsigned int ii=0; ii<elowedges.size()-1; ii++) {
+  for (unsigned int ii=0; ii<fNEBXBN[i]; ii++) {
     std::cout << fCumulFlux[i][ii] << " +/- "
 	       << 100*fCumulFluxErr[i][ii] << " %\t";
     if ((ii+1) % 2 == 0) std::cout << std::endl << "\t  ";
@@ -797,9 +797,6 @@ std::vector<float> UsxSuw::GetELowEdge(unsigned int i) const
 {
   /*
     Return low edges for energy bins. ???The array size is bin+1 (since we want to know the high edge for the last bin)???
-    !!! maybe it worth returning fEPGMAX instead since
-    1. the boundaries are calculated by FLUKA
-    2. it also includes the low energy part neutrons
    */
 
   //  std::cerr << "UsxSuw::ELowEdge: NOT YET IMPLEMENTED" << std::endl;
@@ -807,7 +804,7 @@ std::vector<float> UsxSuw::GetELowEdge(unsigned int i) const
 
   return fEPGMAX[i];
 
-  std::vector<float> vec;
+  /*  std::vector<float> vec;
   float val;
   unsigned int nint = fNEBXBN[i]; // number of energy intervals without low energy neutrons
 
@@ -825,7 +822,7 @@ std::vector<float> UsxSuw::GetELowEdge(unsigned int i) const
   //for (unsigned int ie=0; ie<vec.size(); ie++)
   //std::cout << "ebin" << ie << " "  << vec[ie] << " " << std::endl;
 
-  return vec;
+  return vec;*/
 }
 
 float UsxSuw::GetLowestBoundary(unsigned int i) const
