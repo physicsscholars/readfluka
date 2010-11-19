@@ -451,7 +451,7 @@ void UsxSuw::Print(int i) const
     PrintLowEnergyBoundaries(i);
     
     // low energy cumul flux
-    std::cout << "\t Flux (Part/GeV/cmq/pr):" << std::endl << "\t  ";
+    std::cout << "\t Cumul. Flux (Part/cmq/pr):" << std::endl << "\t  "; // added Cumul
     for (unsigned int ii=fNEBXBN[i]; ii<fFlux[i].size(); ii++) {
       std::cout << fCumulFlux[i][ii] << " +/- " << 100.0*fCumulFluxErr[i][ii] << " %\t";
       if ((ii+1) % 2 == 0) std::cout << std::endl << "\t  ";
