@@ -19,6 +19,9 @@
             <note priority="medium" time="1289904161">
                 Why in Tot. Resp the relative error does not scale when multiplied by area?
             </note>
+            <note priority="medium" time="1290168516">
+                UsxSuw::GetELowEdge: try returning fEPGMAX instead of calculating the boundaries by myself
+            </note>
         </note>
     </note>
 </todo>

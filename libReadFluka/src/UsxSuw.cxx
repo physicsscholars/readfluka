@@ -201,12 +201,14 @@ bool UsxSuw::Read()
     std::cerr << "ebxlow: old=" << fEBXLOW[record] << std::endl;
     PrintFloat(1);
 
-    std::cerr << "epgmax (energy boundaries):\t";
+    //    std::cerr << "epgmax (energy boundaries):\t";
+    vtmp.clear();
     for (int ii=0; ii<nebxbn+igmusx+1; ii++) {
-      std::cerr << ReadFloat() << " ";
-      if ((ii+2) % 10 == 0) std::cerr << std::endl;
+      vtmp.push_back(ReadFloat());
+      //      if ((ii+2) % 10 == 0) std::cerr << std::endl;
     }
-    std::cerr << std::endl;
+    //    std::cerr << std::endl;
+    fEPGMAX.push_back(vtmp);
 
     CheckFormat();
 
@@ -384,7 +386,7 @@ void UsxSuw::Print(int i) const
     if ((elowedges.size()-1-ii+1) % 5 == 0) std::cout << std::endl << "\t  ";
   }
   std::cout << std::endl;
-  std::cout << "\t Lowest boundary (GeV): " << elowedges[0] << std::endl;
+  std::cout << "\t Lowest boundary (GeV): " << GetLowestBoundary(i) << std::endl;  // !!! not elowedges[0] !!!
 
   std::cout << std::endl;
   std::cout << "\t Flux (Part/GeV/cmq/pr):" << std::endl;
@@ -398,12 +400,21 @@ void UsxSuw::Print(int i) const
     std::cout << fFlux[i][ii] << " +/- " << 100.0*fFluxErr[i][ii] << " %\t";
     if ((ii+1) % 2 == 0) std::cout << std::endl << "\t  ";
   }
-  std::cout << std::endl << std::endl;
+  std::cout << std::endl;
 
   if (IsReadNeutrons(i)) {
-    std::cout << "\t Energy boundaries (GeV):" << std::endl;
-    
+    std::cerr << "Energy boundaries before low energy:" << std::endl;
+    for (unsigned int ii=0; ii<fNEBXBN[i]; ii++) std::cerr << fEPGMAX[i][ii] << std::endl;
+   
+    PrintLowEnergyBoundaries(i);
+
+    std::cout << "\t Flux (Part/GeV/cmq/pr):" << std::endl << "\t  ";
+    for (unsigned int ii=fNEBXBN[i]; ii<fFlux[i].size(); ii++) {
+      std::cout << fFlux[i][ii] << " +/- " << 100.0*fFluxErr[i][ii] << " %\t";
+      if ((ii+1) % 2 == 0) std::cout << std::endl << "\t  ";
+    }
   }
+  std::cout << std::endl;
 
   std::cout << "\t**** Cumulative Fluxes as a function of energy ****" << std::endl
 	    << "\t****      (integrated over solid angle)        ****" << std::endl;
@@ -417,7 +428,7 @@ void UsxSuw::Print(int i) const
     if ((elowedges.size()-1-ii+1) % 5 == 0) std::cout << std::endl << "\t  ";
   }
   std::cout << std::endl;
-  std::cout << "\t Lowest boundary (GeV): " << elowedges[0] << std::endl;
+  std::cout << "\t Lowest boundary (GeV): " << GetLowestBoundary(i) << std::endl;
 
   std::cout << "\t Cumul. Flux (Part/cmq/pr):" << std::endl;
   std::cout << "\t  ";
@@ -427,6 +438,17 @@ void UsxSuw::Print(int i) const
     if ((ii+1) % 2 == 0) std::cout << std::endl << "\t  ";
   }
   std::cout << std::endl;
+
+  if (IsReadNeutrons(i)) {
+    PrintLowEnergyBoundaries(i);
+    
+    // low energy cumul flux
+    std::cout << "\t Flux (Part/GeV/cmq/pr):" << std::endl << "\t  ";
+    for (unsigned int ii=fNEBXBN[i]; ii<fFlux[i].size(); ii++) {
+      std::cout << fCumulFlux[i][ii] << " +/- " << 100.0*fCumulFluxErr[i][ii] << " %\t";
+      if ((ii+1) % 2 == 0) std::cout << std::endl << "\t  ";
+    }
+  }
 
   if (fNABXBN[i]>1) {
     std::cout << std::endl;
@@ -767,6 +789,9 @@ std::vector<float> UsxSuw::GetELowEdge(unsigned int i) const
 {
   /*
     Return low edges for energy bins. ???The array size is bin+1 (since we want to know the high edge for the last bin)???
+    !!! maybe it worth returning fEPGMAX instead since
+    1. the boundaries are calculated by FLUKA
+    2. it also includes the low energy part neutrons
    */
 
   //  std::cerr << "UsxSuw::ELowEdge: NOT YET IMPLEMENTED" << std::endl;
@@ -790,6 +815,12 @@ std::vector<float> UsxSuw::GetELowEdge(unsigned int i) const
   //std::cout << "ebin" << ie << " "  << vec[ie] << " " << std::endl;
 
   return vec;
+}
+
+float UsxSuw::GetLowestBoundary(unsigned int i) const
+{
+  if (IsReadNeutrons(i)) return fEPGMAX[i][fNEBXBN[i]];
+  else return GetELowEdge(i)[0];
 }
 
 
@@ -847,4 +878,19 @@ float UsxSuw::GetDataErr(unsigned int i, unsigned int ie, unsigned int ia, EUnit
   unsigned int y = ie+ia*fNEBXBN[i];
   //  std::cout << "GetDataErr: " << i << " " << y << std::endl;
   return fGBSTOR[i][y];
+}
+
+void UsxSuw::PrintLowEnergyBoundaries(unsigned int i) const
+{
+  if (!IsReadNeutrons(i)) return;
+
+  std::cout << "\t Energy boundaries (GeV):" << std::endl << "\t  ";
+  std::cout << std::scientific;
+  for (unsigned int ii=fNEBXBN[i]; ii<fIGMUSX[i]+fNEBXBN[i]; ii++) { // ! Note that here we start from
+    std::cout << fEPGMAX[i][ii] << " ";
+    if ((ii-fNEBXBN[i]+1)%5 == 0) std::cout << std::endl << "\t  ";
+  }
+  std::cout << std::endl;
+  std::cout << "\t  Lowest boundary: " << fEPGMAX[i][fIGMUSX[i]+fNEBXBN[i]]  << std::endl;
+  std::cout << std::endl;
 }

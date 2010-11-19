@@ -70,6 +70,7 @@ namespace ReadFluka {
     void       Reset();
 
     inline double SR2DEG(double val) const { return std::acos(std::max(1.0-val/M_PI/2.0, -1.0)) * 180.0/M_PI; } // strange function used in usxsuw.f
+    void PrintLowEnergyBoundaries(unsigned int i) const;
 
   public:
     UsxSuw(const char *fname);
@@ -129,6 +130,7 @@ namespace ReadFluka {
     std::vector<float> GetALowEdge(unsigned int i, EUnit unit=kRAD) const;
     float GetAwidthRAD(unsigned int i, unsigned int bin) const;
     std::vector<float> GetELowEdge(unsigned int i) const;
+    float GetLowestBoundary(unsigned int i) const;
 
     float GetTotalResponce(unsigned int i) const;
 
