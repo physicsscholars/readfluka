@@ -454,7 +454,7 @@ void UsxSuw::Print(int i) const
     std::cout << "\t Cumul. Flux (Part/cmq/pr):" << std::endl << "\t  "; // added Cumul 
     for (unsigned int ii=fNEBXBN[i]; ii<fFlux[i].size(); ii++) {
       std::cout << fCumulFlux[i][ii] << " +/- " << 100.0*fCumulFluxErr[i][ii] << " %\t";
-      if ((ii+1) % 2 == 0) std::cout << std::endl << "\t  ";
+      if ((ii-fNEBXBN[i]+1) % 2 == 0) std::cout << std::endl << "\t  ";
     }
   }
 
