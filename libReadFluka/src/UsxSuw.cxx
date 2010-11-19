@@ -497,7 +497,7 @@ void UsxSuw::Print(int i) const
 	if (icase==0) {
 	  std::cout << "\t  Flux (Part/sr/GeV/cmq/pr):" << std::endl << "\t   ";
 	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
-	    std::cout  << GetData(i, ie, ia, kSR) << " +/- " << 100.0*GetDataErr(i, ie, ia, kSR) << " %\t";
+	    std::cout  << GetData(i, NE-ie, ia, kSR) << " +/- " << 100.0*GetDataErr(i, NE-ie, ia, kSR) << " %\t";
 	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t   ";
 	  }
 	} else if (icase==1) {
@@ -869,8 +869,8 @@ float UsxSuw::GetData(unsigned int i, unsigned int ie, unsigned int ia, EUnit un
           ) * 180.D+00 / PIPIPI
   */
 
-  //  double val = fGDSTOR[i][ie+ia*fNEBXBN[i]]; // original formula
-  double val = fGDSTOR[i][ie+ia*GetNEbinsTotal(i)];
+  double val = fGDSTOR[i][ie+ia*fNEBXBN[i]]; // original formula
+  //double val = fGDSTOR[i][ie+ia*GetNEbinsTotal(i)];
   //return val;// !!! remove this
 
   switch (unit) {
