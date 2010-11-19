@@ -796,6 +796,9 @@ std::vector<float> UsxSuw::GetELowEdge(unsigned int i) const
 
   //  std::cerr << "UsxSuw::ELowEdge: NOT YET IMPLEMENTED" << std::endl;
 
+
+  return fEPGMAX[i];
+
   std::vector<float> vec;
   float val;
   unsigned int nint = fNEBXBN[i]; // number of energy intervals without low energy neutrons
