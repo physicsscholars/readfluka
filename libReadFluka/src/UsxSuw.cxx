@@ -381,11 +381,19 @@ void UsxSuw::Print(int i) const
 
   std::vector<float> elowedges = GetELowEdge(i);
   std::cout << "\t  ";
-  for (unsigned int ii=elowedges.size()-1; ii>0; ii--) { // do not print the lowest boundary here (ii>0) instead of (ii>=0)
+  /*  for (unsigned int ii=elowedges.size()-1; ii>0; ii--) { // do not print the lowest boundary here (ii>0) instead of (ii>=0)
     std::cout << elowedges[ii] << " ";
     if ((elowedges.size()-1-ii+1) % 5 == 0) std::cout << std::endl << "\t  ";
   }
   std::cout << std::endl;
+  // new
+  std::cout << "new: ";*/
+  for (unsigned int ii=0; ii<fNEBXBN[i]; ii++) {
+    std::cout << elowedges[ii] << " ";
+    if (ii+1%5==0) std::cout << std::endl;
+  }
+  std::cout << std::endl;
+
   std::cout << "\t Lowest boundary (GeV): " << GetLowestBoundary(i) << std::endl;  // !!! not elowedges[0] !!!
 
   std::cout << std::endl;
@@ -423,9 +431,9 @@ void UsxSuw::Print(int i) const
 
   //  std::vector<float> elowedges = GetELowEdge(i);
   std::cout << "\t  ";
-  for (unsigned int ii=elowedges.size()-1; ii>0; ii--) { // do not print the lowest boundary here (ii>0) instead of (ii>=0)
+  for (unsigned int ii=0; ii<fNEBXBN[i]; ii++) { // do not print the lowest boundary here (ii>0) instead of (ii>=0)
     std::cout << elowedges[ii] << " ";
-    if ((elowedges.size()-1-ii+1) % 5 == 0) std::cout << std::endl << "\t  ";
+    if ((ii+1) % 5 == 0) std::cout << std::endl << "\t  ";
   }
   std::cout << std::endl;
   std::cout << "\t Lowest boundary (GeV): " << GetLowestBoundary(i) << std::endl;
@@ -474,21 +482,21 @@ void UsxSuw::Print(int i) const
     }
     std::cout << std::endl;
 
-    for (unsigned int ie=elowedges.size()-1; ie>0; ie--) {
+    for (unsigned int ie=1; ie<=fNEBXBN[i]; ie++) {
       std::cout << "\t Energy interval (GeV): "
-		<< elowedges[ie] << " "
-		<< elowedges[ie-1] << std::endl;
+		<< elowedges[ie-1] << " "
+		<< elowedges[ie] << std::endl;
       for (int icase=0; icase<2; icase++) {
 	if (icase==0) {
 	  std::cout << "\t  Flux (Part/sr/GeV/cmq/pr):" << std::endl << "\t   ";
 	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
-	    std::cout  << GetData(i, ie-1, ia, kSR) << " +/- " << 100.0*GetDataErr(i, ie-1, ia, kSR) << " %\t";
+	    std::cout  << GetData(i, fNEBXBN[i]-ie, ia, kSR) << " +/- " << 100.0*GetDataErr(i, fNEBXBN[i]-ie, ia, kSR) << " %\t";
 	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t   ";
 	  }
 	} else if (icase==1) {
 	  std::cout << "\t  Flux (Part/deg/GeV/cmq/pr):" << std::endl << "\t   ";
 	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
-	    std::cout << GetData(i, ie-1, ia, kDEG) << " +/- " << 100.0*GetDataErr(i, ie-1, ia, kDEG) << " %\t";
+	    std::cout << GetData(i, fNEBXBN[i]-ie, ia, kDEG) << " +/- " << 100.0*GetDataErr(i, fNEBXBN[i]-ie, ia, kDEG) << " %\t";
 	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t   ";
 	  }
 	}
@@ -823,7 +831,7 @@ std::vector<float> UsxSuw::GetELowEdge(unsigned int i) const
 float UsxSuw::GetLowestBoundary(unsigned int i) const
 {
   if (IsReadNeutrons(i)) return fEPGMAX[i][fNEBXBN[i]];
-  else return GetELowEdge(i)[0];
+  else return GetELowEdge(i)[fNEBXBN[i]];
 }
 
 
