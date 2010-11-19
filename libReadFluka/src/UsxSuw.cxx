@@ -503,7 +503,7 @@ void UsxSuw::Print(int i) const
 	} else if (icase==1) {
 	  std::cout << "\t  Flux (Part/deg/GeV/cmq/pr):" << std::endl << "\t   ";
 	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
-	    //std::cout << GetData(i, fNEBXBN[i]-ie, ia, kDEG) << " +/- " << 100.0*GetDataErr(i, fNEBXBN[i]-ie, ia, kDEG) << " %\t";
+	    std::cout << GetData(i, fNEBXBN[i]-ie, ia, kDEG) << " +/- " << 100.0*GetDataErr(i, fNEBXBN[i]-ie, ia, kDEG) << " %\t";
 	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t   ";
 	  }
 	}
