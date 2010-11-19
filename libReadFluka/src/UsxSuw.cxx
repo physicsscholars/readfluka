@@ -458,6 +458,8 @@ void UsxSuw::Print(int i) const
     }
   }
 
+  //  std::cout << std::fixed;
+  
   if (fNABXBN[i]>1) {
     std::cout << std::endl;
     std::cout << "\t**** Double diff. Fluxes as a function of energy ****" << std::endl;
@@ -482,7 +484,12 @@ void UsxSuw::Print(int i) const
     }
     std::cout << std::endl;
 
-    for (unsigned int ie=1; ie<=fNEBXBN[i]; ie++) {
+    std::cerr << "GetNbinsTotal: " << GetNbinsTotal(i) << std::endl;
+    std::cerr << "fNEBXBN: " << fNEBXBN[i] << std::endl;
+    std::cerr << "GetNEbinsTotal: " << GetNEbinsTotal(i) << std::endl;
+
+    unsigned int NE = GetNEbinsTotal(i);
+    for (unsigned int ie=1; ie<=NE; ie++) {
       std::cout << "\t Energy interval (GeV): "
 		<< elowedges[ie-1] << " "
 		<< elowedges[ie] << std::endl;
@@ -490,13 +497,13 @@ void UsxSuw::Print(int i) const
 	if (icase==0) {
 	  std::cout << "\t  Flux (Part/sr/GeV/cmq/pr):" << std::endl << "\t   ";
 	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
-	    std::cout  << GetData(i, fNEBXBN[i]-ie, ia, kSR) << " +/- " << 100.0*GetDataErr(i, fNEBXBN[i]-ie, ia, kSR) << " %\t";
+	    std::cout  << GetData(i, ie, ia, kSR) << " +/- " << 100.0*GetDataErr(i, ie, ia, kSR) << " %\t";
 	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t   ";
 	  }
 	} else if (icase==1) {
 	  std::cout << "\t  Flux (Part/deg/GeV/cmq/pr):" << std::endl << "\t   ";
 	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
-	    std::cout << GetData(i, fNEBXBN[i]-ie, ia, kDEG) << " +/- " << 100.0*GetDataErr(i, fNEBXBN[i]-ie, ia, kDEG) << " %\t";
+	    //std::cout << GetData(i, fNEBXBN[i]-ie, ia, kDEG) << " +/- " << 100.0*GetDataErr(i, fNEBXBN[i]-ie, ia, kDEG) << " %\t";
 	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t   ";
 	  }
 	}
@@ -862,7 +869,9 @@ float UsxSuw::GetData(unsigned int i, unsigned int ie, unsigned int ia, EUnit un
           ) * 180.D+00 / PIPIPI
   */
 
-  double val = fGDSTOR[i][ie+ia*fNEBXBN[i]];
+  //  double val = fGDSTOR[i][ie+ia*fNEBXBN[i]]; // original formula
+  double val = fGDSTOR[i][ie+ia*GetNEbinsTotal(i)];
+  //return val;// !!! remove this
 
   switch (unit) {
   case kSR:

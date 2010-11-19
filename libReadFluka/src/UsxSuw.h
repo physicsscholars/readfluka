@@ -116,7 +116,8 @@ namespace ReadFluka {
     inline unsigned int GetNbinsA(int i) const { return GetNABXBN(i); }
     inline float GetAwidth(int i) const { return fDABXBN[i]; }
 
-    inline unsigned int GetNbinsTotal(int i) const { return (GetNbinsE(i)+fIGMUSX[i])*GetNbinsA(i); }
+    inline unsigned int GetNbinsTotal(int i) const  { return (GetNbinsE(i)+fIGMUSX[i])*GetNbinsA(i); }
+    inline unsigned int GetNEbinsTotal(int i) const { return GetNbinsE(i)+fIGMUSX[i]; }
     //    inline int GetNScored(int i) const { return fNScored[i]; }
     //    inline float *GetScored() const { return fScored; }
     float GetScored(unsigned int ie, unsigned int ia) const;
