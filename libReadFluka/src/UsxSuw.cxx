@@ -416,7 +416,7 @@ void UsxSuw::Print(int i) const
    
     PrintLowEnergyBoundaries(i);
 
-    std::cout << "\t Fluxs (Part/GeV/cmq/pr):" << std::endl << "\t  ";
+    std::cout << "\t Flux (Part/GeV/cmq/pr):" << std::endl << "\t  ";
     for (unsigned int ii=fNEBXBN[i]; ii<fFlux[i].size(); ii++) {
       std::cout << fFlux[i][ii] << " +/- " << 100.0*fFluxErr[i][ii] << " %\t";
       if ((ii-fNEBXBN[i]+1) % 2 == 0) std::cout << std::endl << "\t  ";
