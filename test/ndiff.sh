@@ -6,8 +6,8 @@
 #   or   ndiff.sh TESTID <(cat file1) <(cat file2)
 #        TESTID - any string to describe the current test
 
-RELERR=1.0E-3
-ABSERR=1.0E-3
+RELERR=1.0E-5
+ABSERR=5.0E-5
 
 TESTID=$1
 

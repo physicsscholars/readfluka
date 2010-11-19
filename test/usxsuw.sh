@@ -30,7 +30,7 @@ usxsuw2txt $OUT > $TMP1 || {
 }
 
 if [ $(awk NF $TMP1 | wc -l) -ne $(awk NF $SUMLIS | wc -l) ]; then
-        echo -e "\033[31m Line number test filed\033[0m"
+        echo -e "\033[31m Line number test failed\033[0m"
         exit 4
 fi
 
