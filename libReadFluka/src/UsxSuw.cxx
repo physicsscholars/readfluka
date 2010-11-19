@@ -144,11 +144,11 @@ bool UsxSuw::Read()
     //KLAST = K2;
 
     vtmp.clear();
-    for (int j=0; j<GetNbinsTotal(record); j++) {
+    for (unsigned int j=0; j<GetNbinsTotal(record); j++) {
       dtmp = ReadFloat(); //std::cout << j-K0 << " " << dtmp << "\t";
       vtmp.push_back(dtmp);
     }
-    std::cout << std::endl;
+    //    std::cout << std::endl;
     totresp += std::accumulate(vtmp.begin(), vtmp.end(), 0.0f);
     fGDSTOR.push_back(vtmp); // line 540 in usxsuw.f
 
@@ -168,7 +168,7 @@ bool UsxSuw::Read()
   CheckFormat();
 
   fNRecords = record+1;
-  std::cerr << "->STAT FLAG READ, " << fNRecords << " records found" << std::endl;
+  //  std::cerr << "->STAT FLAG READ, " << fNRecords << " records found" << std::endl;
 
   for (record=0; record<fNRecords; record++) {
     //NX = record;
@@ -211,7 +211,6 @@ bool UsxSuw::Read()
     CheckFormat();
 
 
-    std::cout << "NbinsE: " << GetNbinsE(record) << std::endl;
     vtmp.clear();
     for (unsigned int ii=0; ii<GetNbinsE(record) + fIGMUSX[record]; ii++) { // flux
       vtmp.push_back(ReadFloat());
@@ -250,12 +249,10 @@ bool UsxSuw::Read()
 
     vtmp.clear();
     if (fNABXBN[record]>1) { // more than one angular interval
-      std::cerr << "angles: " << std::endl;
+      //      std::cerr << "angles: " << std::endl;
       for (unsigned int ii=0; ii<GetNbinsTotal(record); ii++)
 	vtmp.push_back(ReadFloat());
-    std::cout << "here" << std::endl;
       CheckFormat();
-    std::cout << "here" << std::endl;
     }
     fGBSTOR.push_back(vtmp); // in any case we need to push_back even an empty vector in order not to break the addressing
   }
@@ -356,9 +353,8 @@ void UsxSuw::Print(int i) const
   std::cout << "\t(Area: " << GetArea(i) << " cmq," << std::endl;
   std::cout << "\t distr. scored: " << GetID(i) << " ," << std::endl;
   std::cout << "\t from reg. " << GetRegFrom(i) << " to " << GetRegTo(i) << "," << std::endl;
-  if (IsReadNeutrons(i)) {
-    std::cout << "\t low energy neutrons scored from group 1" << " to group " << GetMaxNeutronGroup(i) << std::endl;
-  }
+  //if (IsReadNeutrons(i)) std::cout << "\t low energy neutrons scored from group 1" << " to group " << GetMaxNeutronGroup(i) << std::endl;
+  
   if (IsOneWay(i) == true)
     std::cout << "\t one way scoring," << std::endl;
   else
@@ -394,7 +390,7 @@ void UsxSuw::Print(int i) const
   std::cout << "\t Flux (Part/GeV/cmq/pr):" << std::endl;
   std::cout << "\t  ";
 
-  for (unsigned int ii=0; ii<fFlux[i].size(); ii++) {
+  for (unsigned int ii=0; ii<fNEBXBN[i]; ii++) { // do not loop over low energy neutrons, that's why we use fNEBXBN[i] instead of fFlux[i].size()
     /*
       This line is actually the same as the uncommented one (fFlux):
       std::cout << AsFortran(fGDSTOR[i][ii]*(fABXHGH[i]-fABXLOW[i]), 6) << " ";
@@ -403,6 +399,11 @@ void UsxSuw::Print(int i) const
     if ((ii+1) % 2 == 0) std::cout << std::endl << "\t  ";
   }
   std::cout << std::endl << std::endl;
+
+  if (IsReadNeutrons(i)) {
+    std::cout << "\t Energy boundaries (GeV):" << std::endl;
+    
+  }
 
   std::cout << "\t**** Cumulative Fluxes as a function of energy ****" << std::endl
 	    << "\t****      (integrated over solid angle)        ****" << std::endl;
