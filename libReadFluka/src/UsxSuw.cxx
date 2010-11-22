@@ -488,22 +488,47 @@ void UsxSuw::Print(int i) const
     std::cerr << "fNEBXBN: " << fNEBXBN[i] << std::endl;
     std::cerr << "GetNEbinsTotal: " << GetNEbinsTotal(i) << std::endl;
 
-    unsigned int NE = GetNEbinsTotal(i);
-    for (unsigned int ie=1; ie<=NE; ie++) {
-      std::cout << "\t Energy interval (GeV): "
-		<< elowedges[ie-1] << " "
-		<< elowedges[ie] << std::endl;
+
+    //    for (unsigned int ii=0; ii<NE; ii++) std::cout << ii << '\t' << fGDSTOR[i][ii] << std::endl;
+
+    //    std::cout << std::fixed;
+    for (unsigned int ie=0; ie<GetNbinsE(i); ie++) {
+      std::cout << "\t Energy interval (GeV): " << elowedges[ie] << " " << elowedges[ie+1] << std::endl;
       for (int icase=0; icase<2; icase++) {
 	if (icase==0) {
 	  std::cout << "\t  Flux (Part/sr/GeV/cmq/pr):" << std::endl << "\t   ";
 	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
-	    std::cout  << GetData(i, fNEBXBN[i]-ie, ia, kSR) << " +/- " << 100.0*GetDataErr(i, fNEBXBN[i]-ie, ia, kSR) << " %\t";
+	    std::cout << GetData(i, GetNbinsE(i)-ie-1, ia, kSR) << " +/- " << 100.0*GetDataErr(i, GetNbinsE(i)-ie-1, ia, kSR) << " %\t";
+	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t   ";
+	  }
+	} else if (icase==1) {
+	  std::cout << "\t  Flux (Part/deg/GeV/cmq/pr):" << std::endl << "\t   ";
+	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
+	    std::cout << GetData(i, GetNbinsE(i)-ie-1, ia, kDEG) << " +/- " << 100.0*GetDataErr(i, GetNbinsE(i)-ie-1, ia, kDEG) << " %\t";
+	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t   ";
+	  }
+	}
+      }
+      std::cout << std::endl;
+    }
+
+
+    unsigned int NE = GetNEbinsTotal(i); // 107 - as in FLUKA
+    for (unsigned int ie=GetNbinsE(i); ie<NE; ie++) {
+      std::cout << "\t Energy interval (GeV): "
+		<< elowedges[ie] << " "
+		<< elowedges[ie+1] << std::endl;
+      for (int icase=0; icase<2; icase++) {
+	if (icase==0) {
+	  std::cout << "\t  Flux (Part/sr/GeV/cmq/pr):" << std::endl << "\t   ";
+	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
+	    std::cout  << GetData1(i, ie, ia, kSR) << " +/- " << 0*100.0*GetDataErr(i, ie, ia, kSR) << " %\t";
 	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t   "; 
 	  }
 	} else if (icase==1) {
 	  std::cout << "\t  Flux (Part/deg/GeV/cmq/pr):" << std::endl << "\t   ";
 	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
-	    std::cout << GetData(i, fNEBXBN[i]-ie, ia, kDEG) << " +/- " << 100.0*GetDataErr(i, fNEBXBN[i]-ie, ia, kDEG) << " %\t";
+	    std::cout << GetData1(i, ie, ia, kDEG) << " +/- " << 0*100.0*GetDataErr(i, ie, ia, kDEG) << " %\t";
 	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t   ";
 	  }
 	}
@@ -859,19 +884,10 @@ float UsxSuw::GetData(unsigned int i, unsigned int ie, unsigned int ia, EUnit un
     unit == kDEG: [Part/deg/GeV/cmq/pr]
    */
 
-
-  /*
-     ACOS (
-            MAX ( 1.D+00 - OMGMAX(IA) / TWOPIP, - 1.D+00 )
-          ) * 180.D+00 / PIPIPI -
-     ACOS (
-            MAX ( 1.D+00 - OMGMAX(IA-1) / TWOPIP, - 1.D+00 )
-          ) * 180.D+00 / PIPIPI
-  */
-
-  double val = fGDSTOR[i][ie+ia*fNEBXBN[i]]; // original formula
-  //double val = fGDSTOR[i][ie+ia*GetNEbinsTotal(i)];
-  //return val;// !!! remove this
+  unsigned int y = ie + ia*fNEBXBN[i];
+  //y = ie + ia*GetNEbinsTotal(i);
+  double val = fGDSTOR[i][y];
+  // return val;// !!! remove this
 
   switch (unit) {
   case kSR:
@@ -891,6 +907,7 @@ float UsxSuw::GetDataErr(unsigned int i, unsigned int ie, unsigned int ia, EUnit
   /*
     Return relative error of the data (above low energy neutrons) in energy bin 'ie' and angular bin 'ia'
    */
+
   //  return 0;
   unsigned int y = ie+ia*fNEBXBN[i];
   //  std::cout << "GetDataErr: " << i << " " << y << std::endl;
@@ -910,4 +927,30 @@ void UsxSuw::PrintLowEnergyBoundaries(unsigned int i) const
   std::cout << std::endl;
   std::cout << "\t  Lowest boundary (GeV): " << fEPGMAX[i][fIGMUSX[i]+fNEBXBN[i]]  << std::endl;
   std::cout << std::endl;
+}
+
+float UsxSuw::GetData1(unsigned int i, unsigned int ie, unsigned int ia, EUnit unit) const
+{
+  /*
+    Return data (above low energy neutrons) in energy bin 'ie' and angular bin 'ia'
+    unit == kSR:  [Part/sr/GeV/cmq/pr]
+    unit == kDEG: [Part/deg/GeV/cmq/pr]
+   */
+
+  unsigned int y = ie + ia*GetNEbinsTotal(i);
+  //y = ie + ia*GetNEbinsTotal(i);
+  double val = fGDSTOR[i][y];
+  // return val;// !!! remove this
+
+  switch (unit) {
+  case kSR:
+    return val;
+  case kDEG: {
+    std::vector<float> vec = GetALowEdge(i, kRAD);
+    return val * ( vec[ia+1]-vec[ia] ) / (SR2DEG(vec[ia+1]) - SR2DEG(vec[ia]) );
+  }
+  default:
+    std::cerr << "WARNING: UsxSuw::GetData: unit " << unit << " is not supported -> return 0" << std::endl;
+    return 0.0;
+  }
 }
