@@ -461,7 +461,7 @@ void UsxSuw::Print(int i) const
   //  std::cout << std::fixed;
   
   if (fNABXBN[i]>1) {
-    std::cout << std::endl;
+    std::cout << std::endl << std::endl;
     std::cout << "\t**** Double diff. Fluxes as a function of energy ****" << std::endl;
     std::vector<float> alowedges = GetALowEdge(i, kRAD);
 
@@ -511,13 +511,13 @@ void UsxSuw::Print(int i) const
       }
       std::cout << std::endl;
     }
-
+    //    std::cout << "here" << std::endl;
 
     unsigned int NE = GetNEbinsTotal(i); // 107 - as in FLUKA
-    for (unsigned int ie=GetNbinsE(i); ie<NE; ie++) {
+    for (unsigned int ie=GetNbinsE(i)+1; ie<NE; ie++) {
       std::cout << "\t Energy interval (GeV): "
-		<< elowedges[ie] << " "
-		<< elowedges[ie+1] << std::endl;
+		<< elowedges[ie-1] << " "
+		<< elowedges[ie] << std::endl;
       for (int icase=0; icase<2; icase++) {
 	if (icase==0) {
 	  std::cout << "\t  Flux (Part/sr/GeV/cmq/pr):" << std::endl << "\t   ";
