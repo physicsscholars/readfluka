@@ -379,7 +379,7 @@ void UsxSuw::Print(int i) const
 
   std::cout << "\t Energy boundaries (GeV):" << std::endl;
 
-  std::vector<float> elowedges = GetELowEdge(i);
+  std::vector<float> elowedges = GetELowEdge(i); // GetELowEdge(i) = fEPGMAX[i]
   std::cout << "\t  ";
   /*  for (unsigned int ii=elowedges.size()-1; ii>0; ii--) { // do not print the lowest boundary here (ii>0) instead of (ii>=0)
     std::cout << elowedges[ii] << " ";
@@ -488,10 +488,11 @@ void UsxSuw::Print(int i) const
     std::cerr << "fNEBXBN: " << fNEBXBN[i] << std::endl;
     std::cerr << "GetNEbinsTotal: " << GetNEbinsTotal(i) << std::endl;
 
+    unsigned int NE = GetNEbinsTotal(i); // 107 - as in FLUKA
+    //std::cout << "NE: " << NE << std::endl;
+    //for (unsigned int ii=0; ii<NE*GetNbinsA(i); ii++) std::cout << ii << '\t' << fGDSTOR[i][ii] << std::endl;
 
-    //    for (unsigned int ii=0; ii<NE; ii++) std::cout << ii << '\t' << fGDSTOR[i][ii] << std::endl;
-
-    //    std::cout << std::fixed;
+    //   High-energy part:
     for (unsigned int ie=0; ie<GetNbinsE(i); ie++) {
       std::cout << "\t Energy interval (GeV): " << elowedges[ie] << " " << elowedges[ie+1] << std::endl;
       for (int icase=0; icase<2; icase++) {
@@ -511,24 +512,23 @@ void UsxSuw::Print(int i) const
       }
       std::cout << std::endl;
     }
-    //    std::cout << "here" << std::endl;
-
-    unsigned int NE = GetNEbinsTotal(i); // 107 - as in FLUKA
-    for (unsigned int ie=GetNbinsE(i)+1; ie<NE; ie++) {
+    //    std::cout << "low-energy:" << std::endl;
+    //  Low-energy part:
+    for (unsigned int ie=GetNbinsE(i); ie<NE; ie++) {
       std::cout << "\t Energy interval (GeV): "
-		<< elowedges[ie-1] << " "
-		<< elowedges[ie] << std::endl;
+		<< elowedges[ie] << " "
+		<< elowedges[ie+1] << std::endl;
       for (int icase=0; icase<2; icase++) {
 	if (icase==0) {
 	  std::cout << "\t  Flux (Part/sr/GeV/cmq/pr):" << std::endl << "\t   ";
 	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
-	    std::cout  << GetData1(i, ie, ia, kSR) << " +/- " << 0*100.0*GetDataErr(i, ie, ia, kSR) << " %\t";
+	    std::cout  << GetData1(i, ie-GetNbinsE(i)+GetNbinsHGH(i), ia, kSR) << " +/- " << 100.0*GetData1Err(i, ie-GetNbinsE(i)+GetNbinsHGH(i), ia, kSR) << " %\t";
 	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t   "; 
 	  }
 	} else if (icase==1) {
 	  std::cout << "\t  Flux (Part/deg/GeV/cmq/pr):" << std::endl << "\t   ";
 	  for (unsigned int ia=0; ia<GetNbinsA(i); ia++) {
-	    std::cout << GetData1(i, ie, ia, kDEG) << " +/- " << 0*100.0*GetDataErr(i, ie, ia, kDEG) << " %\t";
+	    std::cout << GetData1(i, ie-GetNbinsE(i)+GetNbinsHGH(i), ia, kDEG) << " +/- " << 100.0*GetData1Err(i, ie-GetNbinsE(i)+GetNbinsHGH(i), ia, kDEG) << " %\t";
 	    if ((ia+1)%2 == 0) std::cout << std::endl << "\t   ";
 	  }
 	}
@@ -937,7 +937,7 @@ float UsxSuw::GetData1(unsigned int i, unsigned int ie, unsigned int ia, EUnit u
     unit == kDEG: [Part/deg/GeV/cmq/pr]
    */
 
-  unsigned int y = ie + ia*GetNEbinsTotal(i);
+  unsigned int y = ie + ia*fIGMUSX[i]; //GetNEbinsTotal(i);
   //y = ie + ia*GetNEbinsTotal(i);
   double val = fGDSTOR[i][y];
   // return val;// !!! remove this
@@ -953,4 +953,16 @@ float UsxSuw::GetData1(unsigned int i, unsigned int ie, unsigned int ia, EUnit u
     std::cerr << "WARNING: UsxSuw::GetData: unit " << unit << " is not supported -> return 0" << std::endl;
     return 0.0;
   }
+}
+
+float UsxSuw::GetData1Err(unsigned int i, unsigned int ie, unsigned int ia, EUnit unit) const
+{
+  /*
+    Return relative error of the data (above low energy neutrons) in energy bin 'ie' and angular bin 'ia'
+   */
+
+  //  return 0;
+  unsigned int y = ie+ia*fIGMUSX[i];
+  //  std::cout << "GetDataErr: " << i << " " << y << std::endl;
+  return fGBSTOR[i][y];
 }

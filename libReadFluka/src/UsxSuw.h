@@ -116,6 +116,7 @@ namespace ReadFluka {
     inline unsigned int GetNbinsA(int i) const { return GetNABXBN(i); }
     inline float GetAwidth(int i) const { return fDABXBN[i]; }
 
+    inline unsigned int GetNbinsHGH(int i) const { return GetNbinsE(i)*GetNbinsA(i); }
     inline unsigned int GetNbinsTotal(int i) const  { return (GetNbinsE(i)+GetMaxNeutronGroup(i))*GetNbinsA(i); }
     inline unsigned int GetNEbinsTotal(int i) const { return GetNbinsE(i)+GetMaxNeutronGroup(i); }
     //    inline int GetNScored(int i) const { return fNScored[i]; }
@@ -139,6 +140,7 @@ namespace ReadFluka {
     float GetDataErr(unsigned int i, unsigned int ie, unsigned int ia, EUnit unit) const;
 
     float    GetData1(unsigned int i, unsigned int ie, unsigned int ia, EUnit unit) const;
+    float GetData1Err(unsigned int i, unsigned int ie, unsigned int ia, EUnit unit) const;
 
     // void XbinsE_len() const;
 
