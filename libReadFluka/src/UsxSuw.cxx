@@ -490,7 +490,7 @@ void UsxSuw::Print(int i) const
 
     unsigned int NE = GetNEbinsTotal(i); // 107 - as in FLUKA
     //std::cout << "NE: " << NE << std::endl;
-    //for (unsigned int ii=0; ii<NE*GetNbinsA(i); ii++) std::cout << ii << '\t' << fGDSTOR[i][ii] << std::endl;
+    // for (unsigned int ii=0; ii<NE*GetNbinsA(i); ii++) std::cout << ii << '\t' << fGDSTOR[i][ii] << std::endl;
 
     //   High-energy part:
     for (unsigned int ie=0; ie<GetNbinsE(i); ie++) {
