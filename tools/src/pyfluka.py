@@ -2,22 +2,28 @@ import sys, getopt, re, string, math
 from array import array
 from string import *
 
-global _project_name
-_project_name = "CMP"
+#global _project_name
+#_project_name = "SORDO"
 
-global _file_geo_name
-_file_geo_name = _project_name.lower() + ".geo"
+#global _file_geo_name
+#_file_geo_name = _project_name.lower() + ".geo"
 
-global _file_geo
-_file_geo =  open(_file_geo_name, "w")
+#global _file_geo
+#_file_geo =  open(_file_geo_name, "w")
 
-global _rotdefi_i
-_rotdefi_i = int(1)
+#global _lattice_file
+#_lattice_file = _project_name.lower() + ".lattice"
+
+#global _rotdefi_file
+#_rotdefi_file = _project_name.lower() + ".rotdefi"
+
+#global _rotdefi_i
+#_rotdefi_i = int(1)
 
 def CheckName(name):
     'checks BODY/REGION name for FLUKA com'
     if len(str(name)) > 8:
-        print >>sys.stderr, "name", name, "is too long"
+        print >>sys.stderr, "\033[31m WARNING: name", name, "is too long \033[0m"
         return 1
     if name[0] not in string.letters:
         print >>sys.stderr, "name:", name
@@ -29,9 +35,12 @@ class BODY:
     'class for a body'
     code = None
     name = None
+    whats = []
 
-    def __init__(self):
-        CheckName(self.name)
+    def __init__(self, name, w1, w2, w3, w4, w5, w6):
+        self.name = name
+        self.whats = w1, w2, w3, w4, w5, w6
+#        CheckName(self.name)
     
     def Print(self, name, w1, w2, w3, w4, w5, w6, comment):
         CheckName(name)
@@ -41,71 +50,9 @@ class BODY:
         else:
             print >> _file_geo, "%5s %8s %#9.4g %#9.4g %#9.4g %#10.3f %#9.3f %#9.3f      ! %s" %( self.code, name, w1, w2, w3, w4, w5, w6, comment )
 
-#############################
-
-class RPP(BODY):
-    '''
-    RPP - rectangular parallelepiped
-    It is possible to use both FLUKA and GEANT3 notations in constructor.
-    FLUKA:  name, xmin,    xmax,    ymin,    ymax, zmin, zmax
-    GEANT3: name, xcenter, ycenter, zcenter, array
-            array is an array of 3 numbers of half-dimentions
-    '''
-    code = 'RPP'
-    xmin = None
-    xmax = None
-    ymin = None
-    ymax = None
-    zmin = None
-    zmax = None
-    comment = None
-    # GEANT3 notation:        x     y     z   array  comment
-    def __init__(self, name, xmin, xmax, ymin, ymax, zmin=None, zmax=None, comment=None):
+    def Print3(self, name, w1, w2, w3, comment):
         self.name = name
-        BODY.__init__(self)
-        if zmax is not None:               # then FLUKA notation
-            self.xmin = xmin
-            self.xmax = xmax
-            self.ymin = ymin
-            self.ymax = ymax
-            self.zmin = zmin
-            self.zmax = zmax
-            self.comment = comment
-        else:                              # then GEANT3 notation
-            self.xmin = xmin - ymax[0]
-            self.xmax = xmin + ymax[0]
-            self.ymin = xmax - ymax[1]
-            self.ymax = xmax + ymax[1]
-            self.zmin = ymin - ymax[2]
-            self.zmax = ymin + ymax[2]
-            self.comment = zmin
-        self.Print()
-
-    def Print(self):
-        print >> _file_geo, "%5s %8s %#9.4f %9.4f %9.4f %9.4f %9.4f %9.4f" % ( self.code, self.name, self.xmin, self.xmax, self.ymin, self.ymax, self.zmin, self.zmax )
-
-#############################
-
-class SPH(BODY):
-    'SPH - sphere'
-    x = None
-    y = None
-    z = None
-    R = None
-    def __init__(self, name, x, y, z, R, comment=None):
-        self.code = "SPH"
-        self.name = name
-        BODY.__init__(self)
-        self.x = x
-        self.y = y
-        self.z = z
-        self.R = R
-        self.comment = comment
-        self.Print()
-
-    def Print(self):
-        print >> _file_geo, "%5s %8s %9.3f %9.3f %9.3f %9.3f" % (self.code, self.name, self.x, self.y, self.z, self.R)
-
+        print >> _file_geo, "%5s %8s %9.3f %9.3f %9.3f" % (self.code, self.name, w1, w2, w3)
 #############################
 
 class XYP(BODY):
@@ -121,124 +68,14 @@ class XYP(BODY):
         print >> _file_geo, "%5s %8s %9.3f" % (self.code, self.name, z)
 
 
-class YZP(BODY):
-    'YZP - plane perpendicular to the x-axis'
-    x = None
-    def __init__(self, name, x, comment=None):
-        self.code = "YZP"
-        self.name = name
-        self.x = x
-        self.Print(name, x, comment)
-
-    def Print(self, name, x, comment):
-        print >> _file_geo, "%5s %8s %9.3f" % (self.code, self.name, x)
-
-class XZP(BODY):
-    'XZP - plane perpendicular to the y-axis'
-    y = None
-    def __init__(self, name, y, comment=None):
-        self.code = "XZP"
-        self.name = name
-        self.y = y
-        self.Print(name, y, comment)
-
-    def Print(self, name, y, comment):
-        print >> _file_geo, "%5s %8s %9.3f" % (self.code, self.name, y)
-
-#############################
-
-class ZCC(BODY):
-    'ZCC - cyllinder parallel to z-axis'
-    x = None
-    y = None
-    R = None
-    def __init__(self, name, x, y, R, comment=None):
-        self.code = "ZCC"
-        self.x = x
-        self.y = y
-        self.R = R
-        self.Print(name, x, y, R, comment)
-
-    def Print(self, name, x, y, R, comment):
-        self.name = name
-        print >> _file_geo, "%5s %8s %9.3f %9.3f %9.3f" % (self.code, self.name, x, y, R)
-
-class XCC(BODY):
-    'XCC - cyllinder parallel to x-axis'
-    y = None
-    z = None
-    R = None
-    def __init__(self, name, y, z, R, comment=None):
-        self.code = "XCC"
-        self.y = y
-        self.z = z
-        self.R = R
-        self.Print(name, y, z, R, comment)
-
-    def Print(self, name, y, z, R, comment):
-        self.name = name
-        print >> _file_geo, "%5s %8s %9.3f %9.3f %9.3f" % (self.code, self.name, y, z, R)
-
-class YCC(BODY):
-    'YCC - cyllinder parallel to y-axis'
-    def __init__(self, name, x, z, R, comment=None):
-        self.code = "YCC"
-        self.Print(name, x, z, R, comment)
 
 
-    def Print(self, name, y, z, R, comment):
-        self.name = name
-        print >> _file_geo, "%5s %8s %9.3f %9.3f %9.4f" % (self.code, self.name, y, z, R)        
 
-############################
 
 _reg_counter = 0
 global _materials
 _materials = []
 
-class Region:
-    'describes a region as a combination of bodies/zones'
-    name = None
-    naz = 5
-    title = None
-    comment = None
-    material = None
-    counter = 0
-
-    def __init__(self, name, title, material="", comment=None, naz=5):
-        global _reg_counter
-        _reg_counter = _reg_counter+1
-        self.counter = _reg_counter
-        
-        CheckName(name)
-        self.name = name
-        self.title = title
-        self.comment = comment
-        self.material = material
-        if self.material is not "":
-            CheckName(self.material)
-            _materials.append("%9s%11s" % (self.material, self.name))
-        if naz is not 0:
-            self.naz = int(naz)
-        self.Print()
-
-    def Print(self):
-        if self.comment is not None:
-            print >> _file_geo,  '* region', self.counter, '-', self.comment
-        words = self.title.split()
-        len_of_line = 0
-        for i in range(len(words)):
-            len_of_line += len(words[i]) + 1
-            if len_of_line > 70:
-                words[i] = words[i] + "\n" + " "*12
-                len_of_line = 0
-#            if i and not i % 15: words[i] = words[i] + "\n" + " "*12
-#            if i and not i % 13: words[i] = words[i] + "  "
-        self.title = join(words)
-        print >> _file_geo, "%9s %3d  %s" % (self.name, self.naz, self.title)
-    
-###############################
-        
 def ASSIGNMAT(fname=None):
     material_to_skip = "lattice"
     
@@ -278,6 +115,46 @@ def ROTDEFI(index, polar, azimutal, x, y, z):
 
 global _estimators
 _estimators = []
+
+class USRBDX:
+    classname = 'USRBDX'
+    quantity = None
+    particle = None
+    unit = None
+    upstream = None
+    downstream = None
+    norma = None
+    sdum = None
+    max1 = None
+    min1 = None
+    n1   = None
+    max2 = None
+    min2 = None
+    type = None
+
+    def __init__(self, quantity, particle, unit, upstream, downstream, norma, sdum, max1, min1, n1, max2, min2, type):
+        self.quantity = quantity
+        self.particle = particle
+        self.unit = unit
+        self.upstream = upstream
+        self.downstream = downstream
+        self.norma = norma
+        self.sdum = sdum
+        CheckName(sdum)
+        self.max1 = max1
+        self.min1 = min1
+        self.n1 = n1
+        self.max2 = max2
+        self.min2 = min2
+        self.type = type
+        _estimators.append(self)
+
+    def GetLine(self):
+        return "%-9.8s %9.1f %9s %9.1f %9s %9s %9.1f %-.8s\n%-9.8s %10.3f %#9.3G%9.1f %9.3f %9.3f %9.1f &\n*" % (self.classname, self.quantity, self.particle, self.unit, self.upstream, self.downstream, self.norma, self.sdum, self.classname, self.max1, self.min1, self.n1, self.max2, self.min2, self.type)
+#        return "%-9.8s %9.1f %9s %9.1f %9s %9s %9.1f %-.8s \n*" % (self.classname, self.quantity, self.particle, self.unit, self.upstream, self.downstream, self.norma, self.sdum)
+
+    def Print(self):
+        print >> _file_geo, self.GetLine()
 
 class USRBIN:
     classname = 'USRBIN'
@@ -390,3 +267,147 @@ def ESTIMATORS(fname=None):
 #    file.write("! generated by pyfluka.py\n")
 #    file.write("%-9.8s %9.1f%9.0f.0\n" % ("RANDOMIZE", 1.0, random.random()*2e+6) )
 #    file.close
+
+
+class Project:
+    name = None # name of the project (one word - used in the file names)
+    title = None # title of the project
+    geofilename = None # name of the geometry file
+    geofile = None # geometry file
+    ivopt = None
+    idbg = None
+    region_counter = 0
+    materials = []
+    assignmatfilename = None
+
+    def __init__(self, name, title, ivopt=0, idbg=0):
+        self.name = name
+        self.title = title
+        self.geofilename = self.name.lower() + ".geo"
+        self.geofile = open(self.geofilename, "w")
+        self.ivopt = ivopt
+        self.idbg = idbg
+#        self.region_counter = 0
+        self.assignmatfilename = self.name.lower() + ".assignmat"
+        print >> self.geofile, "%5d%5d               %s" % (self.ivopt, self.idbg, self.title)
+
+
+    def CheckName(self, name):
+        'checks BODY/REGION name for FLUKA com'
+        if len(str(name)) > 8:
+            print >>sys.stderr, "\033[31m WARNING: name", name, "is too long \033[0m"
+            return 1
+        if name[0] not in string.letters:
+            print >>sys.stderr, "name:", name
+            print >>sys.stderr, "the first character of body's name must be alphabetical"
+            return 2
+        return 0
+
+    def end(self):
+        'Prints END in the geometry file'
+        print >> self.geofile, "  END"
+        
+    def close(self):
+        self.geofile.close()
+
+    def ASSIGNMAT(self, fname=None):
+        if fname is None:
+            fname = self.assignmatfilename
+        else:
+            self.assignmatfilename = fname
+        material_to_skip = "lattice"
+    
+        if fname is None:
+            for i in range( len(self.materials) ):
+                if material_to_skip not in self.materials[i]:
+                    print >> self.geofile, "ASSIGNMAT %16s" % self.materials[i]
+        else:
+            file = open(fname, "w")
+            file.write("* generated by pyfluka.py\n")
+            for i in range( len(self.materials) ):
+                if material_to_skip not in self.materials[i]:
+                    file.write("ASSIGNMAT %16s\n" %self.materials[i])
+            file.close()
+        if len(self.materials) != self.region_counter:
+            print >>sys.stderr, "Warning: number of regions (%d) is not equal to one of materials (%d)" % (_reg_counter, len(self.materials))
+
+
+    def Print1(self, code, name, w1, comment=None):
+        print >> self.geofile, "%5s %8s %9.3f" % (code, name, w1)
+
+    def Print3(self, code, name, w1, w2, w3, comment=None):
+        print >> self.geofile, "%5s %8s %9.3f %9.3f %9.3f" % (code, name, w1, w2, w3)
+
+    def Print4(self, code, name, w1, w2, w3, w4):
+        print >> self.geofile, "%5s %8s %9.3f %9.3f %9.3f %9.3f" % (code, name, w1, w2, w3, w4)
+
+    def Print6(self, code, name, w1, w2, w3, w4, w5, w6):
+        print >> self.geofile, "%5s %8s %#9.4f %9.4f %9.4f %9.4f %9.4f %9.4f" % ( code, name, w1, w2, w3, w4, w5, w6 )
+
+
+    def Region(self, name, title, material="", comment=None, naz=5):
+        'describes a region as a combination of bodies/zones'
+        self.region_counter = self.region_counter + 1
+        if material is not "":
+            self.CheckName(material)
+            self.materials.append("%9s%11s" % (material, name))
+        
+        if comment is not None:
+            print >> self.geofile,  '* region', self.region_counter, '-', comment
+        words = title.split()
+        len_of_line = 0
+        for i in range(len(words)):
+            len_of_line += len(words[i]) + 1
+            if len_of_line > 70:
+                words[i] = words[i] + "\n" + " "*12
+                len_of_line = 0
+#            if i and not i % 15: words[i] = words[i] + "\n" + " "*12
+#            if i and not i % 13: words[i] = words[i] + "  "
+        title = join(words)
+        print >> self.geofile, "%9s %3d  %s" % (name, naz, title)
+    
+
+    def SPH(self, name, x, y, z, R, comment=None):
+        'SPH - sphere'
+        self.CheckName(name)
+        self.Print4("SPH", name, x, y, z, R)
+
+    def RPP(self, name, xmin, xmax, ymin, ymax, zmin=None, zmax=None, comment=None):
+        '''
+        RPP - rectangular parallelepiped
+        It is possible to use both FLUKA and GEANT3 notations in constructor.
+        FLUKA:  name, xmin,    xmax,    ymin,    ymax, zmin, zmax
+        GEANT3: name, xcenter, ycenter, zcenter, array
+        array is an array of 3 numbers of half-dimentions
+        '''
+        if zmax is not None: # FLUKA notation
+            self.Print6("RPP", name, xmin, xmax, ymin, ymax, zmin, zmax)
+            return BODY(name, xmin, xmax, ymin, ymax, zmin, zmax)
+        else: # GEANT3 notation
+            self.Print6("RPP", name, xmin-ymax[0], xmin+ymax[0], xmax-ymax[1], xmax+ymax[1], ymin-ymax[2], ymin+ymax[2])
+            return BODY(name, xmin-ymax[0], xmin+ymax[0], xmax-ymax[1], xmax+ymax[1], ymin-ymax[2], ymin+ymax[2])
+
+            
+    def XCC(self, name, y, z, R, comment=None):
+        'XCC - cyllinder parallel to x-axis'
+        self.Print3("XCC", name, y, z, R, comment)
+
+    def XYP(self, name, z, comment=None):
+        'XYP - plane perpendicular to the z-axis'
+        self.Print1("XYP", name, z, comment)
+ 
+    def XZP(self, name, y, comment=None):
+        'XZP - plane perpendicular to the y-axis'
+        self.Print1("XZP", name, y, comment)
+
+    def YCC(self, name, x, z, R, comment=None):
+        'YCC - cyllinder parallel to y-axis'
+        self.Print3("XCC", name, x, z, R, comment)
+
+    def YZP(self, name, x, comment=None):
+        'YZP - plane perpendicular to the x-axis'
+        self.Print1("YZP", name, x, comment)
+
+    def ZCC(self, name, x, y, R, comment=None):
+        'ZCC - cyllinder parallel to z-axis'
+        self.Print3("ZCC", name, x, y, R, comment)
