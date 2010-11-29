@@ -125,7 +125,7 @@ bool UstSuw::Read()
     fTotResp.push_back(ReadFloat());
     fTotRespErr.push_back(ReadFloat());
     std::cerr << "here1" << std::endl;
-    if ((record>0) && (IsReadNeutrons(record))) PrintFloat(2);
+    if ((record>0) && (IsReadNeutrons(record))) PrintFloat(5);
     CheckFormat();
     std::cerr << "here2" << std::endl;
 
