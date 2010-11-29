@@ -31,7 +31,7 @@ namespace ReadFluka {
     char                 *fRunTime;        // run time
     bool                  bCheckFormat1st; // used by CheckFormat: true if we have not read the check format numbers yet
     
-    
+   
   protected:
     std::ifstream        *fin;             //! file descriptor
     int                   fNCASE;          // number of primaries handled so far (current one included)
@@ -42,6 +42,11 @@ namespace ReadFluka {
     int                   fSize_end;
     
   public:
+    float fWCTOT; // total weight
+    int fNCTOT; // total number of incident particles
+    int fMCTOT; //
+    int fMBATCH;
+
     static int gVerbose;
     Base(const char *fname);
     virtual ~Base();
