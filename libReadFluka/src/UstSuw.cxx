@@ -173,7 +173,7 @@ void UstSuw::Print(int record)
   std::cout << "\t ( --> Track l. (cm/pr) " << GetTrackLength(record) << " +/- " << 100*fTotRespErr[record] << " % )"  << std::endl;
 
   std::cout << std::endl;
-  std::cout << "\t**** Different. Fluxes as a function of energy ****" << std::endl;
+  std::cout << "\t**** Different. Fluxes as a function of energy ****" << std::endl; 
   std::cout << "\t****     (integrated over solid angle)         ****" << std::endl;
 
   PrintEnergyBoundaries(record);
