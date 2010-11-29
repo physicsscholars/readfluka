@@ -186,15 +186,17 @@ void UstSuw::Print(int record)
   }
   std::cout << std::endl;
 
-  PrintLowEnergyBoundaries(record);
-
-  std::cout << std::endl;
-  std::cout << "\t Flux (Part/GeV/cmq/pr):" << std::endl << "\t ";
-  for (int i=0; i<GetMaxNeutronGroup(record); i++) {
-    std::cout << GetFluxLEN(i) << " +/- " << 100*GetFluxLENErr(i) << " %\t ";
-    if ((i+1)%2==0) std::cout << std::endl << "\t ";
+  if (IsReadNeutrons(record)) {
+    PrintLowEnergyBoundaries(record);
+    
+    std::cout << std::endl;
+    std::cout << "\t Flux (Part/GeV/cmq/pr):" << std::endl << "\t ";
+    for (int i=0; i<GetMaxNeutronGroup(record); i++) {
+      std::cout << GetFluxLEN(i) << " +/- " << 100*GetFluxLENErr(i) << " %\t ";
+      if ((i+1)%2==0) std::cout << std::endl << "\t ";
+    }
+    std::cout << std::endl;
   }
-  std::cout << std::endl;
   std::cout << std::endl;
   std::cout << "\t **** Cumulative Fluxes as a function of energy ****" << std::endl;
   std::cout << "\t ****        (integrated over solid angle)      ****" << std::endl; // !!! NOT - integrated over Energy !!!
