@@ -54,11 +54,11 @@ USRBDX         +50.0                43.0                 0.0     22.0 &
 *USRBDX         +50.0                 1.0                 0.0     13.0 &
 *
 * Boundary crossing fluence in the middle of the target (log intervals, one-way)
-*USRBDX          99.0     209.0     -47.0       3.0       4.0     400. piFluenUD
-*USRBDX         +50.0               +50.0                 0.0      10.0 &
+USRBDX          99.0     209.0     -47.0       3.0       4.0     400. piFluenUD
+USRBDX         +50.0               +50.0                 0.0      10.0 &
 * Boundary crossing current in the middle of the target (log intervals, one-way)
-*USRBDX          -1.0     209.0     -47.0       3.0       4.0     400. piCurrUD
-*USRBDX         +50.0               +50.0                 0.0      10.0 &
+USRBDX          -1.0     209.0     -47.0       3.0       4.0     400. piCurrUD
+USRBDX         +50.0               +50.0                 0.0      10.0 &
 * Tracklength fluence inside the target, Upstream part and Downstream part
 * Logarithmic energy intervals
 *USRTRACK        -1.0     209.0     -48.0       3.0    1000.0      20. piFluenU
