@@ -196,7 +196,7 @@ void UstSuw::Print(int record)
   }
   std::cout << std::endl;
   std::cout << std::endl;
-  std::cout << "\t **** Cumulative fluxes as a function of energy ****" << std::endl;
+  std::cout << "\t **** Cumulative Fluxes as a function of energy ****" << std::endl;
   std::cout << "\t ****        (integrated over solid angle)      ****" << std::endl; // !!! NOT - integrated over Energy !!!
 
   PrintEnergyBoundaries(record);
