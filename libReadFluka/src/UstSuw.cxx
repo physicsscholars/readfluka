@@ -121,9 +121,13 @@ bool UstSuw::Read()
   fNRecords = record+1;
 
   for (record=0; record<fNRecords; record++) {
+
     fTotResp.push_back(ReadFloat());
     fTotRespErr.push_back(ReadFloat());
+    std::cerr << "here1" << std::endl;
+    if ((record>0) && (IsReadNeutrons(record))) PrintFloat(2);
     CheckFormat();
+    std::cerr << "here2" << std::endl;
 
     int nebxbn = ReadInt();
     int igmusx = ReadInt();
@@ -157,6 +161,8 @@ bool UstSuw::Read()
 
     for (int j=0; j<GetNbinsE(record); j++) fCumulFluxErr.push_back(ReadFloat());
     for (int j=0; j<GetMaxNeutronGroup(record); j++) fCumulFluxLENErr.push_back(ReadFloat());
+
+    CheckFormat();
   }
  
 }
