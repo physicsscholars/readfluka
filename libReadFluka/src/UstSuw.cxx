@@ -208,15 +208,17 @@ void UstSuw::Print(int record)
   }
   std::cout << std::endl;
 
-  PrintLowEnergyBoundaries(record);
-  
-  std::cout << std::endl;
-  std::cout << "\t Cumul. Flux (Part/cmq/pr):" << std::endl << "\t ";
-  for (int i=0; i<GetMaxNeutronGroup(record); i++) {
-    std::cout << GetCumulFluxLEN(i) << " +/- " << 100*GetCumulFluxLENErr(i) << " %\t ";
-    if ((i+1)%2==0) std::cout << std::endl << "\t ";
+  if (IsReadNeutrons(record)) {
+    PrintLowEnergyBoundaries(record);
+    
+    std::cout << std::endl;
+    std::cout << "\t Cumul. Flux (Part/cmq/pr):" << std::endl << "\t ";
+    for (int i=0; i<GetMaxNeutronGroup(record); i++) {
+      std::cout << GetCumulFluxLEN(i) << " +/- " << 100*GetCumulFluxLENErr(i) << " %\t ";
+      if ((i+1)%2==0) std::cout << std::endl << "\t ";
+    }
+    std::cout << std::endl;
   }
-  std::cout << std::endl;
 }
 
 
