@@ -45,7 +45,9 @@ namespace ReadFluka {
     float fWCTOT; // total weight
     int fNCTOT; // total number of incident particles
     int fMCTOT; //
+    int fNBATCH;
     int fMBATCH;
+    int fMCASE;
 
     static int gVerbose;
     Base(const char *fname);
@@ -77,7 +79,7 @@ namespace ReadFluka {
     bool CheckFormat(bool doExit=true);
 
     bool ReadStatFlag(bool doExit=true);
-    void Warning(const char *msg) const;
+    std::string Warning(const char *msg) const;
     std::string AsFortran(double val, int precision, std::ios_base::fmtflags flags=std::ios::fixed) const;
     void PrintInt(unsigned int n) const;
     void PrintFloat(unsigned int n) const;

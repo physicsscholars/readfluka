@@ -29,6 +29,8 @@ Base::Base(const char *fname)
   fRunTime  = new char[32];
 
   bCheckFormat1st = true;
+  fWCTOT = 0.0f;
+  fNCTOT = fMCTOT = fMBATCH = 0;
 }
 
 Base::~Base()
@@ -223,7 +225,7 @@ bool Base::SizeEnd(bool doExit)
   
   if (fSize_start != fSize_end) {
     if (doExit == true) {
-      std::cerr<<"Base::CheckSize() warning:\t" << fSize_start << " " << fSize_end << std::endl;
+      std::cout << Warning("Base::CheckSize():\t") << fSize_start << " " << fSize_end << std::endl;
       exit(WRONG_FORMAT);
     } else {
       fSize_end = tmp;
@@ -300,10 +302,11 @@ std::string Base::Trimmed(std::string const& str, char const* sepSet)
   return ( first==std::string::npos )  ? std::string() : str.substr(first, str.find_last_not_of(sepSet)-first+1);
 }
 
-void Base::Warning(const char *msg) const
+std::string Base::Warning(const char *msg) const
 {
-  std::cerr << "WARNING: " << std::flush;
-  std::cerr << msg << std::endl;
+  std::ostringstream str;
+  str << "\033[33m WARNING: " << msg << "\033[0m";
+  return str.str();
 }
 
 std::string Base::AsFortran(double val, int precision, std::ios_base::fmtflags flags) const
@@ -328,7 +331,7 @@ void Base::PrintInt(unsigned int n) const
   std::cerr << "int:\t";
   for (unsigned int i=0; i<n; i++) {
     if (fin->eof()) {
-      Warning("PrintInt: end of file");
+      std::cerr << Warning("PrintInt: end of file") << std::endl;
       break;
     }
     std::cerr << ReadInt() << " ";
@@ -344,7 +347,7 @@ void Base::PrintFloat(unsigned int n) const
   std::cerr << "float:\t";
   for (unsigned int i=0; i<n; i++) {
     if (fin->eof()) {
-      Warning("PrintFloat: end of file");
+      std::cerr << Warning("PrintFloat: end of file") << std::endl;
       break;
     }
     std::cerr << ReadFloat() << " ";
