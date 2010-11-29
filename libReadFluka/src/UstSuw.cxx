@@ -169,7 +169,7 @@ void UstSuw::Print(int record)
   std::cout << "\t  distr. scored: " << fIDUSTC[record] << " ," << std::endl;
   std::cout << "\t  from reg. " << fNRUSTC[record] << " )" << std::endl;
   std::cout << std::scientific;
-  std::cout << "\t Tot. responce (p/cmq/pr) " << fTotResp[record] << " +/- " << 100*fTotRespErr[record] << " %" << std::endl;
+  std::cout << "\t Tot. response (p/cmq/pr) " << fTotResp[record] << " +/- " << 100*fTotRespErr[record] << " %" << std::endl;
   std::cout << "\t ( --> Track l. (cm/pr) " << GetTrackLength(record) << " +/- " << 100*fTotRespErr[record] << " % )"  << std::endl;
 
   std::cout << std::endl;
