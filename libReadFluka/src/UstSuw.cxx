@@ -41,6 +41,12 @@ void UstSuw::Reset()
   fFluxErr.clear();
   fFluxLEN.clear();
   fFluxLENErr.clear();
+
+  fCumulFlux.clear();
+  fCumulFluxErr.clear();
+  fCumulFluxLEN.clear();
+  fCumulFluxLENErr.clear();
+
 }
 
 bool UstSuw::ReadHeader()
@@ -143,6 +149,14 @@ bool UstSuw::Read()
     for (int j=0; j<GetMaxNeutronGroup(record); j++) fFluxLENErr.push_back(ReadFloat());
     
     CheckFormat();
+    // Read Cumulative flux
+    for (int j=0; j<GetNbinsE(record); j++) fCumulFlux.push_back(ReadFloat());
+    for (int j=0; j<GetMaxNeutronGroup(record); j++) fCumulFluxLEN.push_back(ReadFloat());
+
+    CheckFormat();
+
+    for (int j=0; j<GetNbinsE(record); j++) fCumulFluxErr.push_back(ReadFloat());
+    for (int j=0; j<GetMaxNeutronGroup(record); j++) fCumulFluxLENErr.push_back(ReadFloat());
   }
  
 }
@@ -154,6 +168,7 @@ void UstSuw::Print(int record)
   std::cout << "\t (Volume: " << fVUSRTC[record] << " cmc," << std::endl;
   std::cout << "\t  distr. scored: " << fIDUSTC[record] << " ," << std::endl;
   std::cout << "\t  from reg. " << fNRUSTC[record] << " )" << std::endl;
+  std::cout << std::scientific;
   std::cout << "\t Tot. responce (p/cmq/pr) " << fTotResp[record] << " +/- " << 100*fTotRespErr[record] << " %" << std::endl;
   std::cout << "\t ( --> Track l. (cm/pr) " << GetTrackLength(record) << " +/- " << 100*fTotRespErr[record] << " % )"  << std::endl;
 
@@ -161,13 +176,7 @@ void UstSuw::Print(int record)
   std::cout << "\t**** Different. Fluxes as a function of energy ****" << std::endl;
   std::cout << "\t****     (integrated over solid angle)         ****" << std::endl;
 
-  std::cout << "\t Energy boundaries (GeV):" << std::endl << "\t  ";
-  for (int i=0; i<GetNbinsE(record); i++) {
-    std::cout << fEPGMAX[i] << " ";
-    if (((i+1)%5) == 0) std::cout << std::endl << "\t  ";
-  }
-  std::cout << std::endl;
-  std::cout << "\t  Lowest boundary (GeV): " << fEPGMAX[GetNbinsE(record)] << std::endl;
+  PrintEnergyBoundaries(record);
 
   std::cout << std::endl;
   std::cout << "\t Flux (Part/GeV/cmq/pr):" << std::endl << "\t ";
@@ -177,13 +186,8 @@ void UstSuw::Print(int record)
   }
   std::cout << std::endl;
 
-  std::cout << "\t  Energy boundaries (GeV):" << std::endl << "\t  ";
-  for (int i=GetNbinsE(record); i<GetNbinsTotal(record); i++) {
-    std::cout << fEPGMAX[i] << " ";
-    if ((i+1)%5==0) std::cout << std::endl << "\t  ";
-  }
-  std::cout << std::endl;
-  std::cout << "\t Lowest boundary (GeV): " << fEPGMAX[GetNbinsTotal(record)] << std::endl;
+  PrintLowEnergyBoundaries(record);
+
   std::cout << std::endl;
   std::cout << "\t Flux (Part/GeV/cmq/pr):" << std::endl << "\t ";
   for (int i=0; i<GetMaxNeutronGroup(record); i++) {
@@ -191,4 +195,52 @@ void UstSuw::Print(int record)
     if ((i+1)%2==0) std::cout << std::endl << "\t ";
   }
   std::cout << std::endl;
+  std::cout << std::endl;
+  std::cout << "\t **** Cumulative fluxes as a function of energy ****" << std::endl;
+  std::cout << "\t ****        (integrated over solid angle)      ****" << std::endl; // !!! NOT - integrated over Energy !!!
+
+  PrintEnergyBoundaries(record);
+  std::cout << std::endl;
+  std::cout << "\t Cumul. Flux (Part/cmq/pr):" << std::endl << "\t  ";
+  for (int i=0; i<GetNbinsE(record); i++) {
+    std::cout << GetCumulFlux(i) << " +/- " << 100*GetCumulFluxErr(i) << " %\t ";
+    if ((i+1)%2==0) std::cout << std::endl << "\t  ";
+  }
+  std::cout << std::endl;
+
+  PrintLowEnergyBoundaries(record);
+  
+  std::cout << std::endl;
+  std::cout << "\t Cumul. Flux (Part/cmq/pr):" << std::endl << "\t ";
+  for (int i=0; i<GetMaxNeutronGroup(record); i++) {
+    std::cout << GetCumulFluxLEN(i) << " +/- " << 100*GetCumulFluxLENErr(i) << " %\t ";
+    if ((i+1)%2==0) std::cout << std::endl << "\t ";
+  }
+  std::cout << std::endl;
+}
+
+
+void UstSuw::PrintEnergyBoundaries(int record) const
+{
+  std::cout << "\t Energy boundaries (GeV):" << std::endl << "\t  ";
+  for (int i=0; i<GetNbinsE(record); i++) {
+    std::cout << fEPGMAX[i] << " ";
+    if (((i+1)%5) == 0) std::cout << std::endl << "\t  ";
+  }
+  std::cout << std::endl;
+  std::cout << "\t  Lowest boundary (GeV): " << fEPGMAX[GetNbinsE(record)] << std::endl;
+}
+
+void UstSuw::PrintLowEnergyBoundaries(int record) const
+{
+  if (IsReadNeutrons(record)==false) return;
+
+  std::cout << std::endl;
+  std::cout << "\t  Energy boundaries (GeV):" << std::endl << "\t  ";
+  for (int i=GetNbinsE(record); i<GetNbinsTotal(record); i++) {
+    std::cout << fEPGMAX[i] << " ";
+    if ((i+1-GetNbinsE(record))%5==0) std::cout << std::endl << "\t  ";
+  }
+  std::cout << std::endl;
+  std::cout << "\t Lowest boundary (GeV): " << fEPGMAX[GetNbinsTotal(record)] << std::endl; 
 }
