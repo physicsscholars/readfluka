@@ -63,6 +63,21 @@ namespace ReadFluka {
     void Reset();
     bool Read();
 
+    inline std::string GetTITUTC(int record) const {return fTITUTC[record]; }
+    inline std::string GetName(int record) const {return GetTITUTC(record);}
+
+    inline int GetIDUSTC(int record) const {return fIDUSTC[record];}
+    inline int GetID(int record) const {return GetIDUSTC(record);}
+
+    inline int GetNRUSTC(int record) const {return fNRUSTC[record];}
+    inline int GetRegion(int record) const {return GetNRUSTC(record);}
+
+    inline float GetETCLOW(int record) const {return fETCLOW[record];}
+    inline float GetEmin(int record) const {return fETCLOW[record];}
+
+    inline float GetETCHGH(int record) const {return fETCHGH[record];}
+    inline float GetEmax(int record) const {return GetETCHGH(record);}
+
     inline int GetIGMUTC(int i) const { return fIGMUTC[i]; }
     inline int GetMaxNeutronGroup(int i) const { return GetIGMUTC(i); }
     
@@ -94,6 +109,8 @@ namespace ReadFluka {
     inline bool IsReadNeutrons(int i) const { return GetLLNUTC(i); }
 
     float GetLowestBoundary(int record) const;
+
+    inline unsigned int GetNRecords() const { return fNRecords; }
 
     void Print(int i) const;
     void Print() const;

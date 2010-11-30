@@ -138,6 +138,8 @@ const char *Base::Code2Name(int code, bool replace) const
     return "OPTIPHOT";
   case 1:
     return "PROTON";
+  case 7:
+    return "PHOTON";
   case 8:
     return "NEUTRON";
   case 201:
