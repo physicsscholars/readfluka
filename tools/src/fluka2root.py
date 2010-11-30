@@ -15,12 +15,38 @@ def str2int(s):
         ret = int(float(s))
     return ret
 
-def printincolor(s,col=37):
+def printincolor(s,col=33):
     """
 Print a string with a given color using ANSI/VT100 Terminal Control Escape Sequences
 http://www.termsys.demon.co.uk/vtansi.htm
     """
     print "\033[1;%dm%s\033[0m" % (col, s)
+
+def merge_files(thelist, suffix, thecommand, N, M, inpname):
+    suwfile = inpname.replace(".inp", "%.3d-%.3d_%s" % (N, M, suffix) )
+    temp_path = tempfile.mktemp()
+    tmpfile = open(temp_path, "w")
+
+    for f in thelist:
+        tmpfile.write("%s\n" % f)
+    tmpfile.write("\n")
+    tmpfile.write("%s\n" % suwfile)
+    tmpfile.close()
+    os.system("cat %s" % tmpfile.name)
+    command = "cat %s | $FLUTIL/%s" % (tmpfile.name, thecommand)
+    printincolor(command)
+    return_value = os.system(command)
+    if return_value:
+        sys.exit(1);
+    os.unlink(tmpfile.name)
+    command = "%s2root %s" % (thecommand, suwfile)
+    printincolor(command)
+    return_value = os.system(command)
+    if return_value:
+        sys.exit(2)
+    return "%s.root" % suwfile
+
+
 
 def main(argv=None):
     """
@@ -38,8 +64,8 @@ usage:\tfluka2root file.inp [N] [M]
 
     printincolor("Note that the corresponding histograms from different ROOT files will be summed up but not averaged unless it is implemented in the ROOT's hadd.", 33)
 
-    estimators = {"EVENTDAT" : [], "USRBDX" : [], "USRBIN" : [], "RESNUCLE" : []} # dictionary of supported estimators and their file units
-#    estimators = {"USRBIN" : []} # dictionary of supported estimators and their file units
+    estimators = {"EVENTDAT" : [], "USRBDX" : [], "USRBIN" : [], "RESNUCLE" : [], "USRTRACK" : []} # dictionary of supported estimators and their file units
+#    estimators = {"USRBIN" : [], "USRTRACK" : []} # dictionary of supported estimators and their file units
     opened = {} # dictionary of the opened units (if any)
     out_root_files = [] # list of output ROOT files
     
@@ -126,6 +152,7 @@ usage:\tfluka2root file.inp [N] [M]
     return_value = 0
     resnuclei_binary_files = []
     usrbin_binary_files = []
+    usrtrack_binary_files = []
     for run in range(N, M+1):
         binfilename = ""
         rootfilenames = []
@@ -137,9 +164,13 @@ usage:\tfluka2root file.inp [N] [M]
                     if re.search("RESNUCLE", e): # RESNUCLE = RESNUCLEi = RESNUCLEI
                         e = "RESNUCLEI"
                         resnuclei_binary_files.append(binfilename)
-                    if re.search("USRBIN", e):
+                    elif re.search("USRBIN", e):
+#                        print "AAAAAAAAAAAAAAAAAAAAAAA"
                         usrbin_binary_files.append(binfilename)
+                    elif re.search("USRTRACK", e):
+                        usrtrack_binary_files.append(binfilename)
                     else:
+#                        print "HHHHHHHHHHHHHHHHHHHHHHHo%so" % e
                         rootfilenames.append(binfilename + ".root")
                         command =  "%s2root %s" % (e.lower(), binfilename)
                         printincolor(command)
@@ -151,58 +182,29 @@ usage:\tfluka2root file.inp [N] [M]
 #                            printincolor("WARNING: can't open file %s" % binfilename, 33)
 
 # hadd within one sample
-        print rootfilenames
-        out_root_file = inpname.replace(".inp", "%.3d%s" % (run, ".root"))
-        command = "hadd %s %s" % (out_root_file, string.join(rootfilenames))
-        printincolor(command)
-        return_value = os.system(command)
-# remove tmp files
-        if return_value is 0:
-            command = "rm -f %s" % string.join(rootfilenames)
+        if len(rootfilenames):
+            print "The following ROOT files will be hadded", rootfilenames
+            out_root_file = inpname.replace(".inp", "%.3d%s" % (run, ".root"))
+            command = "hadd %s %s" % (out_root_file, string.join(rootfilenames))
             printincolor(command)
             return_value = os.system(command)
+# remove tmp files
             if return_value is 0:
-                out_root_files.append(out_root_file)
-            else:
-                sys.exit(return_value)
+                command = "rm -f %s" % string.join(rootfilenames)
+                printincolor(command)
+                return_value = os.system(command)
+                if return_value is 0:
+                    out_root_files.append(out_root_file)
+                else:
+                    sys.exit(return_value)
 
     if len(resnuclei_binary_files): # usrsuw to sum RESNUCLEI
-        usrsuwfile = inpname.replace(".inp", "%.3d-%.3d_usrsuw" % (N, M) )
-        temp_path = tempfile.mktemp()
-        tmpfile = open(temp_path, "w")
-        print tmpfile.name
-        for f in resnuclei_binary_files:
-            tmpfile.write("%s\n" % f)
-        tmpfile.write("\n")
-        tmpfile.write("%s\n" % usrsuwfile)
-        tmpfile.close()
-        command = "cat %s | $FLUTIL/usrsuw" % tmpfile.name
-        print command
-        os.system(command)
-        os.unlink(tmpfile.name)
-        command = "usrsuw2root %s" % usrsuwfile
-        os.system(command)
-        out_root_files.append("%s.root" % usrsuwfile)
+        out_root_files.append(merge_files(resnuclei_binary_files, "resnuclei", "usrsuw", N, M, inpname))
 
-    if len(usrbin_binary_files): # usbsuw to sum RESNUCLEI
-        usbsuwfile = inpname.replace(".inp", "%.3d-%.3d_usbsuw" % (N, M) )
-        temp_path = tempfile.mktemp()
-        tmpfile = open(temp_path, "w")
-
-        for f in usrbin_binary_files:
-            tmpfile.write("%s\n" % f)
-        tmpfile.write("\n")
-        tmpfile.write("%s\n" % usbsuwfile)
-        tmpfile.close()
-        os.system("cat %s" % tmpfile.name)
-        command = "cat %s | $FLUTIL/usbsuw" % tmpfile.name
-        print command
-        os.system(command)
-#        os.unlink(tmpfile.name)
-        command = "usbsuw2root %s" % usbsuwfile
-        print command
-        os.system(command)
-        out_root_files.append("%s.root" % usbsuwfile)
+    if len(usrbin_binary_files):
+        out_root_files.append(merge_files(usrbin_binary_files, "usrbin", "usbsuw", N, M, inpname))
+    if len(usrtrack_binary_files):
+        out_root_files.append(merge_files(usrtrack_binary_files, "usrtrack", "ustsuw", N, M, inpname))
 
     print out_root_files
     if return_value is 0 and len(out_root_files)>1:

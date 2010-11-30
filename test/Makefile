@@ -12,6 +12,9 @@ $(FLUPRO)/flukahp:
 usxsuw: run
 	./usxsuw.sh
 
+ustsuw: run
+	./ustsuw.sh
+
 read_usryield: read_usryield.cxx
 	@echo "Compiling $@"
 	@$(GCC) -I$(READFLUKA_SYS)/src $^ -L $(READFLUKA_SYS) -lReadFluka -o $@
