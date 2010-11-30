@@ -107,7 +107,7 @@ bool UstSuw::Read()
     for (int j=0; j<GetNbinsTotal(record); j++) {
       dtmp =  ReadFloat();
       vtmp.push_back(dtmp);
-      std::cout << record << "here: " << dtmp << std::endl;
+      std::cerr << record << "here: " << dtmp << std::endl;
     }
     fGMSTOR.push_back(vtmp);
 
