@@ -36,7 +36,7 @@ namespace ReadFluka {
     std::vector<float> fTotResp;
     std::vector<float> fTotRespErr;
 
-    std::vector<float> fEPGMAX;
+    std::vector< std::vector<float> > fEPGMAX;
 
     std::vector<float> fFlux;
     std::vector<float> fFluxErr;
@@ -92,6 +92,8 @@ namespace ReadFluka {
 
     inline bool GetLLNUTC(int i) const { return fLLNUTC[i]; }
     inline bool IsReadNeutrons(int i) const { return GetLLNUTC(i); }
+
+    float GetLowestBoundary(int record) const;
 
     void Print(int i) const;
     void Print() const;

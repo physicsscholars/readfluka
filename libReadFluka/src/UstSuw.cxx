@@ -137,9 +137,11 @@ bool UstSuw::Read()
 
     PrintFloat(1);
 
+    vtmp.clear();
     for (int j=0; j<GetNbinsTotal(record)+1; j++) { // +1 since number of boundaries are ONE more than number of intervals
-      fEPGMAX.push_back(ReadFloat());
+      vtmp.push_back(ReadFloat());
     }
+    fEPGMAX.push_back(vtmp);
     //std::cout << "fEPGMAX.size(): " << fEPGMAX.size() << std::endl;
     CheckFormat();
     
@@ -233,6 +235,15 @@ void UstSuw::Print(int record) const
   }
 }
 
+float UstSuw::GetLowestBoundary(int record) const
+{
+  /*
+    Return the lowest boundary [GeV]
+  */
+  if (!IsReadNeutrons(record)) return fEPGMAX[record][GetNbinsE(record)];
+  else return 0.02; //fEPGMAX[record][GetNbinsE(record)-1];
+}
+
 void UstSuw::Print() const
 {
   for (int i=0; i<fNRecords; i++) Print(i);
@@ -243,11 +254,12 @@ void UstSuw::PrintEnergyBoundaries(int record) const
 {
   std::cout << "\t Energy boundaries (GeV):" << std::endl << "\t  ";
   for (int i=0; i<GetNbinsE(record); i++) {
-    std::cout << fEPGMAX[i] << " ";
+    std::cout << fEPGMAX[record][i] << " ";
     if (((i+1)%5) == 0) std::cout << std::endl << "\t  ";
   }
   std::cout << std::endl;
-  std::cout << "\t  Lowest boundary (GeV): " << fEPGMAX[GetNbinsE(record)] << std::endl;
+  //  std::cout << "\t  aLowest boundary (GeV): " << fEPGMAX[GetNbinsE(record)] << " " << GetLowestBoundary(record) << std::endl;
+  std::cout << "\t  Lowest boundary (GeV): " << GetLowestBoundary(record) << std::endl;
 }
 
 void UstSuw::PrintLowEnergyBoundaries(int record) const
@@ -257,9 +269,9 @@ void UstSuw::PrintLowEnergyBoundaries(int record) const
   std::cout << std::endl;
   std::cout << "\t  Energy boundaries (GeV):" << std::endl << "\t  ";
   for (int i=GetNbinsE(record); i<GetNbinsTotal(record); i++) {
-    std::cout << fEPGMAX[i] << " ";
+    std::cout << fEPGMAX[record][i] << " ";
     if ((i+1-GetNbinsE(record))%5==0) std::cout << std::endl << "\t  ";
   }
   std::cout << std::endl;
-  std::cout << "\t Lowest boundary (GeV): " << fEPGMAX[GetNbinsTotal(record)] << std::endl; 
+  std::cout << "\t Lowest boundary (GeV): " << fEPGMAX[record][GetNbinsTotal(record)] << std::endl; 
 }
