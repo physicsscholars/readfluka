@@ -122,10 +122,9 @@ bool UstSuw::Read()
 
   for (record=0; record<fNRecords; record++) {
 
-    fTotResp.push_back(ReadFloat());
+    fTotResp.push_back(ReadFloat()); std::cerr << "total response: " << fTotResp[record] << std::endl;
     fTotRespErr.push_back(ReadFloat());
     std::cerr << "here1" << std::endl;
-    if ((record>0) && (IsReadNeutrons(record))) PrintFloat(5);
     CheckFormat();
     std::cerr << "here2" << std::endl;
 
@@ -163,11 +162,16 @@ bool UstSuw::Read()
     for (int j=0; j<GetMaxNeutronGroup(record); j++) fCumulFluxLENErr.push_back(ReadFloat());
 
     CheckFormat();
+
+    PrintFloat(GetNbinsTotal(record));
+
+    CheckFormat();
+
   }
- 
+  return true;
 }
 
-void UstSuw::Print(int record)
+void UstSuw::Print(int record) const
 {
   std::cout << std::endl;
   std::cout << "\tDetector n: " << record+1 <<  " " << fTITUTC[record] << std::endl;
@@ -227,6 +231,11 @@ void UstSuw::Print(int record)
     }
     std::cout << std::endl;
   }
+}
+
+void UstSuw::Print() const
+{
+  for (int i=0; i<fNRecords; i++) Print(i);
 }
 
 

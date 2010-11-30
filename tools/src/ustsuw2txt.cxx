@@ -16,7 +16,7 @@ int main(int argc, const char **argv)
 
   int i=0;
   ustsuw->Read();
-  ustsuw->Print(i);
+  ustsuw->Print();
   i++;
   
 

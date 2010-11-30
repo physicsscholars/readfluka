@@ -50,7 +50,7 @@ namespace ReadFluka {
     std::vector<float> fCumulFluxLEN; // low energy neutron flux
     std::vector<float> fCumulFluxLENErr;
 
-    int fNRecords; // total number of records (USRTRACK cards)
+    unsigned int fNRecords; // total number of records (USRTRACK cards)
     bool fIsReadHeader; // true if the header has already been read
     bool ReadHeader();
 
@@ -93,7 +93,8 @@ namespace ReadFluka {
     inline bool GetLLNUTC(int i) const { return fLLNUTC[i]; }
     inline bool IsReadNeutrons(int i) const { return GetLLNUTC(i); }
 
-    void Print(int i);
+    void Print(int i) const;
+    void Print() const;
   };
 }
 
