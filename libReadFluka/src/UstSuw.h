@@ -31,24 +31,24 @@ namespace ReadFluka {
 
     std::vector<int> fIGMUTC; // maximum low energy group to be scored
     std::vector<float> fENGMAX;
-    std::vector<float> fGMSTOR; // data
+    std::vector< std::vector<float> > fGMSTOR; // data
 
     std::vector<float> fTotResp;
     std::vector<float> fTotRespErr;
 
     std::vector< std::vector<float> > fEPGMAX;
 
-    std::vector<float> fFlux;
-    std::vector<float> fFluxErr;
+    std::vector< std::vector<float> > fFlux;
+    std::vector< std::vector<float> > fFluxErr;
 
-    std::vector<float> fFluxLEN; // low energy neutron flux
-    std::vector<float> fFluxLENErr;
+    std::vector< std::vector<float> > fFluxLEN; // low energy neutron flux
+    std::vector< std::vector<float> > fFluxLENErr;
 
-    std::vector<float> fCumulFlux;
-    std::vector<float> fCumulFluxErr;
+    std::vector< std::vector<float> > fCumulFlux;
+    std::vector< std::vector<float> > fCumulFluxErr;
 
-    std::vector<float> fCumulFluxLEN; // low energy neutron flux
-    std::vector<float> fCumulFluxLENErr;
+    std::vector< std::vector<float> > fCumulFluxLEN; // low energy neutron flux
+    std::vector< std::vector<float> > fCumulFluxLENErr;
 
     unsigned int fNRecords; // total number of records (USRTRACK cards)
     bool fIsReadHeader; // true if the header has already been read
@@ -78,17 +78,17 @@ namespace ReadFluka {
     
     inline float GetTrackLength(int i) const {return GetTotResp(i)*GetVolume(i);} // [cm/pr]
 
-    inline float GetFlux(int i) const {return fFlux[i];}
-    inline float GetFluxErr(int i) const {return fFluxErr[i];}
+    inline float GetFlux(int record, int i) const {return fFlux[record][i];}
+    inline float GetFluxErr(int record, int i) const {return fFluxErr[record][i];}
 
-    inline float GetFluxLEN(int i) const {return fFluxLEN[i];}
-    inline float GetFluxLENErr(int i) const {return fFluxLENErr[i];}
+    inline float GetFluxLEN(int record, int i) const {return fFluxLEN[record][i];}
+    inline float GetFluxLENErr(int record, int i) const {return fFluxLENErr[record][i];}
 
-    inline float GetCumulFlux(int i) const {return fCumulFlux[i];}
-    inline float GetCumulFluxErr(int i) const {return fCumulFluxErr[i];}
+    inline float GetCumulFlux(int record, int i) const {return fCumulFlux[record][i];}
+    inline float GetCumulFluxErr(int record, int i) const {return fCumulFluxErr[record][i];}
 
-    inline float GetCumulFluxLEN(int i) const {return fCumulFluxLEN[i];}
-    inline float GetCumulFluxLENErr(int i) const {return fCumulFluxLENErr[i];}
+    inline float GetCumulFluxLEN(int record, int i) const {return fCumulFluxLEN[record][i];}
+    inline float GetCumulFluxLENErr(int record, int i) const {return fCumulFluxLENErr[record][i];}
 
     inline bool GetLLNUTC(int i) const { return fLLNUTC[i]; }
     inline bool IsReadNeutrons(int i) const { return GetLLNUTC(i); }

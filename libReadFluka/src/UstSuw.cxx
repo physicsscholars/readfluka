@@ -104,10 +104,13 @@ bool UstSuw::Read()
       CheckFormat();
     } else fIGMUTC.push_back(0);
     
+    vtmp.clear();
     for (int j=0; j<GetNbinsTotal(record); j++) {
       dtmp =  ReadFloat();
-      fGMSTOR.push_back(dtmp);
+      vtmp.push_back(dtmp);
+      std::cout << record << "here: " << dtmp << std::endl;
     }
+    fGMSTOR.push_back(vtmp);
 
     CheckFormat();
 
@@ -145,23 +148,43 @@ bool UstSuw::Read()
     //std::cout << "fEPGMAX.size(): " << fEPGMAX.size() << std::endl;
     CheckFormat();
     
-    for (int j=0; j<GetNbinsE(record); j++) fFlux.push_back(ReadFloat());
-    for (int j=0; j<GetMaxNeutronGroup(record); j++) fFluxLEN.push_back(ReadFloat());
+    vtmp.clear();
+    for (int j=0; j<GetNbinsE(record); j++) vtmp.push_back(ReadFloat());
+    fFlux.push_back(vtmp);
+
+    vtmp.clear();
+    for (int j=0; j<GetMaxNeutronGroup(record); j++) vtmp.push_back(ReadFloat());
+    fFluxLEN.push_back(vtmp);
 
     CheckFormat();
 
-    for (int j=0; j<GetNbinsE(record); j++) fFluxErr.push_back(ReadFloat());
-    for (int j=0; j<GetMaxNeutronGroup(record); j++) fFluxLENErr.push_back(ReadFloat());
+    vtmp.clear();
+    for (int j=0; j<GetNbinsE(record); j++) vtmp.push_back(ReadFloat());
+    fFluxErr.push_back(vtmp);
+
+    vtmp.clear();
+    for (int j=0; j<GetMaxNeutronGroup(record); j++) vtmp.push_back(ReadFloat());
+    fFluxLENErr.push_back(vtmp);
     
     CheckFormat();
     // Read Cumulative flux
-    for (int j=0; j<GetNbinsE(record); j++) fCumulFlux.push_back(ReadFloat());
-    for (int j=0; j<GetMaxNeutronGroup(record); j++) fCumulFluxLEN.push_back(ReadFloat());
+    vtmp.clear();
+    for (int j=0; j<GetNbinsE(record); j++) vtmp.push_back(ReadFloat());
+    fCumulFlux.push_back(vtmp);
+
+    vtmp.clear();
+    for (int j=0; j<GetMaxNeutronGroup(record); j++) vtmp.push_back(ReadFloat());
+    fCumulFluxLEN.push_back(vtmp);
 
     CheckFormat();
 
-    for (int j=0; j<GetNbinsE(record); j++) fCumulFluxErr.push_back(ReadFloat());
-    for (int j=0; j<GetMaxNeutronGroup(record); j++) fCumulFluxLENErr.push_back(ReadFloat());
+    vtmp.clear();
+    for (int j=0; j<GetNbinsE(record); j++) vtmp.push_back(ReadFloat());
+    fCumulFluxErr.push_back(vtmp);
+
+    vtmp.clear();
+    for (int j=0; j<GetMaxNeutronGroup(record); j++) vtmp.push_back(ReadFloat());
+    fCumulFluxLENErr.push_back(vtmp);
 
     CheckFormat();
 
@@ -193,7 +216,7 @@ void UstSuw::Print(int record) const
   std::cout << std::endl;
   std::cout << "\t Flux (Part/GeV/cmq/pr):" << std::endl << "\t ";
   for (int i=0; i<GetNbinsE(record); i++) {
-    std::cout << GetFlux(i) << " +/- " << 100*GetFluxErr(i) << " %\t ";
+    std::cout << GetFlux(record, i) << " +/- " << 100*GetFluxErr(record, i) << " %\t ";
     if ((i+1)%2==0) std::cout << std::endl << "\t ";
   }
   std::cout << std::endl;
@@ -204,7 +227,7 @@ void UstSuw::Print(int record) const
     std::cout << std::endl;
     std::cout << "\t Flux (Part/GeV/cmq/pr):" << std::endl << "\t ";
     for (int i=0; i<GetMaxNeutronGroup(record); i++) {
-      std::cout << GetFluxLEN(i) << " +/- " << 100*GetFluxLENErr(i) << " %\t ";
+      std::cout << GetFluxLEN(record, i) << " +/- " << 100*GetFluxLENErr(record, i) << " %\t ";
       if ((i+1)%2==0) std::cout << std::endl << "\t ";
     }
     std::cout << std::endl;
@@ -217,7 +240,7 @@ void UstSuw::Print(int record) const
   std::cout << std::endl;
   std::cout << "\t Cumul. Flux (Part/cmq/pr):" << std::endl << "\t  ";
   for (int i=0; i<GetNbinsE(record); i++) {
-    std::cout << GetCumulFlux(i) << " +/- " << 100*GetCumulFluxErr(i) << " %\t ";
+    std::cout << GetCumulFlux(record, i) << " +/- " << 100*GetCumulFluxErr(record, i) << " %\t ";
     if ((i+1)%2==0) std::cout << std::endl << "\t  ";
   }
   std::cout << std::endl;
@@ -228,7 +251,7 @@ void UstSuw::Print(int record) const
     std::cout << std::endl;
     std::cout << "\t Cumul. Flux (Part/cmq/pr):" << std::endl << "\t ";
     for (int i=0; i<GetMaxNeutronGroup(record); i++) {
-      std::cout << GetCumulFluxLEN(i) << " +/- " << 100*GetCumulFluxLENErr(i) << " %\t ";
+      std::cout << GetCumulFluxLEN(record, i) << " +/- " << 100*GetCumulFluxLENErr(record, i) << " %\t ";
       if ((i+1)%2==0) std::cout << std::endl << "\t ";
     }
     std::cout << std::endl;
@@ -246,7 +269,7 @@ float UstSuw::GetLowestBoundary(int record) const
 
 void UstSuw::Print() const
 {
-  for (int i=0; i<fNRecords; i++) Print(i);
+  for (unsigned int i=0; i<fNRecords; i++) Print(i);
 }
 
 
