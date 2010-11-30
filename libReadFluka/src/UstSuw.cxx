@@ -46,7 +46,6 @@ void UstSuw::Reset()
   fCumulFluxErr.clear();
   fCumulFluxLEN.clear();
   fCumulFluxLENErr.clear();
-
 }
 
 bool UstSuw::ReadHeader()
