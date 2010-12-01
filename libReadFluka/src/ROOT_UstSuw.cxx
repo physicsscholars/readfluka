@@ -15,7 +15,7 @@ TH1F* ROOT_UstSuw::HistTotalResponse(int record) const
   h->SetBinContent(1, GetTotResp(record));
   h->SetBinError(1, GetTotRespErr(record)*GetTotResp(record));  // absolute error
   h->SetEntries(GetEntryNumber());
-  h->Print("base");
+  //  h->Print("base");
   //std::cout << h->GetBinContent(1) << " " << h->GetBinError(1) << std::endl;
   return h;
 }
@@ -28,7 +28,7 @@ TH1F* ROOT_UstSuw::HistTotalTrackLength(int record) const
   h->SetBinContent(1, GetTotResp(record)*GetVolume(record));
   h->SetBinError(1, GetTotRespErr(record)*GetTotResp(record)*GetVolume(record));  // absolute error
   h->SetEntries(GetEntryNumber());
-  h->Print("base");
+  //  h->Print("base");
   //std::cout << h->GetBinContent(1) << " " << h->GetBinError(1) << std::endl;
   return h;
 }
@@ -60,12 +60,17 @@ TH1F *ROOT_UstSuw::HistFlux(int record) const
   std::vector<float> vxbins = GetEnergyBoundaries(record);
   std::vector<float> vflux = GetFluxAll(record);
   std::vector<float> verror = GetFluxErrAll(record);
+  
+  // simple check
+  if (vflux.size() != verror.size()) 
+    Error("ROOT_UstSuw: Flux vector size and FluxErr vector size are different");
+
   const int nbinsx = vxbins.size()-1; // -1 since the number of bins ONE less than the number of boundaries
   float *xbins = new float[nbinsx+1];
   
   for (int i=0; i<nbinsx+1; i++) {
     xbins[i] = vxbins[i];
-    //    std::cout << xbins[i] << std::endl;
+    //    std::cout << xbins[i] << "\t" << vxbins[i+1] << ":\t" << vflux[i] << std::endl;
   }
 
   TH1F *h = new TH1F(Form("%s", UstSuw::GetName(record).c_str()),
@@ -80,6 +85,7 @@ TH1F *ROOT_UstSuw::HistFlux(int record) const
     h->SetBinError(bin+1, error);
   }
   h->SetEntries(GetEntryNumber());
+  h->Print("base");
 
   verror.clear();
   vflux.clear();

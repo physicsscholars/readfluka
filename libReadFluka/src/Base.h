@@ -79,6 +79,7 @@ namespace ReadFluka {
     bool CheckFormat(bool doExit=true);
 
     bool ReadStatFlag(bool doExit=true);
+    void Error(const char *msg) const;
     std::string Warning(const char *msg) const;
     std::string AsFortran(double val, int precision, std::ios_base::fmtflags flags=std::ios::fixed) const;
     void PrintInt(unsigned int n) const;

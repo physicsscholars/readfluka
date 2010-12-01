@@ -309,6 +309,7 @@ std::vector<float> UstSuw::GetEnergyBoundaries(int record) const
   /*
     Return a vector with energy boundaries starting from low energy.
     The number of boundaries is ONE more than the number of intervals.
+    If low energy neutron flux is there, it is included in this vector.
     The method is used in ROOT_UstSuw::HistFlux(int)
   */
   std::vector<float> vec = fEPGMAX[record];
@@ -327,13 +328,21 @@ std::vector<float> UstSuw::GetFluxAll(int record) const
 {
   /*
     Return a vector with flux starting from low energy.
-    If low energy flux is there, it is included in this vector. (!!! not yet implemented!!!)
+    If low energy neutron flux is there, it is included in this vector. (!!! not yet implemented!!!)
     The method is used in ROOT_UstSuw::HistFlux(int)
    */
 
   std::vector<float> vec = fFlux[record];
   std::reverse(vec.begin(), vec.end());
 
+  if (IsReadNeutrons(record)) {
+    std::vector<float> veclen = fFluxLEN[record];
+    std::reverse(veclen.begin(), veclen.end());
+    veclen.insert(veclen.end(), vec.begin(), vec.end());
+    vec.clear(); // ??? do we need it?
+    return veclen;
+  }
+  
   return vec;
 }
 
@@ -347,6 +356,14 @@ std::vector<float> UstSuw::GetFluxErrAll(int record) const
 
   std::vector<float> vec = fFluxErr[record];
   std::reverse(vec.begin(), vec.end());
+
+  if (IsReadNeutrons(record)) {
+    std::vector<float> veclen = fFluxLENErr[record];
+    std::reverse(veclen.begin(), veclen.end());
+    veclen.insert(veclen.end(), vec.begin(), vec.end());
+    vec.clear(); // ??? do we need it ???
+    return veclen;
+  }
 
   return vec;
 }

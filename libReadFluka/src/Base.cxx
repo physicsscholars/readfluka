@@ -311,6 +311,13 @@ std::string Base::Warning(const char *msg) const
   return str.str();
 }
 
+void Base::Error(const char *msg) const
+{
+  std::ostringstream str;
+  std::cout << "\033[31mERROR " << msg << "\033[0m" << std::endl;
+  exit(1);
+}
+
 std::string Base::AsFortran(double val, int precision, std::ios_base::fmtflags flags) const
 {
   /*
