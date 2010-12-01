@@ -24,4 +24,13 @@
             </note>
         </note>
     </note>
+    <note priority="medium" time="1291202875">
+        USRTRACK
+        <note priority="medium" time="1291202883">
+            ustsuw
+            <note priority="medium" time="1291202919">
+                is it FLUX or FLUENCE? Why _sum.lis file says 'flux' but the manual on page 259 says 'fluence'?
+            </note>
+        </note>
+    </note>
 </todo>

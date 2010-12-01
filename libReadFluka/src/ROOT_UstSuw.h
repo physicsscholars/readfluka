@@ -16,6 +16,7 @@ namespace ReadFluka {
     TObjArray *Histograms() const;
     TH1F *HistTotalResponse(int record) const;
     TH1F *HistTotalTrackLength(int record) const;
+    TH1F *HistFlux(int record) const;
   };
 }
 

@@ -1,4 +1,5 @@
 #include "UstSuw.h"
+#include <algorithm>
 
 using namespace ReadFluka;
 
@@ -203,6 +204,7 @@ void UstSuw::Print(int record) const
   std::cout << "\t  distr. scored: " << fIDUSTC[record] << " ," << std::endl;
   std::cout << "\t  from reg. " << fNRUSTC[record] << " )" << std::endl;
   std::cout << std::scientific;
+  // total response is sum of cumulative fluxes:
   std::cout << "\t Tot. response (p/cmq/pr) " << fTotResp[record] << " +/- " << 100*fTotRespErr[record] << " %" << std::endl;
   std::cout << "\t ( --> Track l. (cm/pr) " << GetTrackLength(record) << " +/- " << 100*fTotRespErr[record] << " % )"  << std::endl;
 
@@ -286,6 +288,10 @@ void UstSuw::PrintEnergyBoundaries(int record) const
 
 void UstSuw::PrintLowEnergyBoundaries(int record) const
 {
+  /*
+    Prints energy boundaries for low energy neutrons.
+   */
+
   if (IsReadNeutrons(record)==false) return;
 
   std::cout << std::endl;
@@ -296,4 +302,51 @@ void UstSuw::PrintLowEnergyBoundaries(int record) const
   }
   std::cout << std::endl;
   std::cout << "\t Lowest boundary (GeV): " << fEPGMAX[record][GetNbinsTotal(record)] << std::endl; 
+}
+
+std::vector<float> UstSuw::GetEnergyBoundaries(int record) const
+{
+  /*
+    Return a vector with energy boundaries starting from low energy.
+    The number of boundaries is ONE more than the number of intervals.
+    The method is used in ROOT_UstSuw::HistFlux(int)
+  */
+  std::vector<float> vec = fEPGMAX[record];
+  std::reverse(vec.begin(), vec.end());
+
+  /*  std::cout << "GetEnergyBoundaries:" << std::endl;
+  std::cout << "nbinsE: " << GetNbinsE(record) << std::endl;
+  std::cout << "EPGMAX length: " << fEPGMAX[record].size() << std::endl;
+  for (int i=0; i<vec.size(); i++) std::cout << vec[i] << " ";
+  std::cout << std::endl;*/
+
+  return vec;
+}
+
+std::vector<float> UstSuw::GetFluxAll(int record) const
+{
+  /*
+    Return a vector with flux starting from low energy.
+    If low energy flux is there, it is included in this vector. (!!! not yet implemented!!!)
+    The method is used in ROOT_UstSuw::HistFlux(int)
+   */
+
+  std::vector<float> vec = fFlux[record];
+  std::reverse(vec.begin(), vec.end());
+
+  return vec;
+}
+
+std::vector<float> UstSuw::GetFluxErrAll(int record) const
+{
+  /*
+    Return a vector with flux errors starting from low energy.
+    If low energy flux is there, it is included in this vector. (!!! not yet implemented!!!)
+    The method is used in ROOT_UstSuw::HistFlux(int)
+   */
+
+  std::vector<float> vec = fFluxErr[record];
+  std::reverse(vec.begin(), vec.end());
+
+  return vec;
 }

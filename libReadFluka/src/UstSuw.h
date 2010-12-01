@@ -112,6 +112,10 @@ namespace ReadFluka {
 
     inline unsigned int GetNRecords() const { return fNRecords; }
 
+    std::vector<float> GetEnergyBoundaries(int record) const;
+    std::vector<float> GetFluxAll(int record) const;
+    std::vector<float> GetFluxErrAll(int record) const;
+
     void Print(int i) const;
     void Print() const;
   };
