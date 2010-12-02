@@ -61,12 +61,12 @@ USRBDX          -1.0     209.0     -47.0       3.0       4.0     400. piCurrUD
 USRBDX         +50.0               +50.0                 0.0      10.0 &
 * Tracklength fluence inside the target, Upstream part and Downstream part
 * Logarithmic energy intervals
-USRTRACK        -1.0     209.0     -48.0       3.0    1000.0      13. piFluenU
-USRTRACK        50.0 0.0191554                                           &
-USRTRACK        -1.0    PHOTON     -48.0       4.0    1000.0      23. piFluenD
-USRTRACK        50.0 0.0191554                                           &
+*USRTRACK        -1.0     209.0     -48.0       3.0    1000.0      13. piFluenU
+*USRTRACK        50.0 0.0191554                                           &
+*USRTRACK        -1.0    PHOTON     -48.0    regBE3    1000.0      25. piFluenD
+*USRTRACK        50.0     0.001                                           &
 *
-USRTRACK       -1.0   NEUTRON     -48.0     regBE3       1.6       3. mtrn
+USRTRACK       -1.0   NEUTRON     -48.0     regBE3       1.6      100. mtrn
 USRTRACK       50.0    1.0E-14                                         &
 *
 * Cartesian binning of the pion fluence inside and around the target 

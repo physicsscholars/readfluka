@@ -233,6 +233,9 @@ def ESTIMATORS(fname=None):
 class Project:
     name = None # name of the project (one word - used in the file names)
     title = None # title of the project
+    geotitle = None # title of geometry
+    inpfilename = None
+    inpfile = None
     geofilename = None # name of the geometry file
     geofile = None # geometry file
     ivopt = None
@@ -244,23 +247,35 @@ class Project:
     estimatorsfilename = None
     regions = []
 
-    def __init__(self, name, title, ivopt=0, idbg=0):
+    def __init__(self, name, title, geotitle, inpfilename="", geofilename="", ivopt=0, idbg=0):
         self.name = name
         self.title = title
-        self.geofilename = self.name.lower() + ".geo"
+        self.CheckName(self.title, 80)
+        self.geotitle = geotitle
+        if len(inpfilename):
+            self.inpfilename = inpfilename
+        else:
+            self.inpfilename = self.name.lower() + ".inp"
+        self.inpfile = open(self.inpfilename, "w")
+        if len(geofilename):
+            self.geofilename = geofilename
+        else:
+            self.geofilename = self.name.lower() + ".geo"
         self.geofile = open(self.geofilename, "w")
         self.ivopt = ivopt
         self.idbg = idbg
 #        self.region_counter = 0
         self.assignmatfilename = self.name.lower() + ".assignmat"
         self.estimatorsfilename = self.name.lower() + ".estimators"
-        print >> self.geofile, "%5d%5d               %s" % (self.ivopt, self.idbg, self.title)
+        print >> self.inpfile, "TITLE\n%s" % self.title
+        print >> self.inpfile, "*........+....1....+....2....+....3....+....4....+....5....+....6....+..SDUM.."
+        print >> self.geofile, "%5d%5d               %s" % (self.ivopt, self.idbg, self.geotitle)
 
 
-    def CheckName(self, name):
+    def CheckName(self, name, maxl=8):
         'checks BODY/REGION name for FLUKA com'
-        if len(str(name)) > 8:
-            self.error("CheckName: name %s is too long" % name)
+        if len(str(name)) > maxl:
+            self.error("CheckName: name %s is too long: %d symbols > %d" % (name, len(str(name)), maxl) )
             return True
         if name[0] not in string.letters:
             self.error("The first character of the body's name must be alphabetical (%s)" % name)
@@ -289,6 +304,7 @@ class Project:
     def close(self):
         self.ASSIGNMAT()
         self.ESTIMATORS()
+        self.inpfile.close()
         self.geofile.close()
 
     def ASSIGNMAT(self, fname=None):
@@ -326,6 +342,29 @@ class Project:
             file.write(self.estimators[i] + '\n')
         file.close()
 
+
+    def Line(self, name, w1=None, w2=None, w3=None, w4=None, w5=None, w6=None, sdum=None):
+        '''
+        Print a line in the input file according to the fixed FLUKA format
+        '''
+        whats =  name, w1, w2, w3, w4, w5, w6, sdum
+        format = "%-9.8s"
+        nonempty_whats = []
+        nonempty_whats.append(name)
+        for what in whats[1:7]:
+            if what is None:
+                format += " "*10
+            else:
+                nonempty_whats.append(what)
+                try:
+                    float(what)
+                    format += "%#10.4G"
+                except ValueError:
+                    format += "%10s"
+        if sdum is not None:
+            format += " %s"
+            nonempty_whats.append(sdum)
+        print >> self.inpfile, format % tuple(nonempty_whats)
 
     def Print1(self, code, name, w1, comment=None):
         self.CheckName(name)
