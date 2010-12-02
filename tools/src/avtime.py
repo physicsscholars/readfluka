@@ -38,37 +38,29 @@ def GetMaximumTime(fname):
     return GetTime(fname, "Maximum CPU time used to follow a primary particle", 9)
 
 def main():
-    dir = sys.argv[1]
+    files = sys.argv[1:]
+#    print files
     gStyle.SetOptStat("imr")
-
+ 
     maxtimes = []
     avtimes  = []
     weights  = []
     
-    for root, dirs, files in os.walk(dir):
-        for fout in files:
-            if re.search(".out\Z", fout):
-                print fout
-                path = os.path.join(dir, fout)
-
-                av_time = GetAverageTime(path)
-                if (av_time>0):
-                    max_time = GetMaximumTime(path)
-                    if (max_time>0):
-                        weight = GetWeight(path)
+    for fout in files:
+        if re.search(".out\Z", fout):
+            print fout
+            path = fout
+            av_time = GetAverageTime(path)
+            if (av_time>0):
+                max_time = GetMaximumTime(path)
+                if (max_time>0):
+                    weight = GetWeight(path)
                 
-                if (av_time>0) and (max_time>0) and (weight>0):
-                    avtimes.append(av_time)
-                    maxtimes.append(max_time)
-                    weights.append(weight)
-#                    hAverage.Fill(av_time, weight)
-#                    hMaximum.Fill(max_time, weight)
-#                    hMaxVsAv.Fill(av_time, max_time, weight)
+            if (av_time>0) and (max_time>0) and (weight>0):
+                avtimes.append(av_time)
+                maxtimes.append(max_time)
+                weights.append(weight)
 
-
-#    hMaximum.SetBit(2048)
-#    hMaximum.SetLineColor(ROOT.kRed)
-#    hMaximum.SetLineWidth(2)
 
     hMaxVsAv = TH2F("hMaxVsAv", "Maximum vs Average CPU time;average time [sec];maximum time [sec]",
                     20, float(min(avtimes))*0.99, float(max(avtimes))*1.01,
