@@ -1,5 +1,6 @@
 #! /usr/bin/python -Qwarn
 import sys, getopt, re, string, os
+import glob
 import tempfile
 
 def usage():
@@ -46,14 +47,26 @@ def merge_files(thelist, suffix, thecommand, N, M, inpname):
         sys.exit(2)
     return "%s.root" % suwfile
 
-
+def findNM(inpname):
+    """
+    Find the N and M-numbers used when a FLUKA job with input file 'inpname' was run
+    """
+    inpname = inpname.replace(".inp", "")
+    N = 1
+    M = len(glob.glob1(".", "%s???.out" % inpname))
+    return N,M
 
 def main(argv=None):
     """
 fluka2root - a script to convert the output of all FLUKA estimators (supported by readfluka) to a single ROOT file.
-usage:\tfluka2root file.inp [N] [M]
-\tN - number of previous run plus 1. The default value is 1.
-\tM - number of final run plus 1. The default value is N.
+Usage: There are several ways to run this program:
+ 1. fluka2root inpfile.inp N M
+ \tN - number of previous run plus 1. The default value is 1.
+ \tM - number of final run plus 1. The default value is N.
+ 2. fluka2root inpfile.inp M
+ \tN assumed to be 1
+ 3. fluka2root inpfile.inp
+ \tscript will try to guess N and M based on the files inpfile???.out in the current folder
     """
     if argv is None:
         argv = sys.argv
@@ -70,14 +83,17 @@ usage:\tfluka2root file.inp [N] [M]
     out_root_files = [] # list of output ROOT files
     
     inpname = argv[1]
-    N = 1
+
+    N,M = findNM(inpname)
+
+#    N = 1
     if len(argv) > 2:
         try:
             N = str2int(argv[2])
         except ValueError:
             print main.__doc__
             sys.exit(1)
-    M = N
+#    M = N
     if len(argv) == 4:
         try:
             M = str2int(argv[3])
@@ -85,6 +101,7 @@ usage:\tfluka2root file.inp [N] [M]
             print main.__doc__
             sys.exit(1)
 #    print N, M
+#    sys.exit(0)
 
     inp = open(argv[1], "r")
 #    print "Input file: %s" % inpname
