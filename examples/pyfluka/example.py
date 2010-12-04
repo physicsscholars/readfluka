@@ -36,6 +36,7 @@ def main(argv=None):
    example.Line("GEOBEGIN", None, None, 25, 26, sdum="COMBNAME")
    example.RawLine("example.geo")
    example.RawLine("geolog")
+# just an empty comment line to separate the input file sections
    example.Comment("")
 
 #                                                              GEOMETRY DESCRIPTION
@@ -48,6 +49,7 @@ def main(argv=None):
    example.end()
 
    # REGIONS
+   # note that we describe the regions and set their materials in one line:
    reg = example.Region("regBH1", "+body1 -body2", "BLCKHOLE", "black hole")
    reg = example.Region("regVA2", "+body2 -body3", "VACUUM", "vacuum around", 50)
    reg = example.Region("regBE3", "+body3 +body4", "BERYLLIU", "Be target 1st half")
@@ -63,12 +65,10 @@ def main(argv=None):
    example.Comment("")
    example.Line("MATERIAL",  4.0, 9.0122, 1.848,  5.0, sdum="BERYLLIU")
 
+# this method prints the material assigment described in the lines with example.Region()
    example.ASSIGNMAT()
 
-   example.Open(eventdat_unit, "eventdat")
-   example.Open(usrbin_unit, "usrbin")
    example.Open(usrbdx_unit, "usrbdx")
-   example.Open(usrtrack_unit, "usrtrack")
    example.Comment("")
 
    example.Line("EMFCUT", -0.01, 0.01, 1.0, "BERYLLIU", sdum="PROD-CUT")
