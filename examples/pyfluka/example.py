@@ -18,13 +18,6 @@ def main(argv=None):
 
    beam_ekin = 50
 
-   target_width  = 2   # cm
-   target_height = 2   # cm
-   target_length = 10  # cm
-
-   target_half_dimentions = [target_width/2.0, target_height/2.0, target_length/2.0]
-
-   ############################################################
    # FILE UNITS
    usrbin_type   =  10.0
    eventdat_unit = -75.0
