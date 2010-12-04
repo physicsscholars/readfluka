@@ -10,10 +10,6 @@ def main(argv=None):
    if argv is None:
         argv = sys.argv
 
-   X0 = 0.0
-   Y0 = 0.0
-   Z0 = 0.0
-
    # all dimensions are in centimeters
 
    beam_ekin = 50
