@@ -15,11 +15,7 @@ def main(argv=None):
    beam_ekin = 50
 
    # FILE UNITS
-#   usrbin_type   =  10.0
-#   eventdat_unit = -75.0
-#   usrbin_unit   = -76.0
    usrbdx_unit   = -77.0
-#   usrtrack_unit = -78.0
    
    example = Project("example", "Charged pion fluence inside and around a proton-irradiated Be target", "A simple Be target inside vacuum", "example.inp")
 
