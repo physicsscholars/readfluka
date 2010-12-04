@@ -3,6 +3,10 @@
 from pyfluka import *
 
 def main(argv=None):
+   """
+	Generates a FLUKA input file, similar to $FLUPRO/example.inp
+	The geometry description is saved in a separate file, example.geo
+   """
    if argv is None:
         argv = sys.argv
 
@@ -31,6 +35,10 @@ def main(argv=None):
    example = Project("example", "Charged pion fluence inside and around a proton-irradiated Be target", "A simple Be target inside vacuum", "example.inp")
 
    example.Line("BEAM", -beam_ekin, None, None, None, None, None, "PROTON")
+#
+# note that the previous line can be also written in a shorter way:
+# example.Line("BEAM", -beam_ekin, sdum="PROTON")
+#
    example.Line("BEAMPOS",  0.0,  0.0,  -50.0)
    example.Line("GEOBEGIN", None, None, 25, 26, sdum="COMBNAME")
    example.RawLine("example.geo")
