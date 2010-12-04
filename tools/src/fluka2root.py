@@ -53,6 +53,9 @@ def findNM(inpname):
     """
     inpname = inpname.replace(".inp", "")
     N = 1
+# the same without using glob:
+# len([f for f in os.listdir(myPath) 
+#     if f.endswith('.tif') and os.path.isfile(os.path.join(myPath, f))])
     M = len(glob.glob1(".", "%s???.out" % inpname))
     return N,M
 
