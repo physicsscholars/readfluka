@@ -1,6 +1,5 @@
 #! /usr/bin/python -Qwarn
 
-from math import pi, asin, sqrt, log
 from pyfluka import *
 
 def main(argv=None):
