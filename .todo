@@ -4,6 +4,9 @@
         USRBDX
         <note priority="medium" time="1289649486">
             usxsuw
+            <note priority="veryhigh" time="1291476422">
+                Implement usxsuw2root - it must be easy since usxsuw2txt works fine
+            </note>
             <note priority="medium" time="1289649655">
                 Why in *_sum.lis the total responce is reported in Part/cmq/pr but not in Part/cmq/GeV/pr? When I calculate myself, it turned out that it is also normalized by GeV.
             </note>
