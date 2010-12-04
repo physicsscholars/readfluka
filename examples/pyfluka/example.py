@@ -4,14 +4,12 @@ from pyfluka import *
 
 def main(argv=None):
    """
-	Generates a FLUKA input file, similar to $FLUPRO/example.inp
+	This script generates a FLUKA input file, similar to $FLUPRO/example.inp
 	The geometry description is saved in a separate file, example.geo
 	See comments in readfluka/tools/src/pyfluka.py for documentation of the class Project
    """
    if argv is None:
         argv = sys.argv
-
-   # all dimensions are in centimeters
 
    beam_ekin = 50
 
