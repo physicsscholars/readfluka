@@ -19,7 +19,7 @@ def main(argv=None):
    target_height = 2   # cm
    target_length = 10  # cm
 
-   target_half_dimentions = [target_width/2, target_height/2, target_length/2]
+   target_half_dimentions = [target_width/2.0, target_height/2.0, target_length/2.0]
 
    ############################################################
    # FILE UNITS
