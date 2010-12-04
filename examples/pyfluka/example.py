@@ -31,7 +31,7 @@ def main(argv=None):
    
    example = Project("example", "Charged pion fluence inside and around a proton-irradiated Be target", "A simple Be target inside vacuum", "example.inp")
 
-   example.Line("BEAM", beam_ekin, None, None, None, None, None, "PROTON")
+   example.Line("BEAM", -beam_ekin, None, None, None, None, None, "PROTON")
    example.Line("BEAMPOS",  0.0,  0.0,  -50.0)
    example.Line("GEOBEGIN", None, None, 25, 26, sdum="COMBNAME")
    example.RawLine("example.geo")
