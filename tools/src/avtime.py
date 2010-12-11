@@ -2,7 +2,7 @@
 # Plots two histograms with average and maximum CPU time used to follow a projectile in FLUKA
 
 import sys,time,os,re
-from ROOT import ROOT, TH1F, TH2F, TCanvas, THStack, TLegend, TString, gStyle
+from ROOT import ROOT, TH1F, TH2F, TCanvas, THStack, TLegend, TString, TFile, gStyle
 
 def GetWeight(fname):
 #    print fname
@@ -67,8 +67,11 @@ def main():
                     20, float(min(maxtimes))*0.99, float(max(maxtimes))*1.01)
     
     n = len(avtimes)
+    wtot = 0.0
     for i in range(n):
         hMaxVsAv.Fill(avtimes[i], maxtimes[i], weights[i])
+        wtot += weights[i]
+    hMaxVsAv.SetEntries(int(wtot))
 
 
     c1 = TCanvas("c1", "CPU Time", -1)
@@ -96,6 +99,10 @@ def main():
 
     c1.Update()
     c1.Print("avtime.C")
+    fout = TFile("avtime.root", "recreate")
+    hAverage.Write()
+    hMaximum.Write()
+    fout.Close()
     time.sleep(60)
 
 if __name__ == "__main__":

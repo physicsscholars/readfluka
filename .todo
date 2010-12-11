@@ -33,4 +33,10 @@
             </note>
         </note>
     </note>
+    <note priority="medium" time="1291545505">
+        USRBIN
+        <note priority="medium" time="1291545518">
+            number of entries in the histogram is wrong
+        </note>
+    </note>
 </todo>
