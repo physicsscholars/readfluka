@@ -181,6 +181,7 @@ def main():
     print "MCNP version: ", conv.GetMCNPVersion()
     print "Input file: ", conv.GetInputFileName()
     conv.GetTally(11)
+    conv.GetTally(14)
 
 #    fout = TFile(fname_out, "RECREATE")
 #    GetHistogram(fname_in).Write()
