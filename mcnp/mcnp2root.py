@@ -12,6 +12,7 @@ def main():
     print "MCNP version: ", conv.GetMCNPVersion()
     print "Input file: ", conv.GetInputFileName()
     conv.GetTally(11)
+"""
     conv.GetTally(14)
     conv.GetTally(24)
     conv.GetTally(34)
@@ -19,9 +20,9 @@ def main():
     conv.GetTally(31)
     conv.GetTally(41)
     conv.GetTally(51)
-
+"""
 #    conv.PrintMaterialComposition()
-    conv.PrintProjectiles()
+#    conv.PrintProjectiles()
 
 #    fout = TFile(fname_out, "RECREATE")
 #    GetHistogram(fname_in).Write()
