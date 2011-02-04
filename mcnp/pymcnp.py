@@ -15,6 +15,7 @@ def error(string):
     sys.exit(1)
 
 
+
 def GetHistogram(fname):
     file = open(fname)
     x = []  # upper border of the energy bin
@@ -98,13 +99,12 @@ class Tally():
         del self.energy_bins[:]
         strtmp = "" # a temproary string
 
-        iline = 1
         header_start = None
         header_end = None
         data_start = None
         data_end = None
 # first, search for the tally description:
-        for line in data:
+        for iline, line in enumerate(data, 1):
             if re.search("\A1tally  %d " % number, line): # space after %d is mandatory
                 self.is_header_found = True
                 header_start = iline
@@ -113,7 +113,6 @@ class Tally():
             if self.is_header_found and iline>header_start and re.search("\A1", line):
                 header_end = iline-1
                 break
-            iline = iline+1
 
         if self.is_header_found:
             info("header of tally %d was found between lines %d and %d" % (number, header_start, header_end))
@@ -212,7 +211,7 @@ class Tally():
             return
 
         # analyse the data
-        for line in data[data_start:data_end]:
+        for iline, line in enumerate(data[data_start:data_end], data_start+1):
             # check the data and compare it with the header information
             if re.search("tally type", line):
                 words = line.split()
@@ -225,8 +224,23 @@ class Tally():
 
             # loop through all surfaces
             for isurface in range(len(self.surfaces)):
-                if re.search("\A surface  %s" % int(self.surfaces[isurface]), line):
-                    print line.rstrip()
+                thesurface = int(self.surfaces[isurface])
+                if re.search("\A surface  %s" % thesurface, line):
+#                    print line.rstrip()
+                    time_or_energy = data[iline].strip()
+                    if  time_or_energy == "time":
+                        nbins = len(self.time_bins)/2
+                    elif time_or_energy == "energy":
+                        nbins = len(self.energy_bins)/2
+                    else:
+                        error("neither time nor energy in the data section")
+                    if data[iline+nbins+1].split()[0] != "total": error("format error after reading 1D values")
+                    
+                    print iline+2, iline+nbins+1
+                    self.data[thesurface] = self.Get1Dvalues(data[iline+1:iline+nbins+1])
+                    print "the sufrace", thesurface
+                    if thesurface == 1:   print self.data[thesurface]   --- something is wrong here
+                    continue
         
 
     def GetTimeBins(self, number):
@@ -238,6 +252,17 @@ class Tally():
                 if re.search("  time  bins", line):
                     print line
 
+    def Get1Dvalues(self, lines):
+        """
+        Reads 1D values in the tally's data section and returns the list of values
+        """
+        values = []
+        del values[:]
+        for line in lines:
+            words = line.split()
+            values.append(words[1])
+        return tuple(values)
+        
 
 
 
