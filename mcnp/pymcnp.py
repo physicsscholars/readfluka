@@ -210,8 +210,11 @@ class Tally():
             error("data of tally %d not found" % number)
             return
 
-        # analyse the data
+        # analyse the data 
+        data_start_line = None
+        data_end_line   = None
         for iline, line in enumerate(data[data_start:data_end], data_start+1):
+            if iline<data_end_line: continue
             # check the data and compare it with the header information
             if re.search("tally type", line):
                 words = line.split()
@@ -225,7 +228,7 @@ class Tally():
             # loop through all surfaces
             for isurface in range(len(self.surfaces)):
                 thesurface = int(self.surfaces[isurface])
-                if re.search("\A surface  %s" % thesurface, line):
+                if re.search("\A surface  %s " % thesurface, line): # space after %s is mandatory
 #                    print line.rstrip()
                     time_or_energy = data[iline].strip()
                     if  time_or_energy == "time":
@@ -234,13 +237,15 @@ class Tally():
                         nbins = len(self.energy_bins)/2
                     else:
                         error("neither time nor energy in the data section")
-                    if data[iline+nbins+1].split()[0] != "total": error("format error after reading 1D values")
                     
-                    print iline+2, iline+nbins+1
-                    self.data[thesurface] = self.Get1Dvalues(data[iline+1:iline+nbins+1])
+                    data_start_line = iline+1
+                    data_end_line   = iline+1+nbins
+                    if data[data_end_line].split()[0] != "total": error("format error after reading 1D values")
+                    self.data[thesurface] = self.Get1Dvalues(data[data_start_line:data_end_line])
                     print "the sufrace", thesurface
-                    if thesurface == 1:   print self.data[thesurface]   --- something is wrong here
-                    continue
+        print self.data
+        print iline
+
         
 
     def GetTimeBins(self, number):
@@ -259,8 +264,9 @@ class Tally():
         values = []
         del values[:]
         for line in lines:
+#            print line.rstrip()
             words = line.split()
-            values.append(words[1])
+            values.append((float(words[1]), float(words[2])))
         return tuple(values)
         
 
