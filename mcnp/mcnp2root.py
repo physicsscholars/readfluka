@@ -8,10 +8,11 @@ def main():
     fname_in = sys.argv[1]
     fname_out = fname_in.replace(".txt", ".root")
 
-    conv = Converter(fname_in, fname_out)
+#    conv = Converter(fname_in)
+    conv = ROOTConverter(fname_in, fname_out)
     print "MCNP version: ", conv.GetMCNPVersion()
     print "Input file: ", conv.GetInputFileName()
-    conv.GetTally(11)
+    conv.GetTally(11).GetHistogram(1)
 """
     conv.GetTally(14)
     conv.GetTally(24)

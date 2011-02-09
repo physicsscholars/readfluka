@@ -260,7 +260,8 @@ class Tally():
 
     def Get1Dvalues(self, lines):
         """
-        Reads 1D values in the tally's data section and returns the list of values
+        Reads 1D values in the tally's data section from the lines in the argument and returns the list of values.
+        Note that you should specify the lines to read from - the method should be called from constructor.
         """
         values = []
         del values[:]
@@ -269,7 +270,10 @@ class Tally():
             words = line.split()
             values.append((float(words[1]), float(words[2])))
         return tuple(values)
-        
+
+    def Is1D(self):
+        if len(self.time_bins) * len(self.energy_bins) == 0: return True
+        return False
 
 
 
@@ -277,18 +281,15 @@ class Tally():
 
 class Converter():
     """
-    A class to convert the MCNP output to the ROOT format
+    A class to read the MCNP output
     """
     mcnp_fname = None
     mcnp_file  = None
     mcnp_file_contents = [] # contents of mcnp_file
 
-    root_fname = None
-    
-    def __init__(self, mcnp_fname, root_fname="out.root"):
+    def __init__(self, mcnp_fname):
         self.mcnp_fname = mcnp_fname
-        self.root_fname = root_fname
-        self.mcnp_file  = open(mcnp_fname)
+        self.mcnp_file  = open(self.mcnp_fname)
         self.mcnp_file_contents = self.mcnp_file.readlines()
 #        self.mcnp_file.close()
 
@@ -341,3 +342,36 @@ class Converter():
                 break
             if re.search("nps    x          y          z", line):
                 start = True
+
+
+class ROOTTally(Tally):
+    """
+    A class for Tally with ROOT methods
+    """
+    def __init__(self, data, number):
+        Tally.__init__(self, data, number)
+
+    def GetHistogram(self, surface):
+        print "histogram for surface", surface
+        print self.data[surface]
+        if self.Is1D():                             # for 1D histograms
+            x = []
+            y = []
+            ey = []
+            ... to be continued
+            
+
+
+class ROOTConverter(Converter):
+    """
+    A class to convert the MCNP output to the ROOT format
+    """
+    root_fname = None
+
+    def __init__(self, mcnp_fname, root_fname):
+        Converter.__init__(self, mcnp_fname) # you must always explicitly call the appropriate method in the ancestor class
+        self.root_fname = root_fname
+
+    def GetTally(self, N):
+        """ Return a tally number N """
+        return ROOTTally(self.mcnp_file_contents, N)
