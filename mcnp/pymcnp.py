@@ -112,6 +112,7 @@ class Tally():
 
             if self.is_header_found and iline>header_start and re.search("\A1", line):
                 header_end = iline-1
+                if data[iline-2].strip() != "total bin": error("Format error - can't find the 'total bin' line in the end of tally %d" % number)
                 break
 
         if self.is_header_found:
