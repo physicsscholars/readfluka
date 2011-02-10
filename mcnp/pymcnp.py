@@ -241,7 +241,7 @@ class Tally():
                     data_end_line   = iline+1+nbins
                     if data[data_end_line].split()[0] != "total": error("format error after reading 1D values")
                     self.data[thesurface] = self.Get1Dvalues(data[data_start_line:data_end_line])
-                    print "the sufrace", thesurface
+#                    print "the sufrace", thesurface
 #        print self.data
 #        print iline
 
@@ -326,7 +326,7 @@ class Converter():
         """
         Return the input file name
         """
-        return self.mcnp_file_contents[2]
+        return self.mcnp_file_contents[2].rstrip()
 
     def GetTally(self, N):
         """
@@ -389,7 +389,7 @@ class ROOTTally(Tally):
             bins = self.time_bins
             xtitle = "Time [shakes]"
         
-        print "bins", bins
+#        print "bins", bins
         x = self.ResampleBins(bins) # len(x) = number of bins + 1
         nbins = len(x)-1
         h = TH1F("t%ds%d" % (self.number, surface), "%s;%s" % (self.GetTitle(), xtitle), nbins, array('f', x)) 
@@ -410,8 +410,7 @@ class ROOTTally(Tally):
         return h
 
     def GetHistogram(self, surface):
-        print "histogram for surface", surface
-        print self.data[surface]
+#        print self.data[surface]
         if self.Is1D():                             # for 1D histograms
             return self.GetHistogram1D(surface)
             

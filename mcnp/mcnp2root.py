@@ -14,12 +14,17 @@ def main():
 
     conv = Converter(fname_in)
     conv = ROOTConverter(fname_in)
-    print "MCNP version: ", conv.GetMCNPVersion()
-    print "Input file: ", conv.GetInputFileName()
-    print "ROOT file: ", fname_out
+    print "MCNP version:\t", conv.GetMCNPVersion()
+    print "Input file:\t", conv.GetInputFileName()
+    print "ROOT file:\t", fname_out
 
+    tally = conv.GetTally(11)
+    surfaces = tally.surfaces
+ 
     file = TFile(fname_out, "recreate")
-    conv.GetTally(11).GetHistogram(1).Write()
+    for surface in surfaces:
+        print surface
+        tally.GetHistogram(int(surface)).Write()
     file.Close()
 
 """
