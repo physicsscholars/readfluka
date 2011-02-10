@@ -246,6 +246,13 @@ class Tally():
 #        print iline
 
         
+    def GetTitle(self):
+        """ Return the title without the leading dot """
+        return self.title.replace(".", "")
+
+    def GetNps(self):
+        """ Return number of incident particles converted to float (as needed by TH1::SetEntries)"""
+        return float(self.nps)
 
     def GetTimeBins(self, number):
         """
@@ -385,7 +392,7 @@ class ROOTTally(Tally):
         print "bins", bins
         x = self.ResampleBins(bins) # len(x) = number of bins + 1
         nbins = len(x)-1
-        h = TH1F("t%ds%d" % (self.number, surface), "%s;%s" % (self.title, xtitle), nbins, array('f', x)) 
+        h = TH1F("t%ds%d" % (self.number, surface), "%s;%s" % (self.GetTitle(), xtitle), nbins, array('f', x)) 
 
         warning("the histogram must be scaled by the bin width (remove 1.0 below)")
         for i in range(nbins):
@@ -399,6 +406,7 @@ class ROOTTally(Tally):
 #        h.Draw("hist,e")
 #        h.Print("all")
 #        time.sleep(60)
+        h.SetEntries(self.GetNps())
         return h
 
     def GetHistogram(self, surface):

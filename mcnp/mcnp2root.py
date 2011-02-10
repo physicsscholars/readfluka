@@ -12,12 +12,12 @@ def main():
     fname_in = sys.argv[1]
     fname_out = fname_in + ".root"
 
-#    conv = Converter(fname_in)
-#    conv = ROOTConverter(fname_in)
-#    print "MCNP version: ", conv.GetMCNPVersion()
-#    print "Input file: ", conv.GetInputFileName()
+    conv = Converter(fname_in)
+    conv = ROOTConverter(fname_in)
+    print "MCNP version: ", conv.GetMCNPVersion()
+    print "Input file: ", conv.GetInputFileName()
     print "ROOT file: ", fname_out
-    sys.exit(0)
+
     file = TFile(fname_out, "recreate")
     conv.GetTally(11).GetHistogram(1).Write()
     file.Close()
