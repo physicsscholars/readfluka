@@ -188,7 +188,7 @@ class Tally():
                 self.time_bins[0] = "0.0"
             print "\t%d time bins from  %s to %s shakes" % (len(self.time_bins)/2, self.time_bins[0], self.time_bins[-1])
         if self.is_energy_bins_found:
-            print "\t%d energy bins from  %s to %s MeV" % (len(self.energy_bins)/2, self.energy_bins[0], self.energy_bins[-1])
+            print "\t%d energy bins from  %s to %s MeV" % (len(self.energy_bins)/2, self.energy_bins[0], self.energy_bins[-1]), self.energy_bins
 
 # Now let's find the tally's data
         for iline, line in enumerate(data[header_end+1:], header_end+1):
@@ -217,30 +217,50 @@ class Tally():
             # check the data and compare it with the header information
             if re.search("tally type", line):
                 words = line.split()
-                if self.type != words[2]: error("Tally %d data format error: types from the header and the data mismatch: %s != %s" %(number, self.type, words[2]) )
-                if self.title != string.join(words[3:]): error("Tally %d data format error: titles from the header and the data mismatch: %s != %s" % (number, self.title, string.join(words[3:])))
+                if self.type != words[2]:
+                    error("Tally %d data format error: types from the header and the data mismatch: %s != %s" %(number, self.type, words[2]) )
+                #  sometimes after the tally's title there is a line like "units 1/cm**2", that's why we also compare with words[3:-2]
+                if self.title != string.join(words[3:]) and self.title != string.join(words[3:-2]):
+                    error("Tally %d data format error: titles from the header and the data mismatch: %s != %s" % (number, self.title, string.join(words[3:])))
 
             if line[11:19] == "particle":
                 words = line.split()
-                if self.particles != words[1:]: error("Data format error in tally %d: particles from the header and the data mismatch:\nheader:\t%s\ndata:\t%s" % (number, string.join(self.particles), string.join(words[1:])) )
+                if self.particles != words[1:]:
+                    error("Data format error in tally %d: particles from the header and the data mismatch:\nheader:\t%s\ndata:\t%s" % (number, string.join(self.particles), string.join(words[1:])) )
 
-            # loop through all surfaces
-            for isurface in range(len(self.surfaces)):
-                thesurface = int(self.surfaces[isurface])
-                if re.search("\A surface  %s " % thesurface, line): # space after %s is mandatory
-#                    print line.rstrip()
-                    time_or_energy = data[iline].strip()
-                    if  time_or_energy == "time":
-                        nbins = len(self.time_bins)/2
-                    elif time_or_energy == "energy":
-                        nbins = len(self.energy_bins)/2
-                    else:
-                        error("neither time nor energy in the data section")
+            if self.surfaces:                                                                          # 1D histogram:
+                # loop through all surfaces
+                for isurface in range(len(self.surfaces)):
+                    thesurface = int(self.surfaces[isurface])
+                    if re.search("\A surface  %s " % thesurface, line): # space after %s is mandatory
+                        #                    print line.rstrip()
+                        time_or_energy = data[iline].strip()
+                        if  time_or_energy == "time":
+                            nbins = len(self.time_bins)/2
+                        elif time_or_energy == "energy":
+                            nbins = len(self.energy_bins)/2
+                        else:
+                            error("neither time nor energy in the data section")
                     
-                    data_start_line = iline+1
-                    data_end_line   = iline+1+nbins
-                    if data[data_end_line].split()[0] != "total": error("format error after reading 1D values")
-                    self.data[thesurface] = self.Get1Dvalues(data[data_start_line:data_end_line])
+                        data_start_line = iline+1
+                        data_end_line   = iline+1+nbins
+                        if data[data_end_line].split()[0] != "total": error("format error after reading 1D values")
+                        self.data[thesurface] = self.Get1Dvalues(data[data_start_line:data_end_line])
+                # 2D histogram
+            elif len(self.cells):                                                                            # 2D histogram
+                print "cells data"
+                if re.search("\A cell", line):
+#                        print line
+#                        print "acell (%s)" % string.join(self.cells)
+#                        if re.search("cell (%s)" % string.join(self.cells), line):
+#                            print "found"
+                    data_start_line = iline+2
+                    data_end_line = data_end
+                    self.Get2Dvalues(data[data_start_line:data_end_line])
+
+
+
+
 #                    print "the sufrace", thesurface
 #        print self.data
 #        print iline
@@ -275,6 +295,10 @@ class Tally():
             words = line.split()
             values.append((float(words[1]), float(words[2])))
         return tuple(values)
+
+    def Get2Dvalues(self, lines):
+        for line in lines:
+            print line.strip()
 
     def Is1D(self):
         """
@@ -391,13 +415,14 @@ class ROOTTally(Tally):
         
 #        print "bins", bins
         x = self.ResampleBins(bins) # len(x) = number of bins + 1
+        print x
         nbins = len(x)-1
-        h = TH1F("t%ds%d" % (self.number, surface), "%s;%s" % (self.GetTitle(), xtitle), nbins, array('f', x)) 
+        h = TH1F("t%ds%d" % (self.number, surface), "%s (s=%d, p=%s);%s" % (self.GetTitle(), surface, string.join(self.particles), xtitle), nbins, array('f', x)) 
 
-        warning("the histogram must be scaled by the bin width (remove 1.0 below)")
+#        warning("the histogram must be scaled by the bin width (remove 1.0 below)")
         for i in range(nbins):
             value = self.data[surface][i]
-            xwidth = 1.0 #x[i+1] - x[i]
+            xwidth = x[i+1] - x[i]
             y = float(value[0])/xwidth
             ey = float(value[1])/xwidth * y # absolute error
             h.SetBinContent(i+1, y)

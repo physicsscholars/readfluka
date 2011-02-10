@@ -13,6 +13,9 @@ def main():
     fname_out = fname_in + ".root"
 
     conv = Converter(fname_in)
+    conv.GetTally(24)
+
+"""
     conv = ROOTConverter(fname_in)
     print "MCNP version:\t", conv.GetMCNPVersion()
     print "Input file:\t", conv.GetInputFileName()
@@ -26,10 +29,11 @@ def main():
         print surface
         tally.GetHistogram(int(surface)).Write()
     file.Close()
+"""
+
 
 """
     conv.GetTally(14)
-    conv.GetTally(24)
     conv.GetTally(34)
     conv.GetTally(21)
     conv.GetTally(31)
