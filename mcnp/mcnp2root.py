@@ -5,14 +5,23 @@ from pymcnp import *
 
 
 def main():
+    verbose = '-v' in sys.argv
+    if verbose:
+        sys.argv.remove('-v')
+
     fname_in = sys.argv[1]
-    fname_out = fname_in.replace(".txt", ".root")
+    fname_out = fname_in + ".root"
 
 #    conv = Converter(fname_in)
-    conv = ROOTConverter(fname_in, fname_out)
-    print "MCNP version: ", conv.GetMCNPVersion()
-    print "Input file: ", conv.GetInputFileName()
-    conv.GetTally(11).GetHistogram(1)
+#    conv = ROOTConverter(fname_in)
+#    print "MCNP version: ", conv.GetMCNPVersion()
+#    print "Input file: ", conv.GetInputFileName()
+    print "ROOT file: ", fname_out
+    sys.exit(0)
+    file = TFile(fname_out, "recreate")
+    conv.GetTally(11).GetHistogram(1).Write()
+    file.Close()
+
 """
     conv.GetTally(14)
     conv.GetTally(24)

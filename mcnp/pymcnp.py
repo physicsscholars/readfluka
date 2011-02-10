@@ -184,12 +184,10 @@ class Tally():
                         self.energy_bins.append(words[2])
 
         if self.is_time_bins_found:
-            if len(self.time_bins) % 2:
-                error("number of time borders is not a multiple of 2: %s" % len(self.time_bins))
+            if self.time_bins[0] == "-i": # ??? -i means zero ???
+                self.time_bins[0] = "0.0"
             print "\t%d time bins from  %s to %s shakes" % (len(self.time_bins)/2, self.time_bins[0], self.time_bins[-1])
         if self.is_energy_bins_found:
-            if len(self.energy_bins) % 2:
-                error("number of energy borders is not a multiple of 2")
             print "\t%d energy bins from  %s to %s MeV" % (len(self.energy_bins)/2, self.energy_bins[0], self.energy_bins[-1])
 
 # Now let's find the tally's data
@@ -244,8 +242,8 @@ class Tally():
                     if data[data_end_line].split()[0] != "total": error("format error after reading 1D values")
                     self.data[thesurface] = self.Get1Dvalues(data[data_start_line:data_end_line])
                     print "the sufrace", thesurface
-        print self.data
-        print iline
+#        print self.data
+#        print iline
 
         
 
@@ -272,8 +270,26 @@ class Tally():
         return tuple(values)
 
     def Is1D(self):
+        """
+        Return True if Tally is one-dimentional, otherwise return False
+        """
         if len(self.time_bins) * len(self.energy_bins) == 0: return True
         return False
+
+    def ResampleBins(self, old_bins):
+        """
+        The 'old_bins' tuple has the format of the MCNP output file:
+        x0 x1
+        x1 x2
+        x2 x3
+        but in order to build a histogram we need x0, x1, x2, x3 ..., so here we resample it
+        Also convert the bin values to float.
+        """
+        new_bins = []
+        for i, bin in enumerate(old_bins):
+            if i==0 or i%2:
+                new_bins.append(float(bin))
+        return new_bins
 
 
 
@@ -351,14 +367,46 @@ class ROOTTally(Tally):
     def __init__(self, data, number):
         Tally.__init__(self, data, number)
 
+    def GetHistogram1D(self, surface):
+        """
+        Return TH1 for the given surface
+        """
+
+        x = []
+        bins = []
+        xtitle = None
+        if len(self.energy_bins): 
+            bins = self.energy_bins
+            xtitle = "Energy [MeV]"
+        else:
+            bins = self.time_bins
+            xtitle = "Time [shakes]"
+        
+        print "bins", bins
+        x = self.ResampleBins(bins) # len(x) = number of bins + 1
+        nbins = len(x)-1
+        h = TH1F("t%ds%d" % (self.number, surface), "%s;%s" % (self.title, xtitle), nbins, array('f', x)) 
+
+        warning("the histogram must be scaled by the bin width (remove 1.0 below)")
+        for i in range(nbins):
+            value = self.data[surface][i]
+            xwidth = 1.0 #x[i+1] - x[i]
+            y = float(value[0])/xwidth
+            ey = float(value[1])/xwidth * y # absolute error
+            h.SetBinContent(i+1, y)
+            h.SetBinError(i+1, ey)
+            
+#        h.Draw("hist,e")
+#        h.Print("all")
+#        time.sleep(60)
+        return h
+
     def GetHistogram(self, surface):
         print "histogram for surface", surface
         print self.data[surface]
         if self.Is1D():                             # for 1D histograms
-            x = []
-            y = []
-            ey = []
-            ... to be continued
+            return self.GetHistogram1D(surface)
+            
             
 
 
@@ -366,11 +414,9 @@ class ROOTConverter(Converter):
     """
     A class to convert the MCNP output to the ROOT format
     """
-    root_fname = None
 
-    def __init__(self, mcnp_fname, root_fname):
+    def __init__(self, mcnp_fname):
         Converter.__init__(self, mcnp_fname) # you must always explicitly call the appropriate method in the ancestor class
-        self.root_fname = root_fname
 
     def GetTally(self, N):
         """ Return a tally number N """
