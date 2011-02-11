@@ -254,7 +254,7 @@ class Tally():
 #                        print "acell (%s)" % string.join(self.cells)
 #                        if re.search("cell (%s)" % string.join(self.cells), line):
 #                            print "found"
-                    data_start_line = iline+2
+                    data_start_line = iline
                     data_end_line = data_end
                     self.Get2Dvalues(data[data_start_line:data_end_line])
 
@@ -297,8 +297,75 @@ class Tally():
         return tuple(values)
 
     def Get2Dvalues(self, lines):
-        for line in lines:
-            print line.strip()
+        """ Return the values of a 2D histogram """
+#  (Nx and Ny directions are as printed in the MCNP ASCII file)
+#  set the default values of Nx and Ny as if self.printing_order[0] == 't':
+        Nx = len(self.energy_bins)/2  # number of bins to read along the x-direction
+        Ny = len(self.time_bins)/2    # number of bins to read along the y-direction
+        if self.printing_order[0] == 'e': # otherwise exchnage their values
+            Nx, Ny = Ny, Nx
+        elif self.printing_order[0] != 't':
+            error("can't understand the printing order for tally %d" % self.number)
+        
+        print Nx, Ny
+
+        current_x_bin = 0
+        current_line = 0
+        Nx_current_portion = 0
+        while current_x_bin < Nx:
+            words = lines[current_line].split()
+#            print words
+            if words[-1] == 'total':
+                Nx_current_portion = len(words[1:-1])
+            else:
+                Nx_current_portion = len(words[1:])    # we use 1: since words[0] is the title ('energy' or 'time')
+            print Nx_current_portion
+            current_line += 2
+            for current_y_bin in range(Ny):
+                print lines[current_line].rstrip()
+                current_line  += 1
+            current_x_bin += Nx_current_portion
+            print "a",lines[current_line].split()[0]
+            if lines[current_line].split()[0] != 'total':
+                error("cant find total")
+            else:
+                info("good")
+            current_line += 2
+
+        exit(0)
+            
+
+        words = lines[0].split()
+        if words[-1] == 'total':
+            xborders = words[1:-1]
+        else:
+            xborders = words[1:]
+        
+        if words[0] == "energy:":            # energy in X and time in Y
+            Ny = len(self.time_bins)/2
+        elif words[0] == "time:":
+            Ny = len(self.energy_bins)/2
+            print Ny, "bins in Y"
+        
+        for iline in range(Ny):
+            print "a",lines[iline+2].rstrip()
+
+        if lines[iline+2+1].split()[0] != 'total':
+            error("Get2Dvalues: can't find the 'total' line below the data")
+        
+        values1 = []
+        del values1[:]
+        values2 = []
+        del values2[:]
+        for line in lines[2:-1]:     # skip 2 lines because one is in 'xvalues' and the other one is 'time'; -1 is because the last line is 'total'
+            words = line.split()
+            print words
+#            for i in xborders ???
+            values1.append((words[1],words[2]))
+            values2.append((words[3],words[4]))
+        if lines[-1].split()[0] != 'total':
+            error("Get2Dvalues: can't find the 'total' line below the data")
+        print values1, values2
 
     def Is1D(self):
         """

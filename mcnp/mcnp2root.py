@@ -13,7 +13,7 @@ def main():
     fname_out = fname_in + ".root"
 
     conv = Converter(fname_in)
-    conv.GetTally(24)
+    conv.GetTally(14)
 
 """
     conv = ROOTConverter(fname_in)
