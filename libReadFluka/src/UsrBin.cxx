@@ -54,9 +54,9 @@ void UsrBin::fReadHeader()
   }
 
   std::cout << "UsrBin::ReadHeader: " << ReadInt() << " " << ReadInt() << std::endl;
-  std::cout << "here" << std::endl;
+  //  std::cout << "here" << std::endl;
   CheckFormat();
-  std::cout << "b" << std::endl; 
+  //  std::cout << "b" << std::endl; 
 }
 
 bool UsrBin::Read()
@@ -78,7 +78,7 @@ bool UsrBin::Read()
   
   // cut the spaces from the both sides (if any):
   sprintf(fTITUSB, "%s", Base::Trimmed(std::string(fTITUSB)).c_str());
-  std::cout << "titusb: " << fTITUSB << std::endl;
+  //  std::cout << "titusb: " << fTITUSB << std::endl;
 
   fITUSBN = ReadInt();
   if ((fITUSBN<0) || (fITUSBN>17)) std::cerr << "error in UsrBin::Read():\tfITUSBN=" << fITUSBN << " - unknown type of binning" << std::endl;
@@ -158,16 +158,15 @@ bool UsrBin::fReadCartesian()
   fScored = new float[GetNbins()];
   fScoredVec.clear();
   
-  //	std::cout << ReadInt() << std::endl;	std::cout << ReadInt() << std::endl;
-  //  CheckFormat();
-  ReadFloat(2);
-  if (gVerbose>=kPRINT_TITLE) std::cout << "fScored:\t";
+  if (gVerbose>=kPRINT_SCORED) std::cout << "fScored:\t";
   for (int i=0; i<GetNbins(); i++) {
     fScored[i]  = ReadFloat();
     fScoredVec.push_back(fScored[i]);
     if (gVerbose>=kPRINT_SCORED)	std::cout << fScored[i] << ' ';
   }
   if (gVerbose>=kPRINT_TITLE) std::cout << std::endl;
+
+  CheckFormat();
 
   return true;
 }

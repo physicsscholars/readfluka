@@ -49,6 +49,8 @@ int main(int argc, const char **argv)
 	}*/
     }
   }
+  //  usrbin->Print();
+
   delete usrbin;
   
   return 0;
