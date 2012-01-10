@@ -132,8 +132,13 @@ const char *Base::Code2Name(int code, bool replace) const
     if 'replace' is true then replaces all non-alphanumeric characters
     (helpfull when using this name for a branch of a tree or as a histogram name). 
    */
+  //  std::cerr << "code: " << code << std::endl;
 
   switch(code) {
+  case -6:
+    return replace ? "He4" : "4-HELIUM";
+  case -5:
+    return replace ? "He3" : "3-HELIUM";
   case -1:
     return "OPTIPHOT";
   case 1:
@@ -168,9 +173,13 @@ const char *Base::Code2Name(int code, bool replace) const
     return "ACTIVITY";
   case 235:
     return "ACTOMASS";
+  case 239:
+    std::cerr << "here 239" << std::endl;
+    return replace ? "DPA_SCO" : "DPA-SCO";
   case 240:
     return replace ? "DOSE_EQ" : "DOSE-EQ";
   default:
+    //    std::cerr << "Warning: Default is using in Base::Code2Name for " << code << std::endl;
     std::ostringstream name;
     name << "id" << code;
     return name.str().c_str();

@@ -24,8 +24,10 @@ string code2name(ReadFluka::EventDat *ed)
   ostringstream str;
   int id;
   int nregs = ed->GetNregs();
+  //  cout << "nsco: " << ed->GetNsco() << endl;
   for (unsigned int bin=0; bin<ed->GetNsco(); bin++) {
     id = ed->GetSco(bin);
+    //    cout << "code2name id: " << id << endl;
     str << ed->Code2Name(id,true) << "[" << nregs << "]/F";
     if (bin+1 != ed->GetNsco()) str << ":";
   }
