@@ -128,10 +128,32 @@ bool UsrBin::Read()
   
   if (ituhlp == 0) {
     return fReadCartesian();
+  } else if (ituhlp==2) {
+    return fReadRegions();
   } else {
-    std::cerr << "I can only read Cartesian binning for the time being: " << ituhlp << std::endl;
-    return false;
+    //    std::cerr << "I can only read Cartesian (0) and Region (2) binnings for the time being: " << ituhlp << std::endl;
+    std::cerr << "WARNING from UsrBin::Read():\t default reading function is used for this kind of binning" << std::endl;
+    return fReadRegions();
   }
+
+  return true;
+}
+
+bool UsrBin::fReadBinning()
+{
+  if (fScored) delete fScored;
+  fScored = new float[GetNbins()];
+  fScoredVec.clear();
+  
+  if (gVerbose>=kPRINT_SCORED) std::cout << "fScored:\t";
+  for (int i=0; i<GetNbins(); i++) {
+    fScored[i]  = ReadFloat();
+    fScoredVec.push_back(fScored[i]);
+    if (gVerbose>=kPRINT_SCORED)	std::cout << fScored[i] << ' ';
+  }
+  if (gVerbose>=kPRINT_TITLE) std::cout << std::endl;
+
+  CheckFormat();
 
   return true;
 }
@@ -153,22 +175,13 @@ bool UsrBin::fReadCartesian()
     if (fIDUSBN<200) std::cout<<"\tthis is a track-length binning" << std::endl; // is it correct?
   }
   else if (gVerbose>kPRINT_TITLE) std::clog << std::endl << "read cartesian binning" << std::endl;
-  
-  if (fScored) delete fScored;
-  fScored = new float[GetNbins()];
-  fScoredVec.clear();
-  
-  if (gVerbose>=kPRINT_SCORED) std::cout << "fScored:\t";
-  for (int i=0; i<GetNbins(); i++) {
-    fScored[i]  = ReadFloat();
-    fScoredVec.push_back(fScored[i]);
-    if (gVerbose>=kPRINT_SCORED)	std::cout << fScored[i] << ' ';
-  }
-  if (gVerbose>=kPRINT_TITLE) std::cout << std::endl;
 
-  CheckFormat();
+  return fReadBinning();
+}
 
-  return true;
+bool UsrBin::fReadRegions()
+{
+  return fReadBinning();
 }
 
 float UsrBin::GetScored(int i, int j, int k) const

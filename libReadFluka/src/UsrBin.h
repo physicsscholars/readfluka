@@ -52,7 +52,10 @@ namespace ReadFluka {
     bool        fIsReadHeader;   // true if the header has already been read
     void        fReadHeader();   // reads the header
     
+    bool        fReadBinning();   // read the common part of binnings
     bool        fReadCartesian(); // reads the cartesian binning
+    bool        fReadRegions();   // reads the region binning
+    
     bool        fCheckBounds(int x, int y=1, int z=1) const;
     bool        fFirstRead;
     
