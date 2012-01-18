@@ -78,7 +78,7 @@ Usage: There are several ways to run this program:
         usage()
         sys.exit(1)
 
-    printincolor("Note that the corresponding USRBIN histograms from different ROOT files will be summed up but not averaged unless it is implemented in the ROOT's hadd. All the other supported histograms should work fine", 33)
+#    printincolor("Note that the corresponding USRBIN histograms from different ROOT files will be summed up but not averaged unless it is implemented in the ROOT's hadd. All the other supported histograms should work fine", 33)
 
     estimators = {"EVENTDAT" : [], "USRBDX" : [], "USRBIN" : [], "RESNUCLE" : [], "USRTRACK" : []} # dictionary of supported estimators and their file units
 #    estimators = {"USRBIN" : [], "USRTRACK" : []} # dictionary of supported estimators and their file units
@@ -133,11 +133,14 @@ Usage: There are several ways to run this program:
             if e == "EVENTDAT": # EVENTDAT card has a different format than the other estimators
                 if re.search("\A%s" % e, line):
                     unit = line[10:20].strip()
-                    name = line[70:80].strip()
-                    print "\t", e, unit,name
+                    name = "" #line[0:10].strip() # actually, name for EVENTDAT does not matter - the Tree name will be used
+#                    print "eventdat: \t", e, unit,name
                     if str2int(unit)<0: # we are interested in binary files only
+#                        print "here", e, unit, estimators
                         if not unit in estimators[e]:
-                            estimators[e] = ["_%s" % name]
+#                            print unit
+                            estimators[e] = ["%s" % unit]
+#                            print estimators
             else:
                 if re.search("\A%s" % e, line) and not re.search("\&", line[70:80]):
                     if e == "RESNUCLE":
@@ -145,7 +148,7 @@ Usage: There are several ways to run this program:
                     else:
                         unit = line[30:40].strip()
                     name = line[70:80].strip()
-                    print "\t", e, unit, name
+#                    print "\t", e, unit, name
                     if str2int(unit)<0: # we are interested in binary files only
                         if not unit in estimators[e]:
                             estimators[e].append(unit)
@@ -154,8 +157,8 @@ Usage: There are several ways to run this program:
 
 # Convert units in the file names:
     for e, units in estimators.iteritems():
-        if e == "EVENTDAT":
-            continue
+#        if e == "EVENTDAT":
+#            continue
         for u in units:
             iu = str2int(u)
             if iu<0: # we are interested in binary files only
