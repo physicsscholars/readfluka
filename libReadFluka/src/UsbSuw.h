@@ -74,29 +74,40 @@ namespace ReadFluka {
     bool Read();
 
     float GetScored(int i, int x, int y, int z) const;
-    float GetError(int i, int x, int y, int z) const;
+    inline float GetScored(int ihist, int ibin) const {return fScored[ihist][ibin];}
+    float  GetError(int i, int x, int y, int z) const;
+    inline  float GetError(int ihist, int ibin) const {return fGBSTOR[ihist][ibin];}
 
     inline const int GetMCASE() const {return fMCASE;}
     inline const int GetNBATCH() const {return fNBATCH;}
     inline const int GetNbins(int i) const {return fNXBIN[i]*fNYBIN[i]*fNZBIN[i];}
     inline const int GetN() const {return fN;} // total number of histograms (USRBIN records)
 
-    inline std::string GetTITUSB(int i) const { return fTITUSB[i]; }
-    inline int GetIDUSBN(int i) const {return fIDUSBN[i]; }
-    inline int GetNXBIN(int i) const {return fNXBIN[i]; }
-    inline int GetNYBIN(int i) const {return fNYBIN[i]; }
-    inline int GetNZBIN(int i) const {return fNZBIN[i]; }
+    inline std::string GetTITUSB(int ihist) const { return fTITUSB[ihist]; }
+    inline int GetIDUSBN(int ihist) const {return fIDUSBN[ihist]; }
+    inline int GetNXBIN(int ihist) const {return fNXBIN[ihist]; }
+    inline int GetNYBIN(int ihist) const {return fNYBIN[ihist]; }
+    inline int GetNZBIN(int ihist) const {return fNZBIN[ihist]; }
 
-    inline float GetXLOW(int i) const {return fXLOW[i]; }
-    inline float GetYLOW(int i) const {return fYLOW[i]; }
-    inline float GetZLOW(int i) const {return fZLOW[i]; }
+    inline float GetXLOW(int ihist) const {return fXLOW[ihist]; } // retun Xlow of the histogram number 'ihist'
+    // retun Xlow of the bin number 'bin' in the binning number 'ihist'
+    inline float GetXLOW(int ihist, int bin) const {return fXLOW[ihist] + fDXUSBN[ihist]*bin;} 
+    inline float GetYLOW(int ihist) const {return fYLOW[ihist]; }
+    float GetYLOW(int ihist, int bin) const {return fYLOW[ihist] + fDYUSBN[ihist]*bin;} 
+    inline float GetZLOW(int ihist) const {return fZLOW[ihist]; }
+    float GetZLOW(int ihist, int bin) const {return fZLOW[ihist] + fDZUSBN[ihist]*bin;} 
 
-    inline float GetXHIGH(int i) const {return fXHIGH[i]; }
-    inline float GetYHIGH(int i) const {return fYHIGH[i]; }
-    inline float GetZHIGH(int i) const {return fZHIGH[i]; }
+    inline float GetXHIGH(int ihist) const {return fXHIGH[ihist]; }
+    // retun XHIGH of the bin number 'bin' in the binning number 'ihist'
+    float GetXHIGH(int ihist, int bin) const {return GetXLOW(ihist, bin) + fDXUSBN[ihist];}
+    inline float GetYHIGH(int ihist) const {return fYHIGH[ihist]; }
+    inline float GetYHIGH(int ihist, int bin) const {return GetYLOW(ihist, bin) + fDYUSBN[ihist];} 
+    inline float GetZHIGH(int ihist) const {return fZHIGH[ihist]; }
+    inline float GetZHIGH(int ihist, int bin) const {return GetZLOW(ihist, bin) + fDZUSBN[ihist];} 
 
 
     void Print() const;
+    void Print1() const; // for YJL
   };
 }
 

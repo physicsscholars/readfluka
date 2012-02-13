@@ -87,7 +87,7 @@ void UsbSuw::Reset()
 
 bool UsbSuw::Read()
 {
-  std::cout << "UsbSuw::Read()" << std::endl;
+  //  std::cout << "UsbSuw::Read()" << std::endl;
   if (fin->eof()) return false;
 
   int K0 = 0;
@@ -99,9 +99,9 @@ bool UsbSuw::Read()
   //  CheckFormat();
   for (IB=0; IB<10; IB++) {
     //    CheckFormat();
-    std::cout << "start loop IB" << std::endl;
+    //    std::cerr << "start loop IB" << std::endl;
     NB = IB;
-    MB = ReadInt(); std::cout << MB << std::endl;
+    MB = ReadInt(); //std::cerr << MB << std::endl;
     
     char *strtmp = new char[11];
     fin->read(strtmp, 10); strtmp[10] = '\0';
@@ -174,10 +174,10 @@ bool UsbSuw::Read()
   CheckFormat();
   
   if (fLSTATI) { // 'STATISTICS'
-    std::cout << "statistics" << std::endl;
+    //    std::cerr << "statistics" << std::endl;
     fKLAST = 0;
-    std::cout << "IB: " << IB << std::endl;
-    std::cout << "fN: " << fN << std::endl;
+    //    std::cout << "IB: " << IB << std::endl;
+    //    std::cout << "fN: " << fN << std::endl;
     for (int jj = 0; jj < fN; jj++) { // in usbsuw.f IB instead of fN
       NB = fJB[jj];
       K0 = fKLAST+1;
@@ -230,7 +230,6 @@ float UsbSuw::GetError(int i, int x, int y, int z) const
   return fGBSTOR[i][ishift];
 }
 
-
 void UsbSuw::Print() const
 {
   std::cout << std::scientific;// << std::setprecision(4);
@@ -278,5 +277,25 @@ void UsbSuw::Print() const
       if ( (ibin+1)%10 == 0) std::cout << std::endl << '\t';
     }
     std::cout << std::endl;
+  }
+}
+
+void UsbSuw::Print1() const
+{
+  std::cout << std::scientific;// << std::setprecision(4);
+
+  std::cout << "# " << GetRunTitle() << std::endl;
+  std::cout << "# " << GetRunTime() << std::endl;
+  std::cout << "# Averaged over " << GetNBATCH() << " cycles" << std::endl;
+  std::cout << "# Format: x_center y_center z_center value rel_error" << std::endl;
+
+  for (int i=0; i<1; i++) {
+    for (int ibin=0; ibin<GetNbins(i); ibin++) {
+      std::cout << 
+	(GetXHIGH(i,ibin)+GetXLOW(i,ibin))/2.0 << " " <<
+	(GetYHIGH(i,ibin)+GetYLOW(i,ibin))/2.0 << " " <<
+	(GetZHIGH(i,ibin)+GetZLOW(i,ibin))/2.0 << "  " <<
+	fScored[i][ibin] << " " << fGBSTOR[i][ibin]<< std::endl;
+    }
   }
 }
