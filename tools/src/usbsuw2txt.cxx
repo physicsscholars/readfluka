@@ -36,6 +36,7 @@ int main(int argc, const char **argv)
   */
 
   //usbsuw->Read();
+  int i=0;
   while (usbsuw->Read()) {
     if (!strcmp(format, "")) {
       usbsuw->Print();
@@ -47,18 +48,21 @@ int main(int argc, const char **argv)
 	std::cout << "# Averaged over " << usbsuw->GetNBATCH() << " cycles" << std::endl;
 	std::cout << "# Format: x_center y_center z_center value rel_error" << std::endl;
 	
-	for (int i=0; i<1; i++) {
-	  for (int ibin=0; ibin<usbsuw->GetNbins(i); ibin++) {
-	    std::cout << 
-	      (usbsuw->GetXHIGH(i,ibin)+usbsuw->GetXLOW(i,ibin))/2.0 << " " <<
-	      (usbsuw->GetYHIGH(i,ibin)+usbsuw->GetYLOW(i,ibin))/2.0 << " " <<
-	      (usbsuw->GetZHIGH(i,ibin)+usbsuw->GetZLOW(i,ibin))/2.0 << "  " <<
-	      usbsuw->GetScored(i,ibin) << " " << usbsuw->GetError(i, ibin) << std::endl;
+	for (int binx=1; binx<=usbsuw->GetNXBIN(i); binx++) {
+	  for (int biny=1; biny<=usbsuw->GetNYBIN(i); biny++) {
+	    for (int binz=1; binz<=usbsuw->GetNZBIN(i); binz++) {
+	      std::cout << 
+		(usbsuw->GetXHIGH(i,binx)+usbsuw->GetXLOW(i,binx))/2.0 << " " <<
+		(usbsuw->GetYHIGH(i,biny)+usbsuw->GetYLOW(i,biny))/2.0 << " " <<
+		(usbsuw->GetZHIGH(i,binz)+usbsuw->GetZLOW(i,binz))/2.0 << "  " <<
+		usbsuw->GetScored(i,binx,biny,binz) << " " << usbsuw->GetError(i, binx,biny,binz) << std::endl;
+	    }
 	  }
 	}
     } else {
       return help();
     }
+    i++;
   }
   
   delete usbsuw;
