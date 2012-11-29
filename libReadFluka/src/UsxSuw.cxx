@@ -170,6 +170,9 @@ bool UsxSuw::Read()
   CheckFormat();
   std::cerr << "->STAT FLAG READ, " << fNRecords << " records found" << std::endl;
 
+  
+  int nebxbn = 0; // line 654
+  int igmusx = 0;
   for (record=0; record<fNRecords; record++) {
     //NX = record;
     //  MX = 0; //!!! check this !!! - total number of detectors?
@@ -178,16 +181,18 @@ bool UsxSuw::Read()
     //    float t1 = ReadFloat();
     //float t2 = ReadFloat();
     std::cerr << std::endl;
-    fTotResp.push_back(ReadFloat()); std::cerr << "total responce: " << fTotResp[record] << std::endl;
+    std::cerr << "RECORD # " << record << std::endl;
+    fTotResp.push_back(ReadFloat());    std::cerr << "total responce: " << fTotResp[record] << std::endl;
     fTotRespErr.push_back(ReadFloat()); std::cerr << "total responce error: " << fTotRespErr[record] << std::endl;
     
-    //    for (int i=0; i<1; i++)      std::cout << ReadInt() << std::endl;
-    
-    /*    if (record==2) {
-	  PrintFloat(1);
-	  }*/
-    
-    CheckFormat();
+    if (igmusx==0) CheckFormat("igmusx=0", true);
+    else {
+      PrintFloat(259);
+      CheckFormat("after reading neutron errors", true);
+      PrintFloat(2);
+      CheckFormat();
+    }
+    std::cout << "here45" << std::endl;
     
     /*    if (record==2) {
 	  PrintFloat(2);
@@ -195,10 +200,10 @@ bool UsxSuw::Read()
 	  CheckFormat();
 	  }*/
     
-    int nebxbn = ReadInt(); // line 654
-    int igmusx = ReadInt();
+    nebxbn = ReadInt(); // line 654
+    igmusx = ReadInt();
     
-    std::cerr << "nebxbn: " << nebxbn << "\tigmusx: " << igmusx << std::endl;
+    std::cerr << "nebxbn: " << nebxbn << " (?number of user bins?)\tigmusx: " << igmusx << " (number of low energy neutron bins)" << std::endl;
     
     std::cerr << "ebxlow: old=" << fEBXLOW[record] << std::endl;
     PrintFloat(1);
@@ -259,6 +264,7 @@ bool UsxSuw::Read()
       CheckFormat();
     }
     fGBSTOR.push_back(vtmp); // in any case we need to push_back even an empty vector in order not to break the addressing
+    std::cout << "loop end" << std::endl;
   }
 
 

@@ -77,6 +77,7 @@ namespace ReadFluka {
     int  SizeStart();
     bool SizeEnd(bool doExit=true);
     bool CheckFormat(bool doExit=true);
+    bool CheckFormat(const char *message, bool doExit);
 
     bool ReadStatFlag(bool doExit=true);
     void Error(const char *msg) const;

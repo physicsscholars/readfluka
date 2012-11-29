@@ -250,6 +250,12 @@ bool Base::SizeEnd(bool doExit)
   return true;
 }
 
+bool Base::CheckFormat(const char *message, bool doExit)
+{
+  std::cout << "Base::CheckFormat:\t" << message << std::endl;
+  return CheckFormat(doExit); 
+}
+
 bool Base::CheckFormat(bool doExit)
 {
   //std::cerr << "Base::CheckFormat" << std::endl;
