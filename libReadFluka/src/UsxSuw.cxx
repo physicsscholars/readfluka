@@ -165,10 +165,10 @@ bool UsxSuw::Read()
     record++;
   }
 
-  CheckFormat();
 
   fNRecords = record+1;
-  //  std::cerr << "->STAT FLAG READ, " << fNRecords << " records found" << std::endl;
+  CheckFormat();
+  std::cerr << "->STAT FLAG READ, " << fNRecords << " records found" << std::endl;
 
   for (record=0; record<fNRecords; record++) {
     //NX = record;
@@ -180,27 +180,29 @@ bool UsxSuw::Read()
     std::cerr << std::endl;
     fTotResp.push_back(ReadFloat()); std::cerr << "total responce: " << fTotResp[record] << std::endl;
     fTotRespErr.push_back(ReadFloat()); std::cerr << "total responce error: " << fTotRespErr[record] << std::endl;
-
+    
+    //    for (int i=0; i<1; i++)      std::cout << ReadInt() << std::endl;
+    
     /*    if (record==2) {
-      PrintFloat(1);
-      }*/
-
+	  PrintFloat(1);
+	  }*/
+    
     CheckFormat();
-
+    
     /*    if (record==2) {
-      PrintFloat(2);
-      //      PrintInt(2);
-      CheckFormat();
-      }*/
-
+	  PrintFloat(2);
+	  //      PrintInt(2);
+	  CheckFormat();
+	  }*/
+    
     int nebxbn = ReadInt(); // line 654
     int igmusx = ReadInt();
-
+    
     std::cerr << "nebxbn: " << nebxbn << "\tigmusx: " << igmusx << std::endl;
-
+    
     std::cerr << "ebxlow: old=" << fEBXLOW[record] << std::endl;
     PrintFloat(1);
-
+    
     //    std::cerr << "epgmax (energy boundaries):\t";
     vtmp.clear();
     for (int ii=0; ii<nebxbn+igmusx+1; ii++) {
