@@ -8,17 +8,23 @@ ROOT_UsxSuw::ROOT_UsxSuw(const char *fname) : UsxSuw(fname)
 
 }
 
-TString ROOT_UsxSuw::GetBinTitle() const
+TString ROOT_UsxSuw::GetBinTitle(UInt_t i) const
 {
-  TString str = "";//UsxSuw::GetBinTitle();
-  /*  str.ReplaceAll("<->", "#leftrightarrow");
+  TString str = UsxSuw::GetBinTitle(i);
+  str.ReplaceAll("<->", "#leftrightarrow");
   str.ReplaceAll("->", "#rightarrow");
-  str = str + ";" + GetXtitle() + ";" + GetYtitle();*/
+  str = str + ";" + GetXtitle(i) + ";" + GetYtitle(i);
   return str;
 }
 
-TH2F *ROOT_UsxSuw::Histogram() const
+TH2F *ROOT_UsxSuw::Histogram(UInt_t i) const
 {
+  const char *hname = GetBinName(i).data();
+  const char *htitle = Form("%s", GetBinTitle(i).Data());
+  std::cout << hname << " " << htitle << std::endl;
+  std::cout << GetNEbinsTotal(i) << " " << GetNbinsA(i) << std::endl;
+
+
   /*  Float_t emin = GetEmin();
   Float_t emax = GetEmax();
   if (IsLogE()) {

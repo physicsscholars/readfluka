@@ -17,8 +17,8 @@ namespace ReadFluka {
   public:
     ROOT_UsxSuw(const char *fname);
 
-    TString GetBinTitle() const;
-    TH2F *Histogram() const;
+    TString GetBinTitle(UInt_t i) const;
+    TH2F *Histogram(UInt_t i) const;
   };
 }
 #endif
