@@ -50,8 +50,8 @@ namespace ReadFluka {
     std::vector< std::vector<float> > fEPGMAX; // energy boundaries for each distribution
 
     //    std::vector<int> fNScored; // number of scored values (INTERV*fNABXBN)
-    std::vector< std::vector<float> > fGDSTOR; // array with flux (Part/GeV/cmq/pr)
-    std::vector< std::vector<float> > fGBSTOR; // arrary with flux errors
+    std::vector< std::vector<float> > fGDSTOR; // array with flux (Part/GeV/cmq/pr) [see also fFlux]
+    std::vector< std::vector<float> > fGBSTOR; // arrary with flux errors [see also fFluxError]
 
     std::vector<float> fTOTTOT; // total responce not normalized by GeV and sr. See also UsxSuw::GetTotalResponce(unsigned int) const
     std::vector<float> fTOTERR; // relative error of the total responce

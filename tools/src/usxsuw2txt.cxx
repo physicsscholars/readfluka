@@ -14,11 +14,8 @@ int main(int argc, const char **argv)
   cout << "Total primaries run:\t" << usxsuw->GetEntryNumber() << endl;
   cout << "Total weight of the primaries run:\t" << usxsuw->GetWeight() << endl;
 
-  int i=0;
   usxsuw->Read();
   usxsuw->Print();
-  i++;
-  
 
   delete usxsuw;
   

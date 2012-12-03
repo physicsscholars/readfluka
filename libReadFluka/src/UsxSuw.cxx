@@ -159,7 +159,7 @@ bool UsxSuw::Read()
 
     //    Print(record);
 
-    if (ReadStatFlag(false) == true) {
+    if (ReadStatFlag(false) == true) { // line 545 un usxsuw.f
       break;
     }
     record++;
@@ -171,7 +171,7 @@ bool UsxSuw::Read()
   std::cerr << "->STAT FLAG READ, " << fNRecords << " records found" << std::endl;
 
   
-  int nebxbn = 0; // line 654
+  int nebxbn = 0; // line 654?
   int igmusx = 0;
   for (record=0; record<fNRecords; record++) {
     //NX = record;
@@ -182,9 +182,13 @@ bool UsxSuw::Read()
     //float t2 = ReadFloat();
     std::cerr << std::endl;
     std::cerr << "RECORD # " << record << std::endl;
+    if (record==fNRecords-1) {
+      PrintFloat(1);   CheckFormat();
+    }
+    // line 595
     fTotResp.push_back(ReadFloat());    std::cerr << "total responce: " << fTotResp[record] << std::endl;
     fTotRespErr.push_back(ReadFloat()); std::cerr << "total responce error: " << fTotRespErr[record] << std::endl;
-    
+
     if (igmusx==0) CheckFormat("igmusx=0", true);
     else {
       PrintFloat(259);
@@ -206,7 +210,7 @@ bool UsxSuw::Read()
     std::cerr << "nebxbn: " << nebxbn << " (?number of user bins?)\tigmusx: " << igmusx << " (number of low energy neutron bins)" << std::endl;
     
     std::cerr << "ebxlow: old=" << fEBXLOW[record] << std::endl;
-    PrintFloat(1);
+    std::cerr << "ebxlow: new=" << ReadFloat() << std::endl;
     
     //    std::cerr << "epgmax (energy boundaries):\t";
     vtmp.clear();
@@ -215,13 +219,13 @@ bool UsxSuw::Read()
       //      if ((ii+2) % 10 == 0) std::cerr << std::endl;
     }
     //    std::cerr << std::endl;
-    fEPGMAX.push_back(vtmp);
+    fEPGMAX.push_back(vtmp); // line 654
 
     CheckFormat();
 
 
     vtmp.clear();
-    for (unsigned int ii=0; ii<GetNbinsE(record) + fIGMUSX[record]; ii++) { // flux
+    for (unsigned int ii=0; ii<GetNbinsE(record) + fIGMUSX[record]; ii++) { // flux  line 732
       vtmp.push_back(ReadFloat());
     }
     // FLUKA writes the array in a reverse way, so we reverse it again:
@@ -231,7 +235,7 @@ bool UsxSuw::Read()
     CheckFormat();
 
     vtmp.clear();
-    for (unsigned int ii=0; ii<GetNbinsE(record) + fIGMUSX[record]; ii++) { // flux error
+    for (unsigned int ii=0; ii<GetNbinsE(record) + fIGMUSX[record]; ii++) { // flux error line 734
       vtmp.push_back(ReadFloat());
     }
     //std::reverse(vtmp.begin(), vtmp.end());
