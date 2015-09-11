@@ -1,0 +1,90 @@
+### Description ###
+The goal of this project is to provide a **friendly object-oriented interface** for reading the FLUKA binary output produced by different estimators and (if necessary) convert it in a **ROOT** file or any other format. For instance, using this library one can easily read the **USRBIN** output and draw the resulting histogram with any external tool like ROOT or Gnuplot.
+
+Note that the code is full of bugs, limitations and not-yet-supported features... but sometimes it works.
+
+
+### Implemented converters ###
+  * EVENTDAT (see tools/**eventdat2root** and tools/**eventdat2txt**)
+  * MGDRAW standard output (collision tape, see tools/**mgdraw2txt**)
+  * RESNUCLEI (see tools/**resnuclei2root** and tools/**resnuclei2txt** as well as tools/**usrsuw2txt** and tools/**usrsuw2root**)
+  * USRBDX (see tools/**usrbdx2root** and tools/**usrbdx2txt**). Low energy neutron data is not supported in tools/usrbdx2root.
+  * USRBIN (see tools/**usrbin2root** and tools/**usrbin2txt** as well as tools/**usbsuw2txt** and tools/**usbsuw2root**), only Cartesian binning is currently supported.
+  * USRTRACK (there is no tools/usrtrack2txt or tools/usrtrack2root, but tools/**ustsuw2txt** and tools/**ustsuw2root** should be used)
+In principle, using the methods of the base class `ReadFluka::Base` one can easily develop converters for all the other FLUKA estimators. I have not done it yet just because it was not necessary for me.
+
+There is also a Python script **fluka2root**, which scans the FLUKA input file and converts the output of all supported estimators in a single ROOT file:
+```
+   fluka2root input_file.inp
+```
+Note:
+  * Only fixed input format is supported by fluka2root
+  * There is one important bug in the script: it sums up the corresponding USRBIN histograms from different runs, but not averages them. This is due to the fact that the ROOT's hadd tool does not take into account TH1::kAverage bit, and I do not feel like I want to implement it by myself... Hopefully it will be fixed in one of the next ROOT versions.
+
+### Installation ###
+Most of the code of is platform independent, but the makefiles and the scripts are currently optimised for a linux-like system, otherwise you will need to modify them according to your OS.
+
+The project currently contains two libraries, a set of tools and several examples.
+
+The base library is `libReadFluka` and it provides the base interface to read the FLUKA binary output by means of the classes defined in the namespace called `ReadFluka` (see files without ROOT prefix in `libReadFluka/src/`). It is possible to use this library independently, without any other `ReadFluka` tools, and in this case you do not need ROOT in order to build it.
+
+Another library, `libReadFlukaROOT`, provides an interface to read the binary output (by means of libReadFluka) and convert it in a ROOT file (see files with ROOT prefix in `libReadFluka/src/`). In order to build this library you will need to have [ROOT](http://root.cern.ch) installed with correctly defined environment variable `ROOTSYS`.
+
+Installation is easy:
+  1. Get the source code. You can either checkout the latest version with Subversion:
+```
+   svn checkout http://readfluka.googlecode.com/svn/trunk/ readfluka
+```
+> > or download a tarball from the [Downloads](http://code.google.com/p/readfluka/downloads/list) section with less recent but a bit more stable code. In this case you need to uncompress the file:
+```
+   tar jxf readfluka.120216.tar.bz2
+```
+  1. Evaluate env.sh (later you might want to put it in the end of your ~/.bash\_profile):
+```
+   cd readfluka
+   source env.sh
+```
+> > In case you are using another shell just make the corresponding modifications in env.sh
+  1. Build the library and the readers (see folder 'tools'). You might want to choose one of the following options:
+    * Default installation (ROOT+binary):
+```
+   make
+```
+> > Use it to build all libraries and converters
+    * Non-ROOT (binary) installation:
+```
+   make binary
+```
+> > Use it in order to build `libReadFluka` and `*2txt` converters only.
+    * ROOT installation:
+```
+   make root
+```
+> > Use it in order to build `libReadFlukaROOT` and `*2root` converters only.
+That's it!
+
+### Usage ###
+  * Use the binaries from the **tools** folder to convert the FLUKA binary output in the ROOT or ASCII text files. E.g.:
+```
+  usrbin2root example001_usrbin example001.root
+```
+
+> saves all the histograms produced by the USRBIN estimators in `example001.root`
+  * Explore the source code of converters and implement more sophisticated tools depending on your needs.
+
+### Miscellaneous tools ###
+Here are some useful tools not directly related to the main goal of the project:
+  * tools/src/pyfluka.py - a Python-based approach to the FLUKA input files and geometry description. EXAMPLE: run [examples/pyfluka/example.py](http://code.google.com/p/readfluka/source/browse/trunk/examples/pyfluka/example.py) to generate an input file. UPDATE: There is a much-much more conveniend input file generator, which allows to use Geant4-style geometry description: https://github.com/SAnsell/CombLayer However, it is mostly set up for MCNPX-like input file generation, so it needs some mior modifications to generate input files for FLUKA.
+  * tools/src/avtime.py - a Python script to plot the distribution of average time needed to follow a primary particle based on the .out files generated by several FLUKA runs.
+
+### Important note ###
+Though I am trying to find all the possible bugs, I do know that there are yet plenty of them, so please check carefully the output of the converter you are going to use.
+
+Any questions, comments or feature requests are welcome!
+
+### Contacts ###
+E-mail: `readfluka [at] lizardie.com`
+---
+<a href='Hidden comment: 
+<wiki:gadget url="http://www.ohloh.net/p/118746/widgets/project_basic_stats.xml" height="220" border="0"/><wiki:gadget url="http://www.ohloh.net/p/118746/widgets/project_factoids.xml" width="350" border="0"/>
+'></a>
